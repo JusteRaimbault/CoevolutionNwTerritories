@@ -1,0 +1,508 @@
+
+;; indicators
+
+
+
+
+
+to indicators:compute-indicators
+  output-print (word "population-hierarchies = " population-hierarchies)
+  output-print (word "population-entropies = " population-entropies)
+  output-print (word "population-summaries = " population-summaries)
+  output-print (word "closeness-hierarchies = " closeness-hierarchies)
+  output-print (word "closeness-entropies = " closeness-entropies)
+  output-print (word "closeness-summaries = " closeness-summaries)
+  output-print (word "accessibility-hierarchies = " accessibility-hierarchies)
+  output-print (word "accessibility-entropies = " accessibility-entropies)
+  output-print (word "accessibility-summaries = " accessibility-summaries) 
+  output-print (word "lagged pop clos = " lagged-corrs "city-population" "city-closeness-centrality" 6 0) 
+  output-print (word "lagged pop acc = " lagged-corrs "city-population" "city-accessibility" 6 0) 
+  output-print (word "lagged clos acc = " lagged-corrs "city-closeness-centrality" "city-accessibility" 6 0)  
+  output-print (word "dist pop clos = " distance-correlation "city-population" "city-closeness-centrality")  
+  output-print (word "dist pop acc = " distance-correlation "city-population" "city-accessibility")  
+  output-print (word "dist clos acc = " distance-correlation "city-closeness-centrality" "city-accessibility")  
+  output-print (word "rank pop = " rank-correlation "city-population")  
+  output-print (word "rank clos = " rank-correlation "city-closeness-centrality")  
+  output-print (word "rank acc = " rank-correlation "city-accessibility")  
+  output-print (word "div pop = " trajectories-diversity "city-population")  
+  output-print (word "div clos = " trajectories-diversity "city-closeness-centrality")  
+  output-print (word "div acc = " trajectories-diversity "city-accessibility")
+  output-print (word "complexity pop = " trajectories-complexity "city-population")  
+  output-print (word "complexity clos = " trajectories-complexity "city-closeness-centrality")  
+  output-print (word "complexity acc = " trajectories-complexity "city-accessibility")  
+end
+
+
+
+
+to indicators:update-indicators
+  let current-time ticks
+  foreach indicator-sample-cities [
+     ask ? [
+       table:put city-values-table (list current-time "city-population" index) city-population
+       table:put city-values-table (list current-time "city-closeness-centrality" index) city-closeness-centrality
+       table:put city-values-table (list current-time "city-accessibility" index) city-accessibility
+     ]
+  ]
+end
+
+
+
+;;
+; lagged correlation, between two vars, already
+;  assumed var stored
+to-report lagged-correlation [var1 var2 tau t0]
+  let current-time ticks
+  let x [] let y [] let firstvar var1 let secvar var2
+  if tau > 0 [set firstvar var2 set secvar var1]
+  let t (tau + 1 + t0)
+  repeat (current-time - tau - 1 - t0) [
+    foreach indicator-sample-cities [ask ? [
+       set x lput ((table:get city-values-table (list t firstvar [index] of ?)) - (table:get city-values-table (list (t - 1) firstvar [index] of ?))) x
+       set y lput ((table:get city-values-table (list (t - tau) secvar [index] of ?)) - (table:get city-values-table (list (t - tau - 1) secvar [index] of ?))) y
+    ]]
+    set t t + 1
+  ]
+  let mx mean x set x map [? - mx] x let my mean y set y map [? - my] y
+  let sx standard-deviation x let sy standard-deviation y
+  if sx = 0 or sy = 0 [report 0]
+  report mean (list-times-element-wise x y) / (sx * sy)
+end
+
+
+;;
+; set of lagged corrs for a given pair of vars
+to-report lagged-corrs [var1 var2 abstaumax t0]
+  ; get var values
+  let res []
+  let tau (- abstaumax)
+  repeat abstaumax + 1 [
+    set res lput (lagged-correlation var2 var1 (abs tau) t0) res
+    set tau tau + 1
+  ]
+  repeat abstaumax [
+    set res lput (lagged-correlation var1 var2 tau t0) res
+    set tau tau + 1
+  ]
+  report res
+end
+
+
+
+;;
+; specific way to get max/min lagged corrs (used in rough PSE)
+to-report lagged-cor-minmax [var1 var2 abstaumax tau-pos?]
+  let lc lagged-corrs var1 var2 abstaumax 0
+  ifelse tau-pos? = true [
+    let clc sublist lc (abstaumax + 1) (length lc)
+    ifelse mean clc > 0 [report max clc][report min clc]
+  ][
+    let clc sublist lc 0 abstaumax ifelse mean clc > 0 [report max clc][report min clc]
+  ]
+end
+
+
+;;
+; Specific way to get max/min lagged corrs (used in PSE algo)
+;  relative to rho0, given the following rules :
+;  
+;
+; @param var1 variable1
+; @param var2 variable2
+; @param asbtaumax maximal absolute lag
+; @param tau-pos? get correlation max for tau>0 or tau<0
+to-report lagged-cor-minmax-rel [var1 var2 abstaumax tau-pos?]
+  let lc lagged-corrs var1 var2 abstaumax 0
+  let rho0 item abstaumax lc let clc []
+  ifelse tau-pos? = true [
+    set clc map [? - rho0] (sublist lc (abstaumax + 1) (length lc))    
+  ][
+    set clc map [? - rho0] (sublist lc 0 abstaumax)
+  ]
+  let rhominus min clc let rhoplus max clc
+  
+  ; all corrs smaller than rh0
+  if rhoplus = 0 [
+    ;if the absolute value of the actual corr is larger than rho0, significant
+    ifelse abs (rhominus + rho0) > abs rho0 [
+      report rhominus
+    ][ ; otherwise not
+      report 0
+    ]
+  ]
+  
+  ; all corrs larger than rho0
+  if rhominus = 0 [
+    ; absolute value larger than rho0
+    ifelse abs (rhoplus + rho0) > abs rho0 [
+      report rhoplus
+    ][
+      report 0
+    ]
+  ]
+  
+  ; if fluctuates around rho0
+  
+  ; max and min are smaller in absolute than rho0 : not significant
+  if abs (rhoplus + rho0) < abs rho0 and abs (rhominus + rho0) < abs rho0 [report 0]
+  
+  ; min in absolute is larger
+  if abs (rhoplus + rho0) < abs rho0 and abs (rhominus + rho0) > abs rho0 [report rhominus]
+  
+  ; max in absolute is larger
+  if abs (rhoplus + rho0) > abs rho0 and abs (rhominus + rho0) < abs rho0 [report rhoplus]
+  
+  ; both are, take the largest in absolute
+  if abs (rhoplus + rho0) > abs rho0 and abs (rhominus + rho0) > abs rho0 [
+    ifelse abs (rhoplus + rho0) > abs (rhominus + rho0) [report rhoplus][report rhominus]
+  ]
+  
+end
+
+
+;;
+; in space
+
+;;
+; correlation between two vars
+to-report correlation [var1 var2 time]
+  let x [] let y []
+  foreach indicator-sample-cities [
+    ask ? [
+      set x lput (table:get city-values-table (list time var1 [index] of ?)) x
+      set y lput (table:get city-values-table (list time var2 [index] of ?)) y
+    ]
+  ]
+  let mx mean x set x map [? - mx] x let my mean y set y map [? - my] y
+  let sx standard-deviation x let sy standard-deviation y
+  if sx = 0 or sy = 0 [report 0]
+  report mean (list-times-element-wise x y) / (sx * sy)
+end
+
+
+;;
+; report correlation between cities in each euclidian distance bin
+to-report distance-correlation [var1 var2]
+  let dist-deciles quantile (remove 0 (concatenate matrix:to-row-list (table:get distance-matrices (first dates)))) (seq 0.1 1.0 0.1)
+  ; for each bin, set provisory sampling cities ? DOES not work as all couples will be sampled -> must construct the vector by hand
+  let res [] let i 0
+  foreach dist-deciles [
+    ; lets do that degueulassly with ask-ask...
+    let prev-dec 0
+    if i != 0 [set prev-dec item (i - 1) dist-deciles] let current-dec ?
+    let x [] let y []
+    ask cities [ask (other cities) with [distance myself > prev-dec and distance myself <= current-dec] [
+       foreach seq 1 final-time-step 1 [let t ?
+         set x lput ((table:get city-values-table (list t var1 index)) - (table:get city-values-table (list (t - 1) var1 index))) x
+         set y lput ((table:get city-values-table (list t var2 [index] of myself)) - (table:get city-values-table (list (t - 1) var2 [index] of myself))) y
+       ]
+    ]]
+    let mx mean x set x map [? - mx] x let my mean y set y map [? - my] y
+    let sx standard-deviation x let sy standard-deviation y
+    ifelse sx = 0 or sy = 0 [set res lput 0 res][set res lput (mean (list-times-element-wise x y) / (sx * sy)) res]
+    set i i + 1
+  ]
+  report res
+end
+
+
+
+;;
+;  rank correlation for a given variable
+to-report rank-correlation [var]
+  let xf [] let x0 [] foreach indicator-sample-cities [ask ? [set xf lput (table:get city-values-table (list final-time-step var index)) xf set x0 lput (table:get city-values-table (list 0 var index)) x0]]
+  let sortedxf sort xf let sortedx0 sort x0
+  let rf [] let r0 []
+  foreach indicator-sample-cities [ask ? [
+      ; dirty : must not have similar values : ok, no zeroes.
+      set rf lput (position (table:get city-values-table (list final-time-step var index)) sortedxf) rf
+      set r0 lput (position (table:get city-values-table (list 0 var index)) sortedx0) r0
+  ]]
+  let m0 mean r0 set r0 map [? - m0] r0 let mf mean rf set rf map [? - mf] rf
+  let sigma0 standard-deviation r0 let sigmaf standard-deviation rf
+  if sigma0 = 0 or sigmaf = 0 [report 0] ; no NA, replace by 0
+  report mean (list-times-element-wise r0 rf) / (sigma0 * sigmaf)
+end
+
+
+
+;;
+; trajectories "diversity" for a given variable
+to-report normalized-trajectories [var]
+  ; store normalized trajs in table
+  let trajectories table:make
+  ask cities [
+    let traj []
+    foreach seq 0 final-time-step 1 [set traj lput (table:get city-values-table (list ? var index)) traj]
+    let ma max traj let mi min traj ifelse (ma - mi) != 0 [table:put trajectories index (map [(? - mi) / (ma - mi)] traj)][table:put trajectories index rep 0 (length traj)]
+  ]
+  report trajectories
+end
+
+to-report trajectories-diversity [var]
+  let trajectories normalized-trajectories var
+  let res 0
+  ask cities [
+    ask other cities [
+      let diff (map - (table:get trajectories index) (table:get trajectories [index] of myself))
+      set res res + (sqrt (sum (map * diff diff)))]
+  ]
+  report res / (count cities * (count cities - 1) * (final-time-step + 1))
+end
+
+
+;;
+; trajectories "complexity"
+; in terms of number of inflexion points
+to-report trajectories-complexity [var]
+  let trajectories normalized-trajectories var
+  let res 0
+  ask cities [
+    let traj table:get trajectories index
+    let prev-sign 0 if item 1 traj != item 0 traj [set prev-sign (item 1 traj - item 0 traj) / abs  (item 1 traj - item 0 traj)]
+    foreach seq 2 final-time-step 1 [ let t ?
+      let current-sign 0 if item t traj != item (t - 1) traj [set current-sign (item t traj - item (t - 1) traj) / abs  (item t traj - item (t - 1) traj)]
+      if prev-sign != current-sign [set res res + 1]
+    ]
+  ]
+  report res / (count cities * (final-time-step + 1))
+end
+
+
+;;
+; hierarchy in the system
+to-report rank-size-hierarchy [x]
+  if max x = 0 and min x = 0 [report [0 0]]
+  let sol matrix:regress matrix:from-column-list (list (map [log ? 10] sort-by [?1 >= ?2] x) (map [log ? 10] seq 1 length x 1))
+  report (list (last first sol) (first last sol))
+end
+
+;;
+; entropy assuming that x > 0
+to-report entropy [x]
+  let xtot sum x
+  if xtot = 0 [report 0]
+  report (- 1 / (ln length x) * sum (map [? / xtot * ln (? / xtot)] x))
+end
+
+
+to-report summary [x]
+  report (list mean x median x standard-deviation x)
+end
+
+
+;;
+; hierarchy of pop at time t, suppose trajectories already realized
+to-report population-hierarchy [t]
+  let pops matrix:get-column populations t
+  report rank-size-hierarchy pops
+end
+
+to-report population-entropy [t]
+  let pops matrix:get-column populations t
+  report entropy pops
+end
+
+to-report population-summary [t]
+  let pops matrix:get-column populations t
+  report summary pops
+end
+
+
+to-report population-hierarchies
+  let res []
+  foreach seq 0 final-time-step indicator-sampling-time-step [
+    set res lput population-hierarchy ? res
+  ]
+  report concatenate res
+end
+
+to-report population-entropies
+  let res []
+  foreach seq 0 final-time-step indicator-sampling-time-step [
+    set res lput population-entropy ? res
+  ]
+  report res
+end
+
+
+;;
+; summary stats for populations
+to-report population-summaries
+  let res []
+  foreach seq 0 final-time-step indicator-sampling-time-step [
+    set res lput population-summary ? res
+  ]
+  report concatenate res
+end
+
+
+;;
+; hierarchy of closeness at time t
+to-report closeness-hierarchy [t]
+  let cl [] foreach indicator-sample-cities [ask ? [set cl lput (table:get city-values-table (list t "city-closeness-centrality" index)) cl]]
+  report rank-size-hierarchy cl
+end
+
+;;
+; entropy of closeness at time t
+to-report closeness-entropy [t]
+  let cl [] foreach indicator-sample-cities [ask ? [set cl lput (table:get city-values-table (list t "city-closeness-centrality" index)) cl]]
+  report entropy cl
+end
+
+to-report closeness-summary [t]
+  let cl [] foreach indicator-sample-cities [ask ? [set cl lput (table:get city-values-table (list t "city-closeness-centrality" index)) cl]]
+  report summary cl
+end
+
+to-report closeness-hierarchies
+  let res []
+  foreach seq 0 final-time-step indicator-sampling-time-step [
+    set res lput closeness-hierarchy ? res
+  ]
+  report concatenate res
+end
+
+to-report closeness-entropies
+  let res []
+  foreach seq 0 final-time-step indicator-sampling-time-step [
+    set res lput closeness-entropy ? res
+  ]
+  report res
+end
+
+to-report closeness-summaries
+  let res []
+  foreach seq 0 final-time-step indicator-sampling-time-step [
+    set res lput closeness-summary ? res
+  ]
+  report concatenate res
+end
+
+
+to-report accessibility-hierarchy [t]
+  let cl [] foreach indicator-sample-cities [ask ? [set cl lput (table:get city-values-table (list t "city-accessibility" index)) cl]]
+  report rank-size-hierarchy cl
+end
+
+to-report accessibility-entropy [t]
+  let cl [] foreach indicator-sample-cities [ask ? [set cl lput (table:get city-values-table (list t "city-accessibility" index)) cl]]
+  report entropy cl
+end
+
+to-report accessibility-summary [t]
+  let cl [] foreach indicator-sample-cities [ask ? [set cl lput (table:get city-values-table (list t "city-accessibility" index)) cl]]
+  report summary cl
+end
+
+to-report accessibility-hierarchies
+  let res []
+  foreach seq 0 final-time-step indicator-sampling-time-step [
+    set res lput accessibility-hierarchy ? res
+  ]
+  report concatenate res
+end
+
+to-report accessibility-entropies
+  let res []
+  foreach seq 0 final-time-step indicator-sampling-time-step [
+    set res lput accessibility-entropy ? res
+  ]
+  report res
+end
+
+to-report accessibility-summaries
+  let res []
+  foreach seq 0 final-time-step indicator-sampling-time-step [
+    set res lput accessibility-summary ? res
+  ]
+  report concatenate res
+end
+
+
+
+
+
+;;
+;  Fit indicators for real situation
+
+;;
+; log of total mean square error
+to-report log-mse-population
+ifelse failed? != true [
+  let mse (matrix:map [(?1 - ?2)^ 2] real-populations populations)
+  report ln sum (map sum (matrix:to-row-list mse))
+][report 1e100]
+end
+
+;;
+; mse on log of populations
+to-report mse-log-population
+ifelse failed? != true [
+  let mse (matrix:map [(ln ?1 - ln ?2)^ 2] real-populations populations)
+  report sum (map sum (matrix:to-row-list mse)) 
+][report 1e100]
+end
+
+
+;;
+; log of total mse on distances
+;  note : distances DO NOT follow a power law : no sense to do the mse-log
+to-report log-mse-distance
+  ifelse failed? != true [
+    let tot 0
+    foreach dates [
+       let mse (matrix:map [(?1 - ?2)^ 2] (table:get real-distance-matrices ?) (table:get distance-matrices ?))
+       set tot tot + sum (map sum (matrix:to-row-list mse))
+    ]
+    ifelse tot != 0 [report ln tot][report 0]
+  ][report 1e100]
+end
+
+
+
+
+
+
+;;
+; cities indicators
+;  (better here than in cities file ? -> back to shitty/incompatible netlogo-object archi ...)
+
+
+
+
+;;
+; current mse on past for a city
+;   t <= current time
+to-report city-mse [t]
+  let tt 0
+  ifelse t > ticks [set tt ticks] [set tt t]
+  let d list:minus (sublist population-history 0 (tt + 1)) (sublist expected-population-history 0 (tt + 1))
+  report sum list-times-element-wise d d
+end
+
+; idem
+to-report city-mse-log [t]
+  let tt 0
+  ifelse t > ticks [set tt ticks] [set tt t]
+  let d list:minus (sublist (map [ln ?] population-history) 0 (tt + 1)) (sublist (map [ln ?] expected-population-history) 0 (tt + 1))
+  report sum list-times-element-wise d d
+end
+
+
+
+;;
+; 
+
+
+
+
+
+
+
+;;
+; current date
+to-report current-date
+  report item ticks dates
+end

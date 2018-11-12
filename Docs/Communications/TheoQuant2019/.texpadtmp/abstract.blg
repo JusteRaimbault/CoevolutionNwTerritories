@@ -1,0 +1,46 @@
+This is BibTeX, Version 0.99d (TeX Live 2017)
+Capacity: max_strings=100000, hash_size=100000, hash_prime=85009
+The top-level auxiliary file: /Users/juste/ComplexSystems/CoevolutionNwTerritories/Docs/Communications/TheoQuant2019/.texpadtmp/abstract.aux
+The style file: apalike.bst
+Database file #1: ../biblio.bib
+You've used 5 entries,
+            1935 wiz_defined-function locations,
+            494 strings with 4743 characters,
+and the built_in function-call counts, 1450 in all, are:
+= -- 144
+> -- 35
+< -- 5
++ -- 14
+- -- 10
+* -- 101
+:= -- 278
+add.period$ -- 15
+call.type$ -- 5
+change.case$ -- 28
+chr.to.int$ -- 3
+cite$ -- 5
+duplicate$ -- 64
+empty$ -- 105
+format.name$ -- 15
+if$ -- 270
+int.to.chr$ -- 3
+int.to.str$ -- 0
+missing$ -- 3
+newline$ -- 28
+num.names$ -- 15
+pop$ -- 21
+preamble$ -- 1
+purify$ -- 30
+quote$ -- 0
+skip$ -- 53
+stack$ -- 0
+substring$ -- 87
+swap$ -- 5
+text.length$ -- 0
+text.prefix$ -- 0
+top$ -- 0
+type$ -- 30
+warning$ -- 0
+while$ -- 12
+width$ -- 0
+write$ -- 65

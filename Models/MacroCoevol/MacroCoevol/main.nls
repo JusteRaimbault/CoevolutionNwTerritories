@@ -1,0 +1,45 @@
+
+;;
+; main
+
+
+;;
+; go for the full period
+to go-full-period
+  
+  if headless? = 0 [
+    if ticks > 0 [setup:reset]
+  ]
+  
+  repeat (length matrix:get-row real-populations 0) - 1 [
+    go
+  ]
+
+  if setup-type != "synthetic" [
+    show (word "log mse pop = " log-mse-population)
+    show (word "mse log pop = " mse-log-population)
+    show (word "log mse dist = " log-mse-distance)
+  ]
+  
+end
+
+
+;;
+; go one time step
+to go
+  
+  ; tick done at the beginning, as we start at t=1
+  tick
+  
+  ; evolve populations
+  cities:evolve-populations
+  
+  ; evolve network
+  network:evolve-network
+  
+  indicators:update-indicators
+  
+  ; display
+  update-display
+  
+end
