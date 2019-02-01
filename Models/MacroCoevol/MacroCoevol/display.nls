@@ -86,7 +86,8 @@ to display-plots
     set-current-plot "fit" set-current-plot-pen "default"
     ;let col gradient:scale (list extract-rgb blue extract-rgb red) ticks 0 (length dates)
     let col scale-color red ticks 0 (length dates)
-    set-plot-pen-color (approximate-rgb item 0 col item 1 col item 2 col)
+    ;set-plot-pen-color (approximate-rgb item 0 col item 1 col item 2 col)
+    set-plot-pen-color col
     let sim map ln (sort-by [[?1 ?2] -> ?1 > ?2] (matrix:get-column populations ticks))
     let real map ln (sort-by [[?1 ?2] ->  ?1 > ?2] (matrix:get-column real-populations ticks))
     let i 0 plot-pen-up plotxy first real first sim

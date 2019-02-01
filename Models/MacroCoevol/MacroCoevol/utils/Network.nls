@@ -109,7 +109,7 @@ end
 
 
 
-to connexify-network-link-projection
+to network-utils:connexify-network-link-projection
   nw:set-context turtles paths
   let clusters nw:weak-component-clusters
   let #-new-links length clusters - 1
@@ -143,6 +143,15 @@ to connexify-network-link-projection
     set clusters nw:weak-component-clusters
   ]
   
+end
+
+;;
+; keep giant component for path / nodes only
+to network-utils:keep-giant-component
+  nw:set-context nodes paths
+  let clusters nw:weak-component-clusters
+  let sizes map count clusters let imax list:max-index sizes
+  ask nodes with [not member? self (item imax clusters)][ask my-paths [die] die]
 end
 
 to-report distance-to-point [x y]

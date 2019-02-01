@@ -83,6 +83,7 @@ globals [
   ; network growth
   slime-mould-node-distance
   slime-mould-reinforcment-function
+  slime-mould-link-deletion-proportion
 
   ; network measures
   shortest-paths
@@ -544,10 +545,10 @@ NIL
 10.0
 true
 true
-"if setup-type = \"gis\" [set-current-plot-pen \"sim\" plot [population] of one-of cities with [name = city-traj]]\nif setup-type = \"gis\" [set-current-plot-pen \"real\" plot [population] of one-of cities with [name = city-traj]]" ""
+"if setup-type = \"gis\" [let c one-of cities with [name = city-traj] if c != nobody [set-current-plot-pen \"sim\" plot [population] of c]]\nif setup-type = \"gis\" [let c one-of cities with [name = city-traj] if c != nobody [set-current-plot-pen \"real\" plot [population] of c]]" ""
 PENS
-"sim" 1.0 0 -14070903 true "" "if setup-type = \"gis\" [plot [last population-history] of one-of cities with [name = city-traj]]"
-"real" 1.0 0 -5298144 true "" "if setup-type = \"gis\" [plot [last expected-population-history] of one-of cities with [name = city-traj]]"
+"sim" 1.0 0 -14070903 true "" "if setup-type = \"gis\" [let c one-of cities with [name = city-traj] if c != nobody [plot [last population-history] of c]]"
+"real" 1.0 0 -5298144 true "" "if setup-type = \"gis\" [let c one-of cities with [name = city-traj] if c != nobody [plot [last expected-population-history] of c]]"
 
 INPUTBOX
 919
@@ -624,7 +625,7 @@ final-time-step
 final-time-step
 0
 100
-41.0
+5.0
 1
 1
 NIL
@@ -656,7 +657,7 @@ CHOOSER
 network-type
 network-type
 "virtual" "physical" "real" "fixed"
-0
+1
 
 SLIDER
 6
@@ -682,7 +683,7 @@ network-reinforcment-exponent
 network-reinforcment-exponent
 0
 10
-2.51
+0.39
 0.01
 1
 NIL
@@ -715,7 +716,7 @@ network-reinforcment-gmax
 network-reinforcment-gmax
 0
 0.01
-0.00483
+0.00103
 1e-5
 1
 NIL
@@ -790,13 +791,13 @@ HORIZONTAL
 SLIDER
 9
 422
-263
+283
 455
 physical-network-reinforcment-threshold
 physical-network-reinforcment-threshold
 0
 0.1
-0.0315
+0.0275
 0.0005
 1
 NIL
@@ -810,7 +811,7 @@ CHOOSER
 link-display-var
 link-display-var
 "relative-speed" "flow"
-1
+0
 
 SLIDER
 6
@@ -821,7 +822,7 @@ physical-network-reinforcment-quantile
 physical-network-reinforcment-quantile
 0
 1
-0.3
+0.1
 0.1
 1
 NIL

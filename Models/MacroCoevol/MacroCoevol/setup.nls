@@ -82,8 +82,9 @@ to setup:setup-globals
   
   set indicator-sampling-time-step 5
   
-  set slime-mould-node-distance 20
+  set slime-mould-node-distance 15;20
   set slime-mould-reinforcment-function "full-growth"
+  set slime-mould-link-deletion-proportion 0.2
   
 end
 
@@ -180,57 +181,74 @@ to setup:setup-cities
 end
 
 
-
+;;
+; initial network
 to setup:setup-network
   
   if setup-type = "synthetic" and network-type != "virtual" [
      
-     if physical-network-heuristic = "slime-mould" [
-        foreach seq min-pxcor max-pxcor slime-mould-node-distance [x ->
+     if physical-network-heuristic = "slime-mould" [ setup:initial-network-slime-mould]
+     
+     ;;
+     ; FIXME does not seem to work
+     if physical-network-heuristic = "breakdown" [setup:initial-network-breakdown]
+      
+  ]
+ 
+ 
+  ;;
+  ; use a synthetic slime mould if geopaths are not activated
+  if setup-type = "gis" and network-type = "physical" and geo-paths? = false [
+    ; setup real network
+    if physical-network-heuristic = "slime-mould" [setup:initial-network-slime-mould]
+    
+  ]
+  
+  ;;
+  ; ADDED for geopath nw [FIXME check if no conflict with other networks]
+  ; - too slow
+  ;network-utils:connexify-network-link-projection
+  network-utils:keep-giant-component
+  network:connect-cities
+  
+  ; setup link vars
+  ask paths [new-path]
+  ask paths with [path-length = 0] [die]
+  
+  
+end
+
+
+to setup:initial-network-slime-mould
+  foreach seq min-pxcor max-pxcor slime-mould-node-distance [x ->
            foreach seq min-pycor max-pycor slime-mould-node-distance [ y ->
              create-nodes 1 [setxy x y new-node]
           ]
         ]
         
         ask nodes [create-paths-with (other nodes in-radius (slime-mould-node-distance * sqrt 2)) [new-path]]
-        ask n-of (0.4 * count links) links [die]
+        ask n-of (slime-mould-link-deletion-proportion * count links) links [die]
         planarize-network nodes paths
         ask nodes [ ; jitter
           set xcor (max (list min-pxcor (min (list max-pxcor (xcor - slime-mould-node-distance / 4 + (2 * random (slime-mould-node-distance / 4)))))))
           set ycor (max (list min-pycor (min (list max-pycor (ycor - slime-mould-node-distance / 4 + (2 * random (slime-mould-node-distance / 4)))))))
         ]
         ;ask cities [create-paths-with (other turtles in-radius (slime-mould-node-distance * (sqrt 2) / 2))[new-path]]
-        connexify-network-link-projection
+        network-utils:connexify-network-link-projection
         ;planarize-network turtles paths
-     ]
-     
-     if physical-network-heuristic = "breakdown" [
-        ask cities [let c2 one-of ((other cities) with-min [distance myself]) if not link-neighbor? c2 [create-link-with c2]]
-        connexify-network-link-projection
-    
-        ; optional procedure to create "local" shortcuts
-        local-shortcuts
-    
-        ; planarize
-        planarize-network turtles paths
-    ]
-     
-    ; setup link vars
-    ask paths [new-path]
-    ask paths with [path-length = 0] [die]
-      
-  ]
- 
- 
-  if setup-type = "gis" [
-    ; setup real network
-    
-    
-  ]
-  
-  
 end
 
+
+to setup:initial-network-breakdown
+  ask cities [let c2 one-of ((other cities) with-min [distance myself]) if not link-neighbor? c2 [create-link-with c2]]
+  network-utils:connexify-network-link-projection
+    
+  ; optional procedure to create "local" shortcuts
+  local-shortcuts
+    
+  ; planarize
+  planarize-network turtles paths
+end
 
 
 ;;
