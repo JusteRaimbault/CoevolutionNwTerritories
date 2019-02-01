@@ -80,7 +80,7 @@ end
 ;   trajectories-diversity
 ;   trajectories-complexity
 
-to setup-experiment-synthetic [synth-ranksize nw-threshold nw-gmax physical-nw-rein-quantile final-time grav-weight grav-gamma grav-decay feed-weight feed-gamma feed-decay nw-type seed]
+to setup-experiment-synthetic [synth-ranksize nw-threshold nw-gmax nw-exponent physical-nw-rein-quantile final-time grav-weight grav-gamma grav-decay feed-weight feed-gamma feed-decay nw-type seed]
 
   show (word "exp : " synth-ranksize nw-threshold nw-gmax final-time grav-weight grav-gamma grav-decay feed-weight feed-gamma feed-decay nw-type seed)
   
@@ -94,6 +94,7 @@ to setup-experiment-synthetic [synth-ranksize nw-threshold nw-gmax physical-nw-r
   set synthetic-rank-size-exp synth-ranksize ;1.2
   set network-reinforcment-threshold nw-threshold ;2.0
   set network-reinforcment-gmax nw-gmax ;0.05
+  set network-reinforcment-exponent nw-exponent
   set physical-network-reinforcment-quantile physical-nw-rein-quantile ; 0.1
   set final-time-step final-time
   set gravity-weight grav-weight ; ~ 0.001
@@ -128,7 +129,7 @@ end
 to test-experiment-synthetic
   ca
   ;setup-experiment-synthetic 1.0 3.0 0.01 30 0.0001 1.0 200.0 0.0 1.0 1.0 0 random 10000
-  setup-experiment-synthetic 1.0 3.0 0.01 0.1 30 0.0001 1.0 200.0 0.0 1.0 1.0 1 random 10000
+  setup-experiment-synthetic 1.0 3.0 0.01 2.0 0.1 30 0.0001 1.0 200.0 0.0 1.0 1.0 1 random 10000
   run-experiment
   indicators:compute-indicators
   
