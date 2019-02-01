@@ -21,10 +21,18 @@ end
 to color-patches
   if setup-type = "gis" [
     ;ask patches [set pcolor scale-color brown elevation 0 4000]
-    ask patches with [elevation = -1] [set pcolor white]
-    let gradient-mid 500
-    ask patches with [elevation <= gradient-mid and elevation != -1] [set pcolor gradient:scale (list extract-rgb green extract-rgb brown) elevation 0 gradient-mid]
-    ask patches with [elevation > gradient-mid and elevation != -1] [set pcolor gradient:scale (list extract-rgb brown extract-rgb white) elevation gradient-mid 4000]
+    ask patches [set pcolor scale-color yellow elevation 0 4000]
+    
+    ;ask patches with [elevation = -1] [set pcolor white]
+    ;let gradient-mid 500
+    ;ask patches with [elevation <= gradient-mid and elevation != -1] [
+    ;  set pcolor gradient:scale (list extract-rgb green extract-rgb brown) elevation 0 gradient-mid
+    ;  
+    ;]
+    ;ask patches with [elevation > gradient-mid and elevation != -1] [
+    ;  set pcolor gradient:scale (list extract-rgb brown extract-rgb white) elevation gradient-mid 4000
+   ; 
+    ;]
   ]
 end
 
@@ -38,7 +46,8 @@ to display-cities
   let mi min [color-var] of cities let ma max [color-var] of cities
   ask cities [
     set size (ln population) ;/ 10
-    set color gradient:scale (list extract-rgb blue extract-rgb red) color-var mi ma
+    ;set color gradient:scale (list extract-rgb blue extract-rgb red) color-var mi ma
+    set color scale-color red color-var mi ma
   ]
 end
 
@@ -75,26 +84,28 @@ to display-plots
   ; fit plot
   if setup-type = "gis" [
     set-current-plot "fit" set-current-plot-pen "default"
-    let col gradient:scale (list extract-rgb blue extract-rgb red) ticks 0 (length dates)
+    ;let col gradient:scale (list extract-rgb blue extract-rgb red) ticks 0 (length dates)
+    let col scale-color red ticks 0 (length dates)
     set-plot-pen-color (approximate-rgb item 0 col item 1 col item 2 col)
-    let sim map ln (sort-by [?1 > ?2] (matrix:get-column populations ticks))
-    let real map ln (sort-by [?1 > ?2] (matrix:get-column real-populations ticks))
+    let sim map ln (sort-by [[?1 ?2] -> ?1 > ?2] (matrix:get-column populations ticks))
+    let real map ln (sort-by [[?1 ?2] ->  ?1 > ?2] (matrix:get-column real-populations ticks))
     let i 0 plot-pen-up plotxy first real first sim
     plot-pen-down
-    foreach sim [
+    foreach sim [? ->
        plotxy item i real ? set i i + 1
     ]
   ]
   
   ; rank-size plot
   set-current-plot "rank-size" set-current-plot-pen "default"
-  let col gradient:scale (list extract-rgb blue extract-rgb red) ticks 0 (length dates)
-  set-plot-pen-color (approximate-rgb item 0 col item 1 col item 2 col)
-  let pops map [log ? 10] (sort-by [?1 > ?2] (matrix:get-column populations ticks))
-  let ranks map [log ? 10] (seq 1 count cities 1)
+  ;let col gradient:scale (list extract-rgb blue extract-rgb red) ticks 0 (length dates)
+  let col scale-color red ticks 0 (length dates)
+  set-plot-pen-color col;(approximate-rgb item 0 col item 1 col item 2 col)
+  let pops map [? -> log ? 10] (sort-by [[?1 ?2] -> ?1 > ?2] (matrix:get-column populations ticks))
+  let ranks map [? -> log ? 10] (seq 1 count cities 1)
   let i 0 plot-pen-up plotxy first ranks first pops
     plot-pen-down
-    foreach pops [
+    foreach pops [? ->
        plotxy item i ranks ? set i i + 1
     ]
   

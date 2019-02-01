@@ -33,7 +33,7 @@ end
 to-report norm-p [p l]
   let res 0
   let n length l
-  foreach l [set res res + (? ^ p)]
+  foreach l [? -> set res res + (? ^ p)]
   report (res / n) ^ (1 / p)
 end
 
@@ -78,8 +78,8 @@ end
 ; concatenate a list of lists
 to-report concatenate [lists]
   let res []
-  foreach lists [
-    foreach ? [
+  foreach lists [l ->
+    foreach l [? ->
       set res lput ? res 
     ] 
   ]  
@@ -91,7 +91,7 @@ end
 ; reverse image of a list
 to-report rev [l]
   let res []
-  foreach l [
+  foreach l [? ->
     set res fput ? res
   ]
   report res
@@ -102,8 +102,8 @@ end
 to-report quantile [x q]
   ifelse is-list? q [
     let res [] let sortedx sort x
-    let indexes map [floor (? * (length x))] q
-    foreach indexes [set res lput (item ? sortedx) res]
+    let indexes map [? -> floor (? * (length x))] q
+    foreach indexes [? -> set res lput (item ? sortedx) res]
     report res
   ][
     report item (floor (q * (length x))) (sort x)
@@ -213,7 +213,7 @@ to-report list-times-element-wise [l1 l2]
   let res []
   let i 0
   let shortest [] let longest [] ifelse length l1 < length l2 [set shortest l1 set longest l2][set shortest l2 set longest l1]
-  foreach shortest [
+  foreach shortest [? ->
     set res lput (? * (item i longest)) res
     set i i + 1 
   ]
@@ -223,7 +223,7 @@ end
 
 to-report list:plus [l1 l2]
   let res [] let i 0
-  foreach l1 [
+  foreach l1 [? ->
     set res lput (? + item i l2) res set i i + 1
   ]
   report res
@@ -231,7 +231,7 @@ end
 
 to-report list:minus [l1 l2]
   let res [] let i 0
-  foreach l1 [
+  foreach l1 [? ->
     set res lput (? - item i l2) res set i i + 1
   ]
   report res

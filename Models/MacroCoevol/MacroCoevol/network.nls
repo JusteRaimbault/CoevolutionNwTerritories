@@ -13,7 +13,7 @@ to network:evolve-network
       ;   d_ij (t+1) = d_ij (t) * (1 + g_max * \frac{ (phi_ij/phi_0) ^ \gamma - 1 }{(phi_ij/phi_0) ^ \gamma + 1}
     
       ;set distance-matrix (matrix:times-element-wise distance-matrix (matrix:map [(network-reinforcment-threshold / (? + 1e-7)) ^ network-reinforcment-exponent] gravity-flows)) 
-      set distance-matrix (matrix:times-element-wise distance-matrix (matrix:map [1 + (network-reinforcment-gmax * (1 - (? / network-reinforcment-threshold)^ network-reinforcment-exponent) / (1 + (? / network-reinforcment-threshold)^ network-reinforcment-exponent))] gravity-flows))
+      set distance-matrix (matrix:times-element-wise distance-matrix (matrix:map [? -> 1 + (network-reinforcment-gmax * (1 - (? / network-reinforcment-threshold)^ network-reinforcment-exponent) / (1 + (? / network-reinforcment-threshold)^ network-reinforcment-exponent))] gravity-flows))
     
     ]
   
@@ -149,13 +149,13 @@ to network:cache-nw-measures
       let current-flow matrix:get gravity-flows [index] of c1 [index] of c2
       let current-feedback-flow matrix:get feedback-flows [index] of c1 [index] of c2
       ; compute shortest path
-      let path [] let tpath [] ask c1 [set path nw:weighted-path-to c2 "speed" set tpath nw:turtles-on-weighted-path-to c2 "speed"]
+      let currentpath [] let tpath [] ask c1 [set currentpath nw:weighted-path-to c2 "speed" set tpath nw:turtles-on-weighted-path-to c2 "speed"]
       ; update link betweeness
-      let l 0 foreach path [ask ? [set l l + effective-length set bw-centrality bw-centrality + 1 set flow flow + (current-flow * 2 / (n * (n - 1))) set feedback-flow feedback-flow + (current-feedback-flow * 2 / (n * (n - 1)))]]
+      let l 0 foreach currentpath [? -> ask ? [set l l + effective-length set bw-centrality bw-centrality + 1 set flow flow + (current-flow * 2 / (n * (n - 1))) set feedback-flow feedback-flow + (current-feedback-flow * 2 / (n * (n - 1)))]]
       ; update node betweeness
       ;foreach tpath [ask ? [set city-bw-centrality city-bw-centrality + 1 set city-flow city-flow + (current-flow * 2 / (n * (n - 1)))]]
       ; update shortest path table
-      table:put shortest-paths (list [index] of c1 [index] of c2) path table:put shortest-paths (list [index] of c2 [index] of c1) (rev path)
+      table:put shortest-paths (list [index] of c1 [index] of c2) currentpath table:put shortest-paths (list [index] of c2 [index] of c1) (rev currentpath)
       ; update nw distance table
       table:put nw-distances (list [index] of c1 [index] of c2) l table:put nw-distances (list [index] of c2 [index] of c1) l
       ; update relative speed table

@@ -20,7 +20,7 @@ to cities:evolve-populations
   let n length prev-populations
 
   let diag-pops (matrix:make-diag prev-populations)
-  let diag-pops-gravity matrix:map [ ? ^ gravity-gamma] (matrix:times-scalar diag-pops sum prev-populations) ; ? should be 1 / sum prev-populations -> ok the term simplifies when normalized by mean-pot-gravity
+  let diag-pops-gravity matrix:map [? -> ? ^ gravity-gamma] (matrix:times-scalar diag-pops sum prev-populations) ; ? should be 1 / sum prev-populations -> ok the term simplifies when normalized by mean-pot-gravity
   let pots-gravity matrix:times diag-pops-gravity (matrix:times gravity-weights diag-pops-gravity)
   show sum map sum matrix:to-row-list gravity-weights
   matrix:set-diag-scalar pots-gravity 0
@@ -32,13 +32,13 @@ to cities:evolve-populations
   set gravity-flows matrix:copy pots-gravity
 
   ; update feedback flows
-  let diag-pops-feedback matrix:map [ ? ^ feedback-gamma] diag-pops
+  let diag-pops-feedback matrix:map [? -> ? ^ feedback-gamma] diag-pops
   let pots-feedback-flows matrix:times diag-pops-feedback (matrix:times (matrix:make-constant n n 1) diag-pops-feedback) matrix:set-diag-scalar pots-feedback-flows 0
   set feedback-flows matrix:copy pots-feedback-flows
 
   ; feedbacks -> computation depends on heuristic
   ; lets compute the euclidian by default, quite costless
-  let pots-feedback matrix:times feedback-weights (cities:flatten-pops-feedback (matrix:map [ ? ^ feedback-gamma] (matrix:times (matrix:times diag-pops (matrix:make-constant n n 1)) diag-pops)))
+  let pots-feedback matrix:times feedback-weights (cities:flatten-pops-feedback (matrix:map [? -> ? ^ feedback-gamma] (matrix:times (matrix:times diag-pops (matrix:make-constant n n 1)) diag-pops)))
 
   if network-type = "physical" [
     ; recompute pots-feedbacks on link flows : ! parameter gamma is different : specific var feedback-flow
@@ -62,7 +62,7 @@ to cities:evolve-populations
   let current-populations matrix:plus (matrix:as-column-matrix prev-populations) r
   ;show current-populations
 
-  matrix:set-column populations t map [first ?] matrix:to-row-list current-populations
+  matrix:set-column populations t map [? -> first ?] matrix:to-row-list current-populations
 
 
   ; update agent cities pop
@@ -87,7 +87,7 @@ end
 
 to-report cities:flatten-dists-feedback [m]
   let res [] let i 1
-  foreach but-last matrix:to-row-list m [
+  foreach but-last matrix:to-row-list m [? ->
      set res (concatenate list res (sublist ? i (length ?)))
      set i i + 1
   ]
@@ -107,8 +107,8 @@ end
 
 to cities:update-weights
   ;; weights
-  set gravity-weights matrix:map [exp (- ? / gravity-decay)] distance-matrix
-  set feedback-weights matrix:map [exp (- ? / feedback-decay)] feedback-distance-matrix
+  set gravity-weights matrix:map [? -> exp (- ? / gravity-decay)] distance-matrix
+  set feedback-weights matrix:map [? -> exp (- ? / feedback-decay)] feedback-distance-matrix
 
 end
 
@@ -136,14 +136,14 @@ end
 
 to-report city-closeness-centrality
    let d matrix:get-row distance-matrix index
-   let s 0 let i 0 foreach d [if i != index [set s s + 1 / ?] set i i + 1]
+   let s 0 let i 0 foreach d [? -> if i != index [set s s + 1 / ?] set i i + 1]
    report s / ((length d) - 1)
 end
 
 to-report city-accessibility
   let d matrix:get-row distance-matrix index
   let pops replace-item index (matrix:get-column populations ticks) 0
-  report sum list-times-element-wise pops (map [exp (- ? / gravity-decay)] d)
+  report sum list-times-element-wise pops (map [? -> exp (- ? / gravity-decay)] d)
 end
 
 

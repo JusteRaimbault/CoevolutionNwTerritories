@@ -1,5 +1,4 @@
-
-extensions [gis matrix table gradient nw]
+extensions [gis matrix table nw];gradient
 
 __includes [
 
@@ -169,10 +168,10 @@ paths-own [
 GRAPHICS-WINDOW
 294
 20
-907
-654
-100
-100
+905
+632
+-1
+-1
 3.0
 1
 10
@@ -219,7 +218,7 @@ growth-rate
 growth-rate
 0
 0.05
-2.0E-4
+0.0088
 0.0001
 1
 NIL
@@ -241,7 +240,7 @@ gravity-weight
 gravity-weight
 0
 2e-2
-0.008908
+0.007899
 1e-6
 1
 NIL
@@ -256,7 +255,7 @@ gravity-gamma
 gravity-gamma
 0.5
 5
-0.8
+2.39
 0.01
 1
 NIL
@@ -271,7 +270,7 @@ gravity-decay
 gravity-decay
 1
 500
-311.3
+185.5
 0.1
 1
 NIL
@@ -286,7 +285,7 @@ feedback-weight
 feedback-weight
 0
 0.1
-0
+0.0
 0.001
 1
 NIL
@@ -301,7 +300,7 @@ feedback-gamma
 feedback-gamma
 0
 5
-1
+0.1
 0.1
 1
 NIL
@@ -316,7 +315,7 @@ feedback-decay
 feedback-decay
 0
 200
-1
+0.1
 0.1
 1
 NIL
@@ -373,7 +372,7 @@ BUTTON
 890
 698
 random path
-ask one-of nodes [let p nw:weighted-path-to one-of other nodes \"impedance\" if p != false [foreach p [ask ? [set hidden? false set color red]]]]
+ask one-of nodes [let p nw:weighted-path-to one-of other nodes \"impedance\" if p != false [foreach p [? -> ask ? [set hidden? false set color red]]]]
 NIL
 1
 T
@@ -407,7 +406,7 @@ BUTTON
 890
 734
 random path cities
-ask one-of cities [let c2 one-of other cities let n2 [one-of nodes with-min [distance myself]] of c2 ask one-of nodes with-min [distance myself] [let p nw:weighted-path-to n2 \"impedance\" if p != false [foreach p [ask ? [set hidden? false set color red]]]]]
+ask one-of cities [let c2 one-of other cities let n2 [one-of nodes with-min [distance myself]] of c2 ask one-of nodes with-min [distance myself] [let p nw:weighted-path-to n2 \"impedance\" if p != false [foreach p [? -> ask ? [set hidden? false set color red]]]]]
 NIL
 1
 T
@@ -469,7 +468,7 @@ INPUTBOX
 505
 718
 orig
-0
+0.0
 1
 0
 Number
@@ -480,7 +479,7 @@ INPUTBOX
 557
 718
 dest
-0
+0.0
 1
 0
 Number
@@ -556,7 +555,7 @@ INPUTBOX
 1049
 247
 city-traj
-PARIS
+0
 1
 0
 String
@@ -574,13 +573,13 @@ setup-type
 SLIDER
 1
 70
-110
+138
 103
 synthetic-cities-number
 synthetic-cities-number
 0
 50
-30
+20.0
 1
 1
 NIL
@@ -595,22 +594,22 @@ synthetic-max-pop
 synthetic-max-pop
 0
 100000
-100000
+66000.0
 1000
 1
 NIL
 HORIZONTAL
 
 SLIDER
-111
+137
 70
-266
+292
 103
 synthetic-rank-size-exp
 synthetic-rank-size-exp
 0
 1.5
-1.1
+1.3
 0.1
 1
 NIL
@@ -625,7 +624,7 @@ final-time-step
 final-time-step
 0
 100
-20
+41.0
 1
 1
 NIL
@@ -668,7 +667,7 @@ network-reinforcment-threshold
 network-reinforcment-threshold
 0
 5
-6.397
+1.0
 0.1
 1
 NIL
@@ -683,7 +682,7 @@ network-reinforcment-exponent
 network-reinforcment-exponent
 0
 10
-1
+2.51
 0.01
 1
 NIL
@@ -716,7 +715,7 @@ network-reinforcment-gmax
 network-reinforcment-gmax
 0
 0.01
-0.00645
+0.00483
 1e-5
 1
 NIL
@@ -752,7 +751,7 @@ synthetic-shortcut-number
 synthetic-shortcut-number
 0
 50
-30
+8.0
 1
 1
 NIL
@@ -767,7 +766,7 @@ synthetic-city-max-degree
 synthetic-city-max-degree
 0
 5
-5
+3.0
 1
 1
 NIL
@@ -782,7 +781,7 @@ synthetic-shortcut-radius
 synthetic-shortcut-radius
 0
 30
-30
+13.0
 1
 1
 NIL
@@ -797,7 +796,7 @@ physical-network-reinforcment-threshold
 physical-network-reinforcment-threshold
 0
 0.1
-0.1
+0.0315
 0.0005
 1
 NIL
@@ -822,7 +821,7 @@ physical-network-reinforcment-quantile
 physical-network-reinforcment-quantile
 0
 1
-0.95
+0.3
 0.1
 1
 NIL
@@ -1191,9 +1190,8 @@ false
 0
 Polygon -7500403 true true 270 75 225 30 30 225 75 270
 Polygon -7500403 true true 30 75 75 30 270 225 225 270
-
 @#$#@#$#@
-NetLogo 5.3.1
+NetLogo 6.0.2
 @#$#@#$#@
 @#$#@#$#@
 @#$#@#$#@
@@ -1209,7 +1207,6 @@ true
 0
 Line -7500403 true 150 150 90 180
 Line -7500403 true 150 150 210 180
-
 @#$#@#$#@
 0
 @#$#@#$#@

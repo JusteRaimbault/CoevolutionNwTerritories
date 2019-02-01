@@ -12,6 +12,10 @@ to setup:setup
   setup:setup-globals
   
   ;;
+  ; check conditions
+  setup:assert-conditions
+  
+  ;;
   ; world config
   setup:setup-world
   
@@ -84,6 +88,16 @@ to setup:setup-globals
 end
 
 
+;;
+; check conditions on parameters to avoid runtime errors
+to  setup:assert-conditions
+  
+  if setup-type = "synthetic" and synthetic-cities-number <= 0 [error "Number of cities must be positive"]
+  
+  if gravity-decay <= 0 [error "gravity-decay must be strictly positive"]
+
+end
+
 to setup:setup-world
   
   if setup-type = "synthetic" [
@@ -132,7 +146,7 @@ to setup:setup-population-data
     matrix:set-column populations 0 matrix:get-column real-populations 0
 
     ;; dates
-    set dates map [read-from-string ?] (read-file (word "setup/dates/dates_" period ".csv"))
+    set dates map [? -> read-from-string ?] (read-file (word "setup/dates/dates_" period ".csv"))
   
   ]
   
@@ -156,7 +170,7 @@ to setup:setup-cities
   if setup-type = "gis" [
     let coords read-csv "setup/coords.csv" ","
     let i 0
-    foreach coords [
+    foreach coords [? ->
       let cname first ? let x read-from-string item 1 ? let y read-from-string last ?
       create-cities 1 [set name cname set-coords-l93 x y set index i set population matrix:get real-populations i 0 new-city]
       set i i + 1 
@@ -172,9 +186,9 @@ to setup:setup-network
   if setup-type = "synthetic" and network-type != "virtual" [
      
      if physical-network-heuristic = "slime-mould" [
-        foreach seq min-pxcor max-pxcor slime-mould-node-distance [
-          let x ? foreach seq min-pycor max-pycor slime-mould-node-distance [
-            let y ? create-nodes 1 [setxy x y new-node]
+        foreach seq min-pxcor max-pxcor slime-mould-node-distance [x ->
+           foreach seq min-pycor max-pycor slime-mould-node-distance [ y ->
+             create-nodes 1 [setxy x y new-node]
           ]
         ]
         
@@ -234,12 +248,14 @@ to setup:setup-matrices
       ; load yearly real distance matrices
       set real-distance-matrices table:make
       foreach dates [
-         table:put real-distance-matrices ? read-numeric-csv-as-matrix (word "setup/distances/" ? "_dmat_res1000_cities50.csv") " "
+        date ->
+         table:put real-distance-matrices date read-numeric-csv-as-matrix (word "setup/distances/" date "_dmat_res1000_cities50.csv") " "
       ]
       
       set real-feedback-distance-matrices table:make
       foreach dates [
-         table:put real-feedback-distance-matrices ? read-numeric-csv-as-matrix (word "setup/fdistances/" ? "_fdists_res1000_cities50.csv") " "
+        date ->
+         table:put real-feedback-distance-matrices date read-numeric-csv-as-matrix (word "setup/fdistances/" date "_fdists_res1000_cities50.csv") " "
       ]
       
       set distance-matrix matrix:copy table:get real-distance-matrices (first dates)
@@ -257,7 +273,9 @@ to setup:setup-matrices
     if network-type = "virtual" [
       ; distance matrix
       
-      let xcors [] let ycors [] let pops [] foreach sort-by [[index] of ?1 < [index] of ?2] cities [ask ? [set xcors lput xcor xcors set ycors lput ycor ycors set pops lput population pops]]
+      let xcors [] let ycors [] let pops [] foreach sort-by [[?1 ?2] -> [index] of ?1 < [index] of ?2] cities [
+        ? -> ask ? [set xcors lput xcor xcors set ycors lput ycor ycors set pops lput population pops]
+      ]
       let xi matrix:from-row-list (rep xcors n) let xj matrix:from-column-list (rep xcors n) let yi matrix:from-row-list (rep ycors n) let yj matrix:from-column-list (rep ycors n)
       set distance-matrix matrix:map sqrt ((matrix:times-element-wise (xi matrix:- xj) (xi matrix:- xj)) matrix:+ (matrix:times-element-wise (yi matrix:- yj) (yi matrix:- yj)))
     ]
@@ -268,7 +286,7 @@ to setup:setup-matrices
     ]
     
     ; feedback distance matrix
-    let xcors [] let ycors [] let pops [] foreach sort-by [[index] of ?1 < [index] of ?2] cities [ask ? [set xcors lput xcor xcors set ycors lput ycor ycors set pops lput population pops]]
+    let xcors [] let ycors [] let pops [] foreach sort-by [[?1 ?2] -> [index] of ?1 < [index] of ?2] cities [? -> ask ? [set xcors lput xcor xcors set ycors lput ycor ycors set pops lput population pops]]
     let xi matrix:from-row-list (rep xcors n) let xj matrix:from-column-list (rep xcors n) let yi matrix:from-row-list (rep ycors n) let yj matrix:from-column-list (rep ycors n)
     let feedback-dist-rows []
     let k 0
@@ -277,8 +295,8 @@ to setup:setup-matrices
       let xk matrix:make-constant n n [xcor] of cityk let yk matrix:make-constant n n [ycor] of cityk
       let xik matrix:map cities:zero-infinite (matrix:map sqrt ((matrix:times-element-wise (xi matrix:- xk) (xi matrix:- xk)) matrix:+ (matrix:times-element-wise (yi matrix:- yk) (yi matrix:- yk))))
       let xjk matrix:map cities:zero-infinite (matrix:map sqrt ((matrix:times-element-wise (xj matrix:- xk) (xj matrix:- xk)) matrix:+ (matrix:times-element-wise (yj matrix:- yk) (yj matrix:- yk))))
-      let sc1 (matrix:times-element-wise ((matrix:times-element-wise (xi matrix:- xj) (xi matrix:- xk)) matrix:+ (matrix:times-element-wise (yi matrix:- yj) (yi matrix:- yk))) (matrix:map [1 / ?] (matrix:times-element-wise (matrix:map cities:zero-infinite distance-matrix) xik)))
-      let sc2 (matrix:times-element-wise ((matrix:times-element-wise (xj matrix:- xi) (xj matrix:- xk)) matrix:+ (matrix:times-element-wise (yj matrix:- yi) (yj matrix:- yk))) (matrix:map [1 / ?] (matrix:times-element-wise (matrix:map cities:zero-infinite distance-matrix) xjk)))
+      let sc1 (matrix:times-element-wise ((matrix:times-element-wise (xi matrix:- xj) (xi matrix:- xk)) matrix:+ (matrix:times-element-wise (yi matrix:- yj) (yi matrix:- yk))) (matrix:map [? -> 1 / ?] (matrix:times-element-wise (matrix:map cities:zero-infinite distance-matrix) xik)))
+      let sc2 (matrix:times-element-wise ((matrix:times-element-wise (xj matrix:- xi) (xj matrix:- xk)) matrix:+ (matrix:times-element-wise (yj matrix:- yi) (yj matrix:- yk))) (matrix:map [? -> 1 / ?] (matrix:times-element-wise (matrix:map cities:zero-infinite distance-matrix) xjk)))
       let kfeedbackdistmat (matrix:map cities:feedback-distance sc1 sc2 xik)
       set feedback-dist-rows lput (cities:flatten-dists-feedback kfeedbackdistmat) feedback-dist-rows
       set k k + 1
