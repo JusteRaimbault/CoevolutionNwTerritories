@@ -82,7 +82,7 @@ globals [
   ;;
   ; network growth
   slime-mould-node-distance
-  slime-mould-reinforcment-function
+  ;slime-mould-reinforcment-function
   slime-mould-link-deletion-proportion
 
   ; network measures
@@ -147,6 +147,10 @@ cities-own [
 
 
 breed [nodes node]
+
+nodes-own [
+  name
+]
 
 undirected-link-breed [paths path]
 
@@ -493,7 +497,7 @@ CHOOSER
 period
 period
 "1831-1851" "1841-1861" "1851-1872" "1881-1901" "1891-1911" "1921-1936" "1946-1968" "1962-1982" "1975-1999" "full"
-3
+6
 
 PLOT
 1003
@@ -569,7 +573,7 @@ CHOOSER
 setup-type
 setup-type
 "synthetic" "gis"
-0
+1
 
 SLIDER
 1
@@ -657,7 +661,7 @@ CHOOSER
 network-type
 network-type
 "virtual" "physical" "real" "fixed"
-1
+2
 
 SLIDER
 6
@@ -668,7 +672,7 @@ network-reinforcment-threshold
 network-reinforcment-threshold
 0
 5
-1.0
+0.8
 0.1
 1
 NIL
@@ -716,7 +720,7 @@ network-reinforcment-gmax
 network-reinforcment-gmax
 0
 0.01
-0.00103
+0.00631
 1e-5
 1
 NIL
@@ -797,7 +801,7 @@ physical-network-reinforcment-threshold
 physical-network-reinforcment-threshold
 0
 0.1
-0.0275
+0.00930237936836043
 0.0005
 1
 NIL
@@ -822,7 +826,7 @@ physical-network-reinforcment-quantile
 physical-network-reinforcment-quantile
 0
 1
-0.1
+0.8
 0.1
 1
 NIL
@@ -849,6 +853,16 @@ geo-paths?
 1
 1
 -1000
+
+CHOOSER
+163
+291
+419
+336
+slime-mould-reinforcment-function
+slime-mould-reinforcment-function
+"thresholded" "full-growth"
+0
 
 @#$#@#$#@
 ## WHAT IS IT?

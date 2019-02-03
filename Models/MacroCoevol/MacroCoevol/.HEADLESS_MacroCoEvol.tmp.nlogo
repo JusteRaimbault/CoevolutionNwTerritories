@@ -178,9 +178,6 @@ cities-own [
 
 breed [nodes node]
 
-nodes-own [
-  name
-]
 
 undirected-link-breed [paths path]
 

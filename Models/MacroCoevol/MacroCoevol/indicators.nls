@@ -465,6 +465,7 @@ to-report log-mse-distance
     let tot 0
     foreach dates [? ->
       let mse (matrix:map [[?1 ?2] -> (?1 - ?2)^ 2] (table:get real-distance-matrices ?) (table:get distance-matrices ?))
+      ;show sum (map sum (matrix:to-row-list mse))
        set tot tot + sum (map sum (matrix:to-row-list mse))
     ]
     ifelse tot != 0 [report ln tot][report 0]

@@ -11,7 +11,7 @@
 
 
 
-to-report read-csv [filename delimiter]
+to-report file:read-csv [filename delimiter]
   let rows read-file filename
   let row-list []
   foreach rows [row -> 

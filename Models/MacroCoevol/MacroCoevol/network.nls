@@ -18,7 +18,7 @@ to network:evolve-network
     ]
   
   
-    if network-type = "physical" [
+    if network-type = "physical" or network-type = "real" [
        ; physical network : embodies flows -> feedback computed differently
        ; different possible heuristics for growth
       
@@ -30,14 +30,16 @@ to network:evolve-network
       
     ]
     
-    if network-type = "real" [
-       ; real distances matrices (not coevolution, for benchmarking city growth model)
-       set distance-matrix matrix:copy (table:get real-distance-matrices (item ticks dates)) 
-       set feedback-distance-matrix matrix:copy (table:get real-feedback-distance-matrices (item ticks dates)) 
-    ]
+    ;; FIXME do not use real for that
+    ;if network-type = "real" [
+    ;   ; real distances matrices (not coevolution, for benchmarking city growth model)
+    ;   set distance-matrix matrix:copy (table:get real-distance-matrices (item ticks dates)) 
+    ;   set feedback-distance-matrix matrix:copy (table:get real-feedback-distance-matrices (item ticks dates)) 
+    ;]
   
   
     ; put distance matrix in history
+    ;show (word "avg distmat = " (mean (map mean matrix:to-row-list distance-matrix)))
     table:put distance-matrices (item ticks dates) matrix:copy distance-matrix
     
     ; update interaction weights
@@ -140,6 +142,7 @@ to network:cache-nw-measures
   set shortest-paths table:make set nw-relative-speeds table:make set nw-distances table:make set pairs-total-weight 0
   let clist to-list cities let n count cities
   let i 0 let j 1
+  let ltot 0
   repeat (length clist - 1) [
     let c1 item i clist
     set j i + 1
@@ -165,9 +168,11 @@ to network:cache-nw-measures
       
       set pairs-total-weight pairs-total-weight + [population] of c1 + [population] of c2
       set j j + 1
+      set ltot ltot + l
     ]
     set i i + 1
   ]
+  show (word "avg distance cities = " (2 * ltot / (n * (n - 1))))
   
 end
 

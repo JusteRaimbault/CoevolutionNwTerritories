@@ -83,7 +83,7 @@ to setup:setup-globals
   set indicator-sampling-time-step 5
   
   set slime-mould-node-distance 15;20
-  set slime-mould-reinforcment-function "full-growth"
+  
   set slime-mould-link-deletion-proportion 0.2
   
 end
@@ -169,7 +169,7 @@ to setup:setup-cities
   
   
   if setup-type = "gis" [
-    let coords read-csv "setup/coords.csv" ","
+    let coords file:read-csv "setup/coords.csv" ","
     let i 0
     foreach coords [? ->
       let cname first ? let x read-from-string item 1 ? let y read-from-string last ?
@@ -208,12 +208,29 @@ to setup:setup-network
   ; ADDED for geopath nw [FIXME check if no conflict with other networks]
   ; - too slow
   ;network-utils:connexify-network-link-projection
-  network-utils:keep-giant-component
-  network:connect-cities
+  ;network-utils:keep-giant-component
+  ;network:connect-cities
   
   ; setup link vars
-  ask paths [new-path]
-  ask paths with [path-length = 0] [die]
+  ;ask paths [new-path]
+  ;ask paths with [path-length = 0] [die]
+  
+  
+  if setup-type = "gis" and network-type = "real" [
+    let nodedata file:read-csv (word "setup/graphs/" first dates "_graph_res10000_cities50_nodes.csv") ","
+    foreach nodedata [row ->
+      let nodename first row
+      if count cities with [name = nodename] = 0 [create-nodes 1 [new-node set-coords-l93 (read-from-string item 1 row) (read-from-string item 2 row) set name nodename]]
+    ]
+     
+    let edgedata file:read-csv (word "setup/graphs/" first dates "_graph_res10000_cities50_edges.csv") ","
+    foreach edgedata [row -> 
+      let n1name first row let n2name item 1 row let relspeed (read-from-string item 2 row)
+      let n1 one-of turtles with [name = n1name] let n2 one-of turtles with [name = n2name]
+      if n1 != nobody and n2 != nobody [ask n1 [create-path-with n2 [new-path set relative-speed relspeed set effective-length link-length * relspeed]]]
+    ]
+   ]
+  
   
   
 end
@@ -376,6 +393,9 @@ to setup:setup-headless
   
   ;set physical-network-reinforcment-threshold 0.1
   ;set physical-network-reinforcment-quantile 0.95
+  
+  ;set slime-mould-reinforcment-function "full-growth"
+  ;set slime-mould-reinforcment-function "thresholded"
   
   set synthetic-shortcut-number 30
   set synthetic-city-max-degree 5

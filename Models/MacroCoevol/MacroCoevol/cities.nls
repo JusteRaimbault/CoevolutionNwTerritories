@@ -40,7 +40,7 @@ to cities:evolve-populations
   ; lets compute the euclidian by default, quite costless
   let pots-feedback matrix:times feedback-weights (cities:flatten-pops-feedback (matrix:map [? -> ? ^ feedback-gamma] (matrix:times (matrix:times diag-pops (matrix:make-constant n n 1)) diag-pops)))
 
-  if network-type = "physical" [
+  if network-type = "physical" or network-type = "real" [
     ; recompute pots-feedbacks on link flows : ! parameter gamma is different : specific var feedback-flow
 
     ;  - cache nw measures (!! normalisation feedback-flows)
@@ -162,5 +162,5 @@ to set-coords-l93 [x y]
   let l93xmin 825 let l93xmax 10200 let l93ymin 16700 let l93ymax 27000
   let xx min-pxcor + ((max-pxcor - min-pxcor) * (x - l93xmin) / (l93xmax - l93xmin))
   let yy min-pycor + ((max-pycor - min-pycor) * (y - l93ymin) / (l93ymax - l93ymin))
-  setxy xx yy
+  setxy (min list (max list min-pxcor xx) max-pxcor) (min list (max list min-pycor yy) max-pycor)
 end

@@ -17,30 +17,35 @@ val nwType = Val[Int]
 val nwThreshold = Val[Double]
 val nwExponent = Val[Double]
 val nwGmax = Val[Double]
-
+val slimeMouldFun = Val[Int]
 
 // Reporters
 val logmsepop=Val[Double]
 val mselogpop=Val[Double]
 val logmsedist=Val[Double]
 
-//setup-experiment-real-calibration calibperiod growthrate grav-weight grav-gamma grav-decay feed-weight feed-gamma feed-decay nw-type nw-threshold nw-exp nw-gmax
-val cmds = Seq("setup-experiment-real-calibration \"${period}\" ${growthRate} ${gravityWeight} ${gravityGamma} ${gravityDecay} ${feedbackWeight} ${feedbackGamma} ${feedbackDecay} ${nwType} ${nwThreshold} ${nwExponent} ${nwGmax}","run-experiment")
+//setup-experiment-real-calibration calibperiod growthrate grav-weight grav-gamma grav-decay feed-weight feed-gamma feed-decay nw-type nw-threshold nw-exp nw-gmax slimemouldfun
+val cmds = Seq("setup-experiment-real-calibration \"${period}\" ${growthRate} ${gravityWeight} ${gravityGamma} ${gravityDecay} ${feedbackWeight} ${feedbackGamma} ${feedbackDecay} ${nwType} ${nwThreshold} ${nwExponent} ${nwGmax} ${slimeMouldFun}","run-experiment")
 
 // Model
 val model =
-NetLogo5Task.workspace(workDirectory,"HEADLESS_MacroCoEvol.nlogo",cmds) set(
-    inputs += (period,growthRate,gravityWeight,gravityGamma,gravityDecay,feedbackWeight,feedbackGamma,feedbackDecay,nwType,nwThreshold,nwExponent,nwGmax),
-    outputs += (period,growthRate,gravityWeight,gravityGamma,gravityDecay,feedbackWeight,feedbackGamma,feedbackDecay,nwType,nwThreshold,nwExponent,nwGmax),
+NetLogo6Task(workDirectory / "HEADLESS_MacroCoEvol.nlogo",cmds,embedWorkspace=true,reuseWorkspace=true) set(
+    inputs += (period,growthRate,gravityWeight,gravityGamma,gravityDecay,/*feedbackWeight,feedbackGamma,feedbackDecay,nwType*/,nwThreshold,nwExponent,nwGmax,slimeMouldFun),
+    outputs += (period,growthRate,gravityWeight,gravityGamma,gravityDecay,feedbackWeight,feedbackGamma,feedbackDecay,nwType,nwThreshold,nwExponent,nwGmax,slimeMouldFun),
     netLogoOutputs += ("log-mse-population", logmsepop),
     netLogoOutputs += ("mse-log-population", mselogpop),
-    netLogoOutputs += ("log-mse-distance", logmsedist)
+    netLogoOutputs += ("log-mse-distance", logmsedist),
+    period := currentperiod,
+    feedbackWeight := 0.0,
+    feedbackGamma := 1.0,
+    feedbackDecay := 1.0,
+    nwType := 0
 )
 val modelCapsule = Capsule(model)
 
 
-//val local = LocalEnvironment(50)
-val grid = EGIEnvironment("vo.complex-systems.eu",openMOLEMemory = 4000 megabytes)
+val local = LocalEnvironment(10)
+//val grid = EGIEnvironment("vo.complex-systems.eu")//,openMOLEMemory = 4000 megabytes)
 
 
 
@@ -75,28 +80,28 @@ val currentperiod = "1831-1851"
 
 
 val datestr = (new SimpleDateFormat("yyyyMMdd")).format(new Date())
-val purpose = "calibperiod_island_abstractnw_grid"
+//val purpose = "calibperiod_island_abstractnw_grid"
+//val purpose = "calibperiod_island_realnw_grid"
+val purpose = "TEST"
 val resdir = datestr+"_"+purpose
 
-val varSetting = ExplorationTask(
+/*val varSetting = ExplorationTask(
   (period is currentperiod)
   x (feedbackWeight is 0.0)
   x (feedbackGamma is 1.0)
   x (feedbackDecay is 1.0)
-  x (nwType is 1)
+  //x (nwType is 1)
+  x (nwType is 0)
 ) set(
-  inputs += (growthRate,gravityWeight,gravityGamma,gravityDecay/*,feedbackWeight,feedbackGamma,feedbackDecay*/,nwThreshold,nwExponent,nwGmax),
-  outputs += (growthRate,gravityWeight,gravityGamma,gravityDecay/*,feedbackWeight,feedbackGamma,feedbackDecay*/,nwThreshold,nwExponent,nwGmax)
-)
+//  inputs += (growthRate,gravityWeight,gravityGamma,gravityDecay,feedbackWeight,feedbackGamma,feedbackDecay,nwThreshold,nwExponent,nwGmax,slimeMouldFun),
+//  outputs += (growthRate,gravityWeight,gravityGamma,gravityDecay,feedbackWeight,feedbackGamma,feedbackDecay,nwThreshold,nwExponent,nwGmax,slimeMouldFun),
+)*/
 
-val eval = varSetting -< model
+//val eval = varSetting -< model
 
 val evolution =
-  SteadyStateEvolution(
-    algorithm =
-      NSGA2(
-        mu = 200,
-        genome =
+  NSGA2Evolution(
+    genome =
           Seq(
               growthRate in Range(0.0, 0.2)
               ,gravityWeight in Range(0.00005,0.03)
@@ -108,23 +113,22 @@ val evolution =
               ,nwThreshold in Range(0.1,20.0)
               ,nwExponent in Range(0.1,10.0)
               ,nwGmax in Range(0.0,0.2)
+              ,slimeMouldFun in Seq(0,1)
             ),
-          objectives = Seq(logmsepop,logmsedist)
-      ),
-    evaluation = eval,
-    //parallelism = 50,
-    termination = 1 hours
-    //termination = 1000
+            mu = 200,
+          objectives = Seq(logmsepop,logmsedist),
+          evaluation = model,
+          //termination = 3 hours,
+          termination = 10 minutes,
+          //parallelism = 1000,
+          //distribution = Island(10 minutes)
 )
 
-val island = IslandEvolution(evolution, parallelism = 400,termination=10 hours)
 val savePopulation = SavePopulationHook(island, workDirectory / "calibration" / resdir / currentperiod)
 //val savePopulation = SavePopulationHook(evolution, workDirectory / "calibration" / resdir / currentperiod)
 
-
 //(evolution on local hook savePopulation)
-
-(island on grid hook savePopulation)
+(evolution on grid hook savePopulation)
 
 
 
