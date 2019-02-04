@@ -30,7 +30,7 @@ val cmds = Seq("setup-experiment-real-calibration \"${period}\" ${growthRate} ${
 // Model
 val model =
 NetLogo6Task(workDirectory / "HEADLESS_MacroCoEvol.nlogo",cmds,embedWorkspace=true,reuseWorkspace=true) set(
-    inputs += (period,growthRate,gravityWeight,gravityGamma,gravityDecay,/*feedbackWeight,feedbackGamma,feedbackDecay,nwType*/,nwThreshold,nwExponent,nwGmax,slimeMouldFun),
+    inputs += (period,growthRate,gravityWeight,gravityGamma,gravityDecay,/*feedbackWeight,feedbackGamma,feedbackDecay,nwType,*/nwThreshold,nwExponent,nwGmax,slimeMouldFun),
     outputs += (period,growthRate,gravityWeight,gravityGamma,gravityDecay,feedbackWeight,feedbackGamma,feedbackDecay,nwType,nwThreshold,nwExponent,nwGmax,slimeMouldFun),
     netLogoOutputs += ("log-mse-population", logmsepop),
     netLogoOutputs += ("mse-log-population", mselogpop),
