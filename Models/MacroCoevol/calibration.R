@@ -3,12 +3,11 @@ library(dplyr)
 library(ggplot2)
 source(paste0(Sys.getenv('CN_HOME'),'/Models/Utils/R/plots.R'))
 
-setwd(paste0(Sys.getenv('CN_HOME'),'/Models/MacroCoEvol/MacroCoEvol/calibres'))
+setwd(paste0(Sys.getenv('CS_HOME'),'/CoevolutionNwTerritories/Models/MacroCoevol/MacroCoevol'))
 
 periods = c("1831-1851","1841-1861","1851-1872","1881-1901","1891-1911","1921-1936","1946-1968","1962-1982","1975-1999")
 
-#resdir = '20170929_calibperiod_nsga_abstractnw_local/'
-resdir = '20171122_calibperiod_island_abstractnw_grid/'
+resdir = '20190203_CALIBPERIOD_REALNW_LOCAL/'
 
 params = c("growthRate","gravityGamma","gravityDecay","gravityWeight"#,"feedbackGamma","feedbackDecay","feedbackWeight")
             ,"nwThreshold","nwExponent","nwGmax")
