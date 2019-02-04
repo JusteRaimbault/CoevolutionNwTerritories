@@ -3,10 +3,13 @@ import java.util.Date
 
 // variables
 val synthRankSize = Val[Double]
+
 val nwThreshold = Val[Double]
 val nwGmax = Val[Double]
 val nwExponent = Val[Double]
-val physNwQuantile = Val[Double]
+val nwPhysQuantile = Val[Double]
+val nwSlimeMouldFun = Val[Double]
+
 val finalTime = Val[Int]
 val gravityWeight = Val[Double]
 val gravityGamma = Val[Double]
@@ -55,9 +58,8 @@ val complexityPop = Val[Double]
 val id = Val[Int]
 val replication = Val[Int]
 
-// setup-experiment-synthetic [synth-ranksize nw-threshold nw-gmax final-time grav-weight grav-gamma grav-decay feed-weight feed-gamma feed-decay nw-type seed
-
-val cmds = Seq("setup-experiment-synthetic ${synthRankSize} ${nwThreshold} ${nwGmax} ${nwExponent} ${physNwQuantile} ${finalTime} ${gravityWeight} ${gravityGamma} ${gravityDecay} ${feedbackWeight} ${feedbackGamma} ${feedbackDecay} ${nwType} ${replication}","run-experiment")
+// setup-experiment-synthetic [synth-ranksize nw-type nw-threshold nw-gmax nw-exponent physical-nw-rein-quantile nw-slimemould-fun grav-weight grav-gamma grav-decay feed-weight feed-gamma feed-decay final-time seed
+val cmds = Seq("setup-experiment-synthetic ${synthRankSize} ${nwType} ${nwThreshold} ${nwGmax} ${nwExponent} ${nwPhysQuantile} ${nwSlimeMouldFun} ${gravityWeight} ${gravityGamma} ${gravityDecay} ${feedbackWeight} ${feedbackGamma} ${feedbackDecay} ${finalTime} ${replication}","run-experiment")
 
 val model =
 NetLogo6Task(workDirectory / "HEADLESS_MacroCoEvol.nlogo",cmds,embedWorkspace=true,reuseWorkspace=true) set(
@@ -99,7 +101,7 @@ val indics_hook = AppendToCSVFileHook(workDirectory / "exploration" / ((new Simp
   arraysOnSingleRow := true
 )
 
-val env = LocalEnvironment(20)
+val env = LocalEnvironment(10)
 //val env = EGIEnvironment("vo.complex-systems.eu",openMOLEMemory = 4000 megabytes)
 
 
@@ -107,38 +109,40 @@ val env = LocalEnvironment(20)
 val exploration =  DirectSampling(
   evaluation = (model on env hook indics_hook),
   //evaluation = (model on env by 20 hook indics_hook)
-  /*(((synthRankSize in (0.5 to 1.5 by 0.5)) x
+  /*((//(synthRankSize in (0.5 to 1.5 by 0.5)) x
     //(nwThreshold in (0.5 to 4.5 by 0.5)) x
-    (nwExponent in (0.5 to 2.0 by 0.5)) x
+    //(nwExponent in (0.5 to 2.0 by 0.5)) x
     (physNwQuantile in (0.05 to 0.85 by 0.2)) x
-    (nwGmax in (0.0 to 0.05 by 0.05)) x
+    //(nwGmax in (0.0 to 0.05 by 0.05)) x
     (gravityWeight in (0.00025 to 0.001 by 0.00025)) x
     (gravityGamma in (0.5 to 1.5 by 0.5)) x
     (gravityDecay in (10.0 to 210.0 by 50.0))
   ) withIndex id )*/
   sampling = ((LHS (
     1
-    ,synthRankSize in Range(0.5,1.5)
+    //,synthRankSize in Range(0.5,1.5)
     //,nwThreshold in Range(0.0,5.0)
-    ,nwExponent in Range(0.0,2.0)
+    //,nwExponent in Range(0.0,2.0)
     ,physNwQuantile in Range(0.0,1.0)
-    ,nwGmax in Range(0.0,0.05)
+    //,nwGmax in Range(0.0,0.05)
     ,gravityWeight in Range(0.0,0.001)
     ,gravityGamma in Range(0.0,2.0)
     ,gravityDecay in Range(0.0,200.0)
   )) withIndex id)
     x (nwType is 1)
     x (finalTime is 30)
-  //x (synthRankSize is 1.1)
-  x (nwThreshold is 2.0)
-  //x (nwGmax is 0.05)
+    x (synthRankSize is 1.0)
+    x (nwThreshold is 1.0)
+    x (nwGmax is 0.05)
+    x (nwExponent is 1.0)
+    x (nwSlimeMouldFun is 0.0)
   //x (gravityWeight is 0.0005)
   //x (gravityGamma is 1.0)
   //x (gravityDecay is 50.0)
   x (feedbackWeight is 0.0)
   x (feedbackGamma is 1.0)
   x (feedbackDecay is 1.0)
-  x (replication in (UniformDistribution[Int]() take 20))
+  x (replication in (UniformDistribution[Int]() take 10))
 )
 
 exploration

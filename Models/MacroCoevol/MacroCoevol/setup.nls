@@ -192,7 +192,9 @@ to setup:setup-network
      ;;
      ; FIXME does not seem to work
      if physical-network-heuristic = "breakdown" [setup:initial-network-breakdown]
-      
+   
+    ask paths [new-path]
+    ask paths with [path-length = 0] [die]   
   ]
  
  

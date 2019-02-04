@@ -81,9 +81,9 @@ end
 ;   trajectories-diversity
 ;   trajectories-complexity
 
-to setup-experiment-synthetic [synth-ranksize nw-threshold nw-gmax nw-exponent physical-nw-rein-quantile final-time grav-weight grav-gamma grav-decay feed-weight feed-gamma feed-decay nw-type seed]
+to setup-experiment-synthetic [synth-ranksize nw-type nw-threshold nw-gmax nw-exponent physical-nw-rein-quantile nw-slimemould-fun grav-weight grav-gamma grav-decay feed-weight feed-gamma feed-decay final-time seed]
 
-  show (word "exp : " synth-ranksize nw-threshold nw-gmax final-time grav-weight grav-gamma grav-decay feed-weight feed-gamma feed-decay nw-type seed)
+  show (word "exp : " synth-ranksize " - " nw-threshold " - " nw-gmax " - " final-time " - " grav-weight " - " grav-gamma " - " grav-decay " - " feed-weight " - " feed-gamma " - " feed-decay " - " nw-type " - " seed)
   
   ca
   
@@ -107,6 +107,7 @@ to setup-experiment-synthetic [synth-ranksize nw-threshold nw-gmax nw-exponent p
   
   ; multi-modeling params
   if nw-type = 0 [set network-type "virtual"] if nw-type = 1 [set network-type "physical"]
+  if nw-slimemould-fun = 0 [set slime-mould-reinforcment-function "thresholded"] if nw-slimemould-fun = 1 [set slime-mould-reinforcment-function "full-growth"]
   
   set setup-type "synthetic"
   
@@ -129,8 +130,10 @@ end
 
 to test-experiment-synthetic
   ca
-  ;setup-experiment-synthetic 1.0 3.0 0.01 30 0.0001 1.0 200.0 0.0 1.0 1.0 0 random 10000
-  setup-experiment-synthetic 1.0 3.0 0.01 2.0 0.1 30 0.0001 1.0 200.0 0.0 1.0 1.0 1 random 10000
+  
+  ;setup-experiment-synthetic synth-ranksize nw-type nw-threshold nw-gmax nw-exponent physical-nw-rein-quantile nw-slimemould-fun grav-weight grav-gamma grav-decay feed-weight feed-gamma feed-decay final-time seed
+  ;setup-experiment-synthetic 1.0 1 3.0 0.01 30 0.0001 1.0 200.0 0.0 1.0 1.0 0 random 10000
+  setup-experiment-synthetic 1.0 1 3.0 0.01 1.0 0.5 0 0.0001 1.0 200.0 0.0 1.0 1.0 30 random 10000
   run-experiment
   indicators:compute-indicators
   
