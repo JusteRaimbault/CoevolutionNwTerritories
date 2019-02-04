@@ -27,24 +27,6 @@ val logmsedist=Val[Double]
 //setup-experiment-real-calibration calibperiod growthrate grav-weight grav-gamma grav-decay feed-weight feed-gamma feed-decay nw-type nw-threshold nw-exp nw-gmax slimemouldfun
 val cmds = Seq("setup-experiment-real-calibration \"${period}\" ${growthRate} ${gravityWeight} ${gravityGamma} ${gravityDecay} ${feedbackWeight} ${feedbackGamma} ${feedbackDecay} ${nwType} ${nwThreshold} ${nwExponent} ${nwGmax} ${slimeMouldFun}","run-experiment")
 
-<<<<<<< HEAD
-// Model
-val model =
-NetLogo6Task(workDirectory / "HEADLESS_MacroCoEvol.nlogo",cmds,embedWorkspace=true,reuseWorkspace=true) set(
-    inputs += (period,growthRate,gravityWeight,gravityGamma,gravityDecay,/*feedbackWeight,feedbackGamma,feedbackDecay,nwType,*/nwThreshold,nwExponent,nwGmax,slimeMouldFun),
-    outputs += (period,growthRate,gravityWeight,gravityGamma,gravityDecay,feedbackWeight,feedbackGamma,feedbackDecay,nwType,nwThreshold,nwExponent,nwGmax,slimeMouldFun),
-    netLogoOutputs += ("log-mse-population", logmsepop),
-    netLogoOutputs += ("mse-log-population", mselogpop),
-    netLogoOutputs += ("log-mse-distance", logmsedist),
-    period := currentperiod,
-    feedbackWeight := 0.0,
-    feedbackGamma := 1.0,
-    feedbackDecay := 1.0,
-    nwType := 0
-)
-val modelCapsule = Capsule(model)
-=======
->>>>>>> 3499b71e031b4ec1cd8bb79c05ed711728b14ffd
 
 
 
@@ -101,8 +83,8 @@ NetLogo6Task(workDirectory / "HEADLESS_MacroCoEvol.nlogo",cmds,embedWorkspace=tr
 val modelCapsule = Capsule(model)
 
 
-//val env = LocalEnvironment(30)
-val env = EGIEnvironment("vo.complex-systems.eu")//,openMOLEMemory = 4000 megabytes)
+val env = LocalEnvironment(30)
+//val env = EGIEnvironment("vo.complex-systems.eu")//,openMOLEMemory = 4000 megabytes)
 
 
 //val currentperiod = "1831-1851"
@@ -110,7 +92,7 @@ val env = EGIEnvironment("vo.complex-systems.eu")//,openMOLEMemory = 4000 megaby
 
 val datestr = (new SimpleDateFormat("yyyyMMdd")).format(new Date())
 //val purpose = "calibperiod_island_abstractnw_grid"
-val purpose = "CALIBPERIOD_REALNW_GRID"
+val purpose = "CALIBPERIOD_REALNW_LOCAL"
 //val purpose = "TEST"
 val resdir = datestr+"_"+purpose
 
@@ -147,14 +129,16 @@ val evolution =
             mu = 200,
           objectives = Seq(logmsepop,logmsedist),
           evaluation = model,
-          termination = 3 hours,
+          termination = 2 hours,
           //termination = 10 minutes,
-          parallelism = 1000,
-          distribution = Island(10 minutes)
+          parallelism = 30//,
+          //distribution = Island(10 minutes)
 )
 
+//val savePopulation = SavePopulationHook(island, workDirectory / "calibration" / resdir / currentperiod)
 val savePopulation = SavePopulationHook(evolution, workDirectory / "calibration" / resdir / currentperiod)
 
+//(evolution on local hook savePopulation)
 (evolution on env hook savePopulation)
 
 
