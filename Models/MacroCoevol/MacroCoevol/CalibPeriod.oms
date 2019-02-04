@@ -27,6 +27,24 @@ val logmsedist=Val[Double]
 //setup-experiment-real-calibration calibperiod growthrate grav-weight grav-gamma grav-decay feed-weight feed-gamma feed-decay nw-type nw-threshold nw-exp nw-gmax slimemouldfun
 val cmds = Seq("setup-experiment-real-calibration \"${period}\" ${growthRate} ${gravityWeight} ${gravityGamma} ${gravityDecay} ${feedbackWeight} ${feedbackGamma} ${feedbackDecay} ${nwType} ${nwThreshold} ${nwExponent} ${nwGmax} ${slimeMouldFun}","run-experiment")
 
+<<<<<<< HEAD
+// Model
+val model =
+NetLogo6Task(workDirectory / "HEADLESS_MacroCoEvol.nlogo",cmds,embedWorkspace=true,reuseWorkspace=true) set(
+    inputs += (period,growthRate,gravityWeight,gravityGamma,gravityDecay,/*feedbackWeight,feedbackGamma,feedbackDecay,nwType,*/nwThreshold,nwExponent,nwGmax,slimeMouldFun),
+    outputs += (period,growthRate,gravityWeight,gravityGamma,gravityDecay,feedbackWeight,feedbackGamma,feedbackDecay,nwType,nwThreshold,nwExponent,nwGmax,slimeMouldFun),
+    netLogoOutputs += ("log-mse-population", logmsepop),
+    netLogoOutputs += ("mse-log-population", mselogpop),
+    netLogoOutputs += ("log-mse-distance", logmsedist),
+    period := currentperiod,
+    feedbackWeight := 0.0,
+    feedbackGamma := 1.0,
+    feedbackDecay := 1.0,
+    nwType := 0
+)
+val modelCapsule = Capsule(model)
+=======
+>>>>>>> 3499b71e031b4ec1cd8bb79c05ed711728b14ffd
 
 
 
