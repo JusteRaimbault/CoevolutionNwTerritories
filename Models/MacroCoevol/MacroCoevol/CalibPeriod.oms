@@ -24,7 +24,7 @@ val logmsepop=Val[Double]
 val mselogpop=Val[Double]
 val logmsedist=Val[Double]
 
-//setup-experiment-real-calibration calibperiod growthrate grav-weight grav-gamma grav-decay feed-weight feed-gamma feed-decay nw-type nw-threshold nw-exp nw-gmax slimemouldfun
+//setup-experiment-real-calibration [calibperiod growthrate grav-weight grav-gamma grav-decay feed-weight feed-gamma feed-decay nw-type nw-threshold-quantile nw-exp nw-gmax slimemouldfun]
 val cmds = Seq("setup-experiment-real-calibration \"${period}\" ${growthRate} ${gravityWeight} ${gravityGamma} ${gravityDecay} ${feedbackWeight} ${feedbackGamma} ${feedbackDecay} ${nwType} ${nwThreshold} ${nwExponent} ${nwGmax} ${slimeMouldFun}","run-experiment")
 
 
@@ -85,7 +85,7 @@ NetLogo6Task(workDirectory / "HEADLESS_MacroCoEvol.nlogo",cmds,embedWorkspace=tr
 val modelCapsule = Capsule(model)
 
 
-val env = LocalEnvironment(30)
+val env = LocalEnvironment(20)
 //val env = EGIEnvironment("vo.complex-systems.eu")//,openMOLEMemory = 4000 megabytes)
 
 
@@ -123,7 +123,7 @@ val evolution =
               //,feedbackWeight in Range(0.00005,10.0)
               //,feedbackGamma in Range(0.0,100.0)
               //,feedbackDecay in Range(0.1,1000.0)
-              ,nwThreshold in Range(0.1,20.0)
+              ,nwThreshold in Range(0.0,1.0)
               ,nwExponent in Range(0.1,10.0)
               ,nwGmax in Range(0.0,0.2)
               //,slimeMouldFun in Seq(0,1)
@@ -131,9 +131,9 @@ val evolution =
             mu = 200,
           objectives = Seq(logmsepop,logmsedist),
           evaluation = model,
-          termination = 2 hours,
+          termination = 3 hours,
           //termination = 10 minutes,
-          parallelism = 30//,
+          parallelism = 20//,
           //distribution = Island(10 minutes)
 )
 
