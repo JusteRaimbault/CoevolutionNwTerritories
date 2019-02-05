@@ -247,9 +247,9 @@ for(couple in c("ClosenessAccessibility","PopAccessibility","PopCloseness")){
 
 dir.create(paste0(resdir,'laggedcorrs'))
 
-synthRankSize=1.5
-nwGmax=0.05
-nwExponent=1
+#synthRankSize=1.5
+#nwGmax=0.05
+#nwExponent=1
 
 for(synthrankSize in unique(res$synthRankSize)){
   for(nwGmax in unique(res$nwGmax)){

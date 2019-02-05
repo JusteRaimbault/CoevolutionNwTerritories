@@ -352,12 +352,30 @@ Large experience plan and bi-objective calibration on 9 periods $\rightarrow$ us
 }
 
 
+
+\sframe{Model behavior}{
+
+
+
+\begin{columns}
+	\begin{column}{0.5\linewidth}
+		\includegraphics[width=\textwidth]{figures/6-2-2-fig-macrocoevol-behavior-time.jpg}
+	\end{column}
+	\begin{column}{0.5\linewidth}
+		\includegraphics[width=\textwidth]{figures/closenessSummaries_mean_synthRankSize1_gravityWeight0_001_gravityDecay10_nwExponent1.png}\\\includegraphics[width=\textwidth]{figures/populationEntropies_synthRankSize1_gravityWeight0_001_gravityGamma0_5_nwExponent1.png}
+	\end{column}
+\end{columns}
+
+}
+
+
+
 \sframe{Model behavior}{
 
 % Systematic explorations of the model on synthetic data using the OpenMole software show that even with the same processes for network growth, qualitative behavior fundamentally differ.
 % -> OK ; ex no existence of the complexity maximum
 
-\textit{Strongly different qualitative behavior}
+\textit{Strongly different qualitative behavior for aggregated indicators}
 
 \bigskip
 
@@ -397,7 +415,8 @@ Large experience plan and bi-objective calibration on 9 periods $\rightarrow$ us
 %[1] "00/01/11" "00/11/01" "00/11/00" "00/11/11"
 
 
-\textit{Less co-evolution regimes: similar results than \cite{raimbault2018unveiling} which explored the SimpopNet model}
+\textit{Less co-evolution regimes: similar results than \cite{raimbault2018unveiling} which explored the SimpopNet model} (only 3 against % TODO check in thesis
+ co-evolutive regimes)
 
 \bigskip
 
@@ -407,9 +426,11 @@ Large experience plan and bi-objective calibration on 9 periods $\rightarrow$ us
 		\includegraphics[width=\textwidth]{figures/6-2-2-fig-macrocoevol-correlations.jpg}
 	\end{column}
 	\begin{column}{0.5\linewidth}
+		\includegraphics[width=\textwidth]{figures/laggedregimes_absrho_nwGmax0_05.png}
 	\end{column}
 \end{columns}
 
+% arma(1,1) behavior -> WTF ???
 
 
 }
