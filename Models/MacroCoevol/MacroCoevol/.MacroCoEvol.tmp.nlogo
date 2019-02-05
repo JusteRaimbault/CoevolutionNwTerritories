@@ -223,7 +223,7 @@ growth-rate
 growth-rate
 0
 0.05
-0.0088
+0.001
 0.0001
 1
 NIL
@@ -260,7 +260,7 @@ gravity-gamma
 gravity-gamma
 0.5
 5
-2.39
+1.67
 0.01
 1
 NIL
@@ -275,7 +275,7 @@ gravity-decay
 gravity-decay
 1
 500
-185.5
+152.0
 0.1
 1
 NIL
@@ -584,7 +584,7 @@ synthetic-cities-number
 synthetic-cities-number
 0
 50
-20.0
+30.0
 1
 1
 NIL
@@ -614,7 +614,7 @@ synthetic-rank-size-exp
 synthetic-rank-size-exp
 0
 1.5
-1.3
+1.0
 0.1
 1
 NIL
@@ -629,7 +629,7 @@ final-time-step
 final-time-step
 0
 100
-5.0
+30.0
 1
 1
 NIL
@@ -687,7 +687,7 @@ network-reinforcment-exponent
 network-reinforcment-exponent
 0
 10
-0.39
+1.0
 0.01
 1
 NIL
@@ -719,8 +719,8 @@ SLIDER
 network-reinforcment-gmax
 network-reinforcment-gmax
 0
-0.01
-0.00631
+0.05
+0.05
 1e-5
 1
 NIL
@@ -801,7 +801,7 @@ physical-network-reinforcment-threshold
 physical-network-reinforcment-threshold
 0
 0.1
-0.00930237936836043
+2.169884876234831E-5
 0.0005
 1
 NIL
@@ -826,7 +826,7 @@ physical-network-reinforcment-quantile
 physical-network-reinforcment-quantile
 0
 1
-0.8
+0.5
 0.1
 1
 NIL

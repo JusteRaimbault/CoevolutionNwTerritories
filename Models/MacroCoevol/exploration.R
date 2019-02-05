@@ -8,7 +8,8 @@ source(paste0(Sys.getenv('CN_HOME'),'/Models/Utils/R/plots.R'))
 
 setwd(paste0(Sys.getenv('CS_HOME'),'/CoevolutionNwTerritories/Models/MacroCoevol/MacroCoevol'))
 
-resprefix = '20190201_174314_SYNTHETICPHYSICAL_GRID'
+#resprefix = '20190201_174314_SYNTHETICPHYSICAL_GRID'
+resprefix = '20190204_211508_SYNTHETICPHYSICAL_GRID'
 res <- as.tbl(read.csv(paste0('exploration/',resprefix,'.csv'),stringsAsFactors = FALSE))#,header=F,skip = 1))
 
 resdir=paste0(Sys.getenv('CS_HOME'),'/CoevolutionNwTerritories/Results/MacroCoevol/',resprefix,'/');dir.create(resdir)
@@ -43,7 +44,7 @@ names(res)<-c(
   "feedbackDecay","feedbackGamma","feedbackWeight",
   "finalTime",
   "gravityDecay","gravityGamma","gravityWeight",
-  "id","nwExponent","nwGmax","nwThreshold","nwType","physNwQuantile",
+  "id","nwExponent","nwGmax","nwPhysQuantile","nwSlimeMouldFun","nwThreshold","nwType",
   timelyNames(c("populationEntropies"),samplingTimes),
   timelyNames(c("populationHierarchies_alpha","populationHierarchies_rsquared"),samplingTimes),
   timelyNames(c("populationSummaries_mean","populationSummaries_median","populationSummaries_sd"),samplingTimes),
@@ -59,7 +60,7 @@ names(res)<-c(
 
 #params = c("synthRankSize","feedbackDecay","feedbackGamma","feedbackWeight","gravityDecay","gravityGamma","gravityWeight","nwGmax","nwThreshold")
 params = c("synthRankSize","gravityDecay","gravityGamma","gravityWeight",
-           "nwGmax","nwExponent","physNwQuantile")
+           "nwGmax","nwExponent","nwPhysQuantile")
 
 
 
@@ -111,10 +112,10 @@ for(gravityWeight in unique(res$gravityWeight)){
 dir.create(paste0(resdir,'targeted'))
 
 # closeness mean
-nwGmax=0.05;synthRankSize=1.0;gravityDecay=10;gravityWeight=0.001;nwExponent=0.5
+nwGmax=0.05;synthRankSize=1.0;gravityDecay=10;gravityWeight=0.001;nwExponent=1
 var="closenessSummaries_mean"
 g=ggplot(timedata[timedata$gravityGamma!=1.0&timedata$synthRankSize==synthRankSize&timedata$nwGmax==nwGmax&timedata$gravityWeight==gravityWeight&timedata$gravityDecay==gravityDecay&timedata$nwExponent==nwExponent,],
-         aes_string(x="time",y=var,color="physNwQuantile",group="physNwQuantile")
+         aes_string(x="time",y=var,color="nwPhysQuantile",group="nwPhysQuantile")
 )
 g+geom_point()+geom_smooth()+facet_wrap(~gravityGamma)+
   ggtitle(bquote(w[G]*"="*.(gravityWeight)*" ; "*d[G]*"="*.(gravityDecay)*" ; "*alpha[S]*"="*.(synthRankSize)*" ; "*alpha[N]*"="*.(nwExponent)))+
@@ -123,10 +124,10 @@ g+geom_point()+geom_smooth()+facet_wrap(~gravityGamma)+
 ggsave(paste0(resdir,'targeted/',var,'_synthRankSize',synthRankSize,'_gravityWeight',gravityWeight,"_gravityDecay",gravityDecay,'_nwExponent',nwExponent,'.png'),width=20,height=14,units='cm')
 
 
-nwGmax=0.05;synthRankSize=1.0;gravityGamma=0.5;gravityWeight=0.001;gravityDecays=c(10,110);nwExponent=2.0
+nwGmax=0.05;synthRankSize=1.0;gravityGamma=0.5;gravityWeight=0.001;gravityDecays=c(10,110);nwExponent=1.0
 var="populationEntropies"
 g=ggplot(timedata[timedata$gravityDecay%in%gravityDecays&timedata$gravityGamma==gravityGamma&timedata$synthRankSize==synthRankSize&timedata$nwGmax==nwGmax&timedata$gravityWeight==gravityWeight&timedata$nwExponent==nwExponent,],
-         aes_string(x="time",y=var,color="physNwQuantile",group="physNwQuantile")
+         aes_string(x="time",y=var,color="nwPhysQuantile",group="nwPhysQuantile")
 )
 g+geom_point()+geom_smooth()+facet_wrap(~gravityDecay)+
   ggtitle(bquote(w[G]*"="*.(gravityWeight)*" ; "*gamma[G]*"="*.(gravityGamma)*" ; "*alpha[S]*"="*.(synthRankSize)*" ; "*alpha[N]*"="*.(nwExponent)))+
@@ -171,20 +172,22 @@ for(synthrankSize in unique(res$synthRankSize)){
 # targeted
 
 synthrankSize = 1;nwGmax=0.05;nwExponent=1
-gravityWeight=0.001;networkThresholds = c(0.5,1.0,2.0)
+gravityWeight=0.001;networkThresholds = c(1)#c(0.5,1.0,2.0)
+nwPhysQuantiles = unique(res$nwPhysQuantile)
 mes="complexity";var="Accessibility"
-g=ggplot(res[res$synthRankSize==synthrankSize&res$nwGmax==nwGmax&res$gravityWeight==gravityWeight&res$nwThreshold%in%networkThresholds&res$nwExponent==nwExponent,],aes_string(x="gravityDecay",y=paste0(mes,var),color="gravityGamma",group="gravityGamma"))
-g+geom_point()+geom_smooth()+facet_wrap(~physNwQuantile,scales="free")+ggtitle(bquote(w[G]*"="*.(gravityWeight)*" ; "*alpha[S]*"="*.(synthRankSize)*" ; "*alpha[N]*"="*.(nwExponent)))+
+g=ggplot(res[res$synthRankSize==synthrankSize&res$nwGmax==nwGmax&res$gravityWeight==gravityWeight&res$nwThreshold%in%networkThresholds&res$nwPhysQuantile%in%nwPhysQuantiles&res$nwExponent==nwExponent,],aes_string(x="gravityDecay",y=paste0(mes,var),color="gravityGamma",group="gravityGamma"))
+g+geom_point()+geom_smooth()+facet_wrap(~nwPhysQuantile,scales="free")+ggtitle(bquote(w[G]*"="*.(gravityWeight)*" ; "*alpha[S]*"="*.(synthRankSize)*" ; "*alpha[N]*"="*.(nwExponent)))+
   xlab(expression(d[G]))+ylab(expression(C*"["*Z[i]*"]"))+scale_color_continuous(name=expression(gamma[G]))+
   stdtheme
 ggsave(paste0(resdir,'targeted/',mes,var,'_synthrankSize',synthrankSize,'_nwGmax',parstr(nwGmax),'_gravityWeight',parstr(gravityWeight),'_nwExponent',parstr(nwExponent),'.png'),width=30,height=15,units='cm')
 
 
 synthrankSize = 1;nwGmax=0.05;nwExponent=1
-gravityWeight=0.001;networkThresholds = c(0.5,1.0,2.0)
+gravityWeight=0.001;networkThresholds = c(1)#c(0.5,1.0,2.0)
+nwPhysQuantiles = unique(res$nwPhysQuantile)
 mes="rankCorr";var="Accessibility"
-g=ggplot(res[res$synthRankSize==synthrankSize&res$nwGmax==nwGmax&res$gravityWeight==gravityWeight&res$nwThreshold%in%networkThresholds&res$nwExponent==nwExponent,],aes_string(x="gravityDecay",y=paste0(mes,var),color="gravityGamma",group="gravityGamma"))
-g+geom_point()+geom_smooth()+facet_wrap(~physNwQuantile,scales="free")+ggtitle(bquote(w[G]*"="*.(gravityWeight)*" ; "*alpha[S]*"="*.(synthRankSize)*" ; "*alpha[N]*"="*.(nwExponent)))+
+g=ggplot(res[res$synthRankSize==synthrankSize&res$nwGmax==nwGmax&res$gravityWeight==gravityWeight&res$nwThreshold%in%networkThresholds&res$nwPhysQuantile%in%nwPhysQuantiles&res$nwExponent==nwExponent,],aes_string(x="gravityDecay",y=paste0(mes,var),color="gravityGamma",group="gravityGamma"))
+g+geom_point()+geom_smooth()+facet_wrap(~nwPhysQuantile,scales="free")+ggtitle(bquote(w[G]*"="*.(gravityWeight)*" ; "*alpha[S]*"="*.(synthRankSize)*" ; "*alpha[N]*"="*.(nwExponent)))+
   xlab(expression(d[G]))+ylab(expression(p*"["*Z[i]*"]"))+scale_color_continuous(name=expression(gamma[G]))+
   stdtheme
 ggsave(paste0(resdir,'targeted/',mes,var,'_synthrankSize',synthrankSize,'_nwGmax',parstr(nwGmax),'_gravityWeight',parstr(gravityWeight),'_nwExponent',parstr(nwExponent),'.png'),width=30,height=15,units='cm')
@@ -240,27 +243,33 @@ for(couple in c("ClosenessAccessibility","PopAccessibility","PopCloseness")){
   lagdata=rbind(lagdata,melted)
 }
 
+
+
+dir.create(paste0(resdir,'laggedcorrs'))
+
 synthRankSize=1.5
 nwGmax=0.05
 nwExponent=1
 
-dir.create(paste0(resdir,'laggedcorrs'))
-
+for(synthrankSize in unique(res$synthRankSize)){
+  for(nwGmax in unique(res$nwGmax)){
+    for(nwExponent in unique(res$nwExponent)){
+      
 for(gravityWeight in unique(res$gravityWeight)){
-  for(physNwQuantile in unique(res$physNwQuantile)){  
+  for(nwPhysQuantile in unique(res$nwPhysQuantile)){  
     
     #gravityWeight=0.00075
     #nwThreshold=2.5
     
-    g=ggplot(lagdata[lagdata$synthRankSize==synthRankSize&lagdata$nwGmax==nwGmax&lagdata$gravityWeight==gravityWeight&lagdata$physNwQuantile==physNwQuantile&res$nwExponent==nwExponent,],
+    g=ggplot(lagdata[lagdata$synthRankSize==synthRankSize&lagdata$nwGmax==nwGmax&lagdata$gravityWeight==gravityWeight&lagdata$nwPhysQuantile==nwPhysQuantile&res$nwExponent==nwExponent,],
              aes(x=tau,y=rho,color=var,group=var)
     )
-    g+geom_point(pch='.')+stat_smooth(span = 0.1)+facet_grid(gravityGamma~gravityDecay)+ggtitle(paste0("gravityWeight=",gravityWeight," ; nwThreshold=",nwThreshold))+stdtheme
-    ggsave(paste0(resdir,'laggedcorrs/laggedcorrs_gravityWeight',gravityWeight,'_physNwQuantile',physNwQuantile,'.pdf'),width=30,height=20,units='cm')
+    g+geom_point(pch='.')+stat_smooth(span = 0.1)+facet_grid(gravityGamma~gravityDecay)+ggtitle(paste0("gravityWeight=",gravityWeight," ; nwPhysQuantile=",nwPhysQuantile))+stdtheme
+    ggsave(paste0(resdir,'laggedcorrs/laggedcorrs_gravityWeight',gravityWeight,'_nwPhysQuantile',nwPhysQuantile,'.pdf'),width=30,height=20,units='cm')
     
   }
 }
-
+}}}
 
 # stat test
 #synthRankSize=1;nwGmax=0.0
@@ -294,44 +303,47 @@ for(synthRankSize in unique(lagdata$synthRankSize)){
     show(nwGmax)
     for(gravityWeight in unique(lagdata$gravityWeight)){
       show(gravityWeight)
-      for(physNwQuantile in unique(lagdata$physNwQuantile)){
+      for(nwPhysQuantile in unique(lagdata$nwPhysQuantile)){
+        show(physNwQuantile)
         for(gravityGamma in unique(lagdata$gravityGamma)){
           for(gravityDecay in unique(lagdata$gravityDecay)){
             for(nwExponent in unique(lagdata$nwExponent)){
       k=1
-  for(var in c("PopAccessibility","ClosenessAccessibility","PopCloseness")){
-    show(var)
+  for(var in c("ClosenessAccessibility","PopAccessibility","PopCloseness")){
+    #show(var)
     cdata = lagdata[lagdata$synthRankSize==synthRankSize&lagdata$nwGmax==nwGmax&lagdata$gravityWeight==gravityWeight&
-                  lagdata$physNwQuantile==physNwQuantile&lagdata$gravityGamma==gravityGamma&lagdata$gravityDecay==gravityDecay&
+                  lagdata$nwPhysQuantile==nwPhysQuantile&lagdata$gravityGamma==gravityGamma&lagdata$gravityDecay==gravityDecay&
                     lagdata$nwExponent==nwExponent&
                   lagdata$var==var,]
     #show(nrow(cdata))
     #ggplot(cdata,aes(x=tau,y=rho,color=var))+geom_point(pch='.')+geom_smooth()
     #test=ks.test(cdata$rho[cdata$tau==0],cdata$rho[cdata$tau==2])
+    if(nrow(cdata)>10){
     rho0 = mean(cdata$rho[cdata$tau==0])
     sdata=cdata%>%group_by(tau)%>%summarise(rho=mean(rho)-rho0)
     taumax = sdata$tau[abs(sdata$rho)==max(abs(sdata$rho[sdata$tau>0]))]
     taumin = sdata$tau[abs(sdata$rho)==max(abs(sdata$rho[sdata$tau<0]))]
     tplus = ks.test(cdata$rho[cdata$tau==0],cdata$rho[cdata$tau==taumax])
     tminus = ks.test(cdata$rho[cdata$tau==0],cdata$rho[cdata$tau==taumin])
-    signifs=rbind(signifs,data.frame(synthRankSize=synthRankSize,nwGmax=nwGmax,gravityWeight=gravityWeight,nwThreshold=nwThreshold,gravityGamma=gravityGamma,gravityDecay=gravityDecay,
+    signifs=rbind(signifs,data.frame(synthRankSize=synthRankSize,nwGmax=nwGmax,gravityWeight=gravityWeight,nwPhysQuantile=nwPhysQuantile,gravityGamma=gravityGamma,gravityDecay=gravityDecay,
                   varcouple = k,signif = ifelse(tplus$p.value<0.01,ifelse(abs(sdata$rho[sdata$tau==taumax]+rho0)>abs(rho0),
                                                 ifelse(sdata$rho[sdata$tau==taumax]+rho0>0,1,-1),0),0),
                   val = sdata$rho[sdata$tau==taumax],tau=abs(taumax)
                   ))
     k=k+1
-    signifs=rbind(signifs,data.frame(synthRankSize=synthRankSize,nwGmax=nwGmax,gravityWeight=gravityWeight,nwThreshold=nwThreshold,gravityGamma=gravityGamma,gravityDecay=gravityDecay,
+    signifs=rbind(signifs,data.frame(synthRankSize=synthRankSize,nwGmax=nwGmax,gravityWeight=gravityWeight,nwPhysQuantile=nwPhysQuantile,gravityGamma=gravityGamma,gravityDecay=gravityDecay,
                                      varcouple = k,signif = ifelse(tminus$p.value<0.01,ifelse(abs(sdata$rho[sdata$tau==taumin]+rho0)>abs(rho0),
                                                                    ifelse(sdata$rho[sdata$tau==taumin]+rho0>0,1,-1),0),0),
                                      val = sdata$rho[sdata$tau==taumin],tau=abs(taumin)
                   ))
     k=k+1
+    }
   }
 }}}}}}}
 
 
 #save(signifs,file=paste0(resdir,"signifs.RData"))
-#save(signifs,file=paste0(resdir,"signifs_absrho.RData"))
+save(signifs,file=paste0(resdir,"signifs_absrho.RData"))
 #load(paste0(resdir,"signifs.RData"))
 #load(paste0(resdir,"signifs_absrho.RData"))
 
@@ -341,7 +353,7 @@ for(synthRankSize in unique(lagdata$synthRankSize)){
 
 nwGmax=0.05
 
-signs = signifs[signifs$nwGmax==nwGmax,]%>%group_by(synthRankSize,nwGmax,gravityWeight,#nwThreshold,
+signs = signifs[signifs$nwGmax==nwGmax,]%>%group_by(synthRankSize,nwGmax,gravityWeight,nwPhysQuantile,
                                                     gravityGamma,gravityDecay)%>%summarise(
   sign = paste0(signif[which(varcouple==3)[1]],signif[which(varcouple==4)[1]],"/",signif[which(varcouple==1)[1]],signif[which(varcouple==2)[1]],"/",signif[which(varcouple==5)[1]],signif[which(varcouple==6)[1]]),
   #count=n(),
@@ -350,10 +362,12 @@ signs = signifs[signifs$nwGmax==nwGmax,]%>%group_by(synthRankSize,nwGmax,gravity
 )
 
 unique(signs$sign[signs$strength>3])
+unique(signs$sign[signs$strength>2])
 signs$corrstrength[signs$strength>4]
 signs[signs$strength>4,]
 
 unique(signs$sign)[grep('11',unique(signs$sign))]
+grep('11',signs$sign)
 
 # coevol pop - centrality
 summary(signs[signs$sign=="11/00/11"|signs$sign=="10/10/11"|signs$sign=="00/11/11"|signs$sign=="10/01/11"|signs$sign=="10/11/11",])
@@ -363,11 +377,14 @@ summary(signs[signs$sign=="11/00/11"|signs$sign=="10/10/11"|signs$sign=="00/11/1
 signs[signs$sign=="10/11/11",]# max number of links
 
 # plot these strongest regimes
+# OR co-evolution regimes
 
 sdata=data.frame()
-for(r in which(signs$strength>3)[!duplicated(signs$sign[signs$strength>3])]){
-  synthRankSize=signs$synthRankSize[r];nwGmax=signs$nwGmax[r];gravityWeight=signs$gravityWeight[r];nwThreshold=signs$nwThreshold[r];gravityGamma=signs$gravityGamma[r];gravityDecay=signs$gravityDecay[r]
-  sdata=rbind(sdata,data.frame(lagdata[lagdata$synthRankSize==synthRankSize&lagdata$nwGmax==nwGmax&lagdata$gravityWeight==gravityWeight&lagdata$nwThreshold==nwThreshold&lagdata$gravityGamma==gravityGamma&lagdata$gravityDecay==gravityDecay,],
+#for(r in which(signs$strength>3)[!duplicated(signs$sign[signs$strength>3])]){
+for(r in grep('11',signs$sign)[!duplicated(signs$sign[grep('11',signs$sign)])]){
+  show(signs$sign[r])
+  synthRankSize=signs$synthRankSize[r];nwGmax=signs$nwGmax[r];gravityWeight=signs$gravityWeight[r];nwPhysQuantile=signs$nwPhysQuantile[r];gravityGamma=signs$gravityGamma[r];gravityDecay=signs$gravityDecay[r]
+  sdata=rbind(sdata,data.frame(lagdata[lagdata$synthRankSize==synthRankSize&lagdata$nwGmax==nwGmax&lagdata$gravityWeight==gravityWeight&lagdata$nwPhysQuantile==nwPhysQuantile&lagdata$gravityGamma==gravityGamma&lagdata$gravityDecay==gravityDecay,],
                                id=paste0(synthRankSize,nwGmax,gravityWeight,nwThreshold,gravityGamma,gravityDecay),
                                reg=signs$sign[r]
                                )
@@ -375,9 +392,10 @@ for(r in which(signs$strength>3)[!duplicated(signs$sign[signs$strength>3])]){
 }
 
 g=ggplot(sdata,aes(x=tau,y=rho,colour=var,group=var))
-g+geom_point(pch='.')+geom_smooth()+facet_wrap(~reg,scales="free")+
+g+geom_point(pch='.')+stat_smooth(span = 0.1)+facet_wrap(~reg,scales="free")+
   xlab(expression(tau))+ylab(expression(rho[tau]))+stdtheme+
-  theme(legend.justification=c(1,0), legend.position=c(0.9,0.1))+scale_colour_discrete(name="Variables")
+  #theme(legend.justification=c(1,0), legend.position=c(0.9,0.1))+
+  scale_colour_discrete(name="Variables")
 ggsave(paste0(resdir,'targeted/laggedregimes_absrho_nwGmax',parstr(nwGmax),'.png'),width=30,height=30,units='cm')
 
 
