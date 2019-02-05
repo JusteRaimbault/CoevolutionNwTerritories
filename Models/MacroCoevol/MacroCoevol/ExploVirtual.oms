@@ -63,8 +63,8 @@ val cmds = Seq("setup-experiment-synthetic ${synthRankSize} ${nwType} ${nwThresh
 
 val model =
 NetLogo6Task(workDirectory / "HEADLESS_MacroCoEvol.nlogo",cmds,embedWorkspace=true,reuseWorkspace=true) set(
-    inputs += (synthRankSize,nwThreshold,nwGmax,nwExponent,physNwQuantile,finalTime,gravityWeight,gravityGamma,gravityDecay,feedbackWeight,feedbackGamma,feedbackDecay,nwType,replication,id),
-    outputs += (synthRankSize,nwThreshold,nwGmax,nwExponent,physNwQuantile,finalTime,gravityWeight,gravityGamma,gravityDecay,feedbackWeight,feedbackGamma,feedbackDecay,nwType,replication,id),
+    inputs += (synthRankSize,nwThreshold,nwGmax,nwExponent,nwPhysQuantile,nwSlimeMouldFun,finalTime,gravityWeight,gravityGamma,gravityDecay,feedbackWeight,feedbackGamma,feedbackDecay,nwType,replication,id),
+    outputs += (synthRankSize,nwThreshold,nwGmax,nwExponent,nwPhysQuantile,nwSlimeMouldFun,finalTime,gravityWeight,gravityGamma,gravityDecay,feedbackWeight,feedbackGamma,feedbackDecay,nwType,replication,id),
     netLogoOutputs += ("population-hierarchies", populationHierarchies),
     netLogoOutputs += ("population-entropies", populationEntropies),
     netLogoOutputs += ("population-summaries", populationSummaries),
@@ -93,42 +93,42 @@ NetLogo6Task(workDirectory / "HEADLESS_MacroCoEvol.nlogo",cmds,embedWorkspace=tr
 )
 
 
-//val purpose = "SYNTHETICPHYSICAL_GRID"
-val purpose = "TEST"
+val purpose = "SYNTHETICPHYSICAL_GRID"
+//val purpose = "TEST"
 
 // output
 val indics_hook = AppendToCSVFileHook(workDirectory / "exploration" / ((new SimpleDateFormat("yyyyMMdd_HHmmss")).format(new Date()))+"_"+purpose+".csv") set (
   arraysOnSingleRow := true
 )
 
-val env = LocalEnvironment(10)
-//val env = EGIEnvironment("vo.complex-systems.eu",openMOLEMemory = 4000 megabytes)
+//val env = LocalEnvironment(10)
+val env = EGIEnvironment("vo.complex-systems.eu",openMOLEMemory = 4000 megabytes)
 
 
 // (synthRankSize,nwThreshold,nwGmax,finalTime,gravityWeight,gravityGamma,gravityDecay,feedbackWeight,feedbackGamma,feedbackDecay,replication,id)
 val exploration =  DirectSampling(
-  evaluation = (model on env hook indics_hook),
-  //evaluation = (model on env by 20 hook indics_hook)
-  /*((//(synthRankSize in (0.5 to 1.5 by 0.5)) x
+  //evaluation = (model on env hook indics_hook),
+  evaluation = (model on env by 10 hook indics_hook),
+  sampling = ((//(synthRankSize in (0.5 to 1.5 by 0.5)) x
     //(nwThreshold in (0.5 to 4.5 by 0.5)) x
     //(nwExponent in (0.5 to 2.0 by 0.5)) x
-    (physNwQuantile in (0.05 to 0.85 by 0.2)) x
+    (nwPhysQuantile in (0.05 to 0.85 by 0.2)) x
     //(nwGmax in (0.0 to 0.05 by 0.05)) x
     (gravityWeight in (0.00025 to 0.001 by 0.00025)) x
     (gravityGamma in (0.5 to 1.5 by 0.5)) x
     (gravityDecay in (10.0 to 210.0 by 50.0))
-  ) withIndex id )*/
-  sampling = ((LHS (
+  ) withIndex id )
+  /*sampling = ((LHS (
     1
     //,synthRankSize in Range(0.5,1.5)
     //,nwThreshold in Range(0.0,5.0)
     //,nwExponent in Range(0.0,2.0)
-    ,physNwQuantile in Range(0.0,1.0)
+    ,nwPhysQuantile in Range(0.0,1.0)
     //,nwGmax in Range(0.0,0.05)
     ,gravityWeight in Range(0.0,0.001)
     ,gravityGamma in Range(0.0,2.0)
     ,gravityDecay in Range(0.0,200.0)
-  )) withIndex id)
+  )) withIndex id)*/
     x (nwType is 1)
     x (finalTime is 30)
     x (synthRankSize is 1.0)
@@ -142,7 +142,7 @@ val exploration =  DirectSampling(
   x (feedbackWeight is 0.0)
   x (feedbackGamma is 1.0)
   x (feedbackDecay is 1.0)
-  x (replication in (UniformDistribution[Int]() take 10))
+  x (replication in (UniformDistribution[Int]() take 50))
 )
 
 exploration
