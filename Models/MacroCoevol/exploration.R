@@ -331,7 +331,7 @@ for(synthRankSize in unique(lagdata$synthRankSize)){
 
 
 #save(signifs,file=paste0(resdir,"signifs.RData"))
-save(signifs,file=paste0(resdir,"signifs_absrho.RData"))
+#save(signifs,file=paste0(resdir,"signifs_absrho.RData"))
 #load(paste0(resdir,"signifs.RData"))
 #load(paste0(resdir,"signifs_absrho.RData"))
 
@@ -341,8 +341,9 @@ save(signifs,file=paste0(resdir,"signifs_absrho.RData"))
 
 nwGmax=0.05
 
-signs = signifs[signifs$nwGmax==nwGmax,]%>%group_by(synthRankSize,nwGmax,gravityWeight,nwThreshold,gravityGamma,gravityDecay)%>%summarise(
-  sign = paste0(signif[varcouple==3],signif[varcouple==4],"/",signif[varcouple==1],signif[varcouple==2],"/",signif[varcouple==5],signif[varcouple==6]),
+signs = signifs[signifs$nwGmax==nwGmax,]%>%group_by(synthRankSize,nwGmax,gravityWeight,#nwThreshold,
+                                                    gravityGamma,gravityDecay)%>%summarise(
+  signstr = paste0(signif[which(varcouple==3)[1]],signif[which(varcouple==4)[1]],"/",signif[which(varcouple==1)[1]],signif[which(varcouple==2)[1]],"/",signif[which(varcouple==5)[1]],signif[which(varcouple==6)[1]]),
   #count=n(),
   strength=sum(abs(signif)),
   corrstrength = sum(abs(signif*val))
