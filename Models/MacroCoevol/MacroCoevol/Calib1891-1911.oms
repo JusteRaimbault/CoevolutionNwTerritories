@@ -48,7 +48,6 @@ val currentperiod = "1891-1911"
 
 
 
-
 // Model
 val model =
 NetLogo6Task(workDirectory / "HEADLESS_MacroCoEvol.nlogo",cmds,embedWorkspace=true,reuseWorkspace=true) set(
@@ -61,7 +60,8 @@ NetLogo6Task(workDirectory / "HEADLESS_MacroCoEvol.nlogo",cmds,embedWorkspace=tr
     feedbackWeight := 0.0,
     feedbackGamma := 1.0,
     feedbackDecay := 1.0,
-    nwType := 0
+    nwType := 0,
+    slimeMouldFun := 0
 )
 val modelCapsule = Capsule(model)
 
@@ -107,7 +107,7 @@ val evolution =
               ,nwThreshold in Range(0.1,20.0)
               ,nwExponent in Range(0.1,10.0)
               ,nwGmax in Range(0.0,0.2)
-              ,slimeMouldFun in Seq(0,1)
+              //,slimeMouldFun in Seq(0,1)
             ),
             mu = 200,
           objectives = Seq(logmsepop,logmsedist),
