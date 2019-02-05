@@ -85,7 +85,7 @@ NetLogo6Task(workDirectory / "HEADLESS_MacroCoEvol.nlogo",cmds,embedWorkspace=tr
 val modelCapsule = Capsule(model)
 
 
-val env = LocalEnvironment(20)
+val env = LocalEnvironment(30)
 //val env = EGIEnvironment("vo.complex-systems.eu")//,openMOLEMemory = 4000 megabytes)
 
 
@@ -133,7 +133,7 @@ val evolution =
           evaluation = model,
           termination = 3 hours,
           //termination = 10 minutes,
-          parallelism = 20//,
+          parallelism = 30//,
           //distribution = Island(10 minutes)
 )
 

@@ -48,7 +48,6 @@ val currentperiod = "1975-1999"
 
 
 
-
 // Model
 val model =
 NetLogo6Task(workDirectory / "HEADLESS_MacroCoEvol.nlogo",cmds,embedWorkspace=true,reuseWorkspace=true) set(
@@ -61,13 +60,14 @@ NetLogo6Task(workDirectory / "HEADLESS_MacroCoEvol.nlogo",cmds,embedWorkspace=tr
     feedbackWeight := 0.0,
     feedbackGamma := 1.0,
     feedbackDecay := 1.0,
-    nwType := 0
+    nwType := 0,
+    slimeMouldFun := 0
 )
 val modelCapsule = Capsule(model)
 
 
-//val local = LocalEnvironment(10)
-val grid = EGIEnvironment("vo.complex-systems.eu")//,openMOLEMemory = 4000 megabytes)
+val env = LocalEnvironment(30)
+//val env = EGIEnvironment("vo.complex-systems.eu")//,openMOLEMemory = 4000 megabytes)
 
 
 //val currentperiod = "1831-1851"
@@ -75,8 +75,8 @@ val grid = EGIEnvironment("vo.complex-systems.eu")//,openMOLEMemory = 4000 megab
 
 val datestr = (new SimpleDateFormat("yyyyMMdd")).format(new Date())
 //val purpose = "calibperiod_island_abstractnw_grid"
-//val purpose = "calibperiod_island_realnw_grid"
-val purpose = "TEST"
+val purpose = "CALIBPERIOD_REALNW_LOCAL"
+//val purpose = "TEST"
 val resdir = datestr+"_"+purpose
 
 /*val varSetting = ExplorationTask(
@@ -107,22 +107,22 @@ val evolution =
               ,nwThreshold in Range(0.1,20.0)
               ,nwExponent in Range(0.1,10.0)
               ,nwGmax in Range(0.0,0.2)
-              ,slimeMouldFun in Seq(0,1)
+              //,slimeMouldFun in Seq(0,1)
             ),
             mu = 200,
           objectives = Seq(logmsepop,logmsedist),
           evaluation = model,
-          termination = 3 hours,
+          termination = 2 hours,
           //termination = 10 minutes,
-          parallelism = 1000,
-          distribution = Island(10 minutes)
+          parallelism = 30//,
+          //distribution = Island(10 minutes)
 )
 
 //val savePopulation = SavePopulationHook(island, workDirectory / "calibration" / resdir / currentperiod)
 val savePopulation = SavePopulationHook(evolution, workDirectory / "calibration" / resdir / currentperiod)
 
 //(evolution on local hook savePopulation)
-(evolution on grid hook savePopulation)
+(evolution on env hook savePopulation)
 
 
 
