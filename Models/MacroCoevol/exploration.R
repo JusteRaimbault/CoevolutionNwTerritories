@@ -343,7 +343,7 @@ nwGmax=0.05
 
 signs = signifs[signifs$nwGmax==nwGmax,]%>%group_by(synthRankSize,nwGmax,gravityWeight,#nwThreshold,
                                                     gravityGamma,gravityDecay)%>%summarise(
-  signstr = paste0(signif[which(varcouple==3)[1]],signif[which(varcouple==4)[1]],"/",signif[which(varcouple==1)[1]],signif[which(varcouple==2)[1]],"/",signif[which(varcouple==5)[1]],signif[which(varcouple==6)[1]]),
+  sign = paste0(signif[which(varcouple==3)[1]],signif[which(varcouple==4)[1]],"/",signif[which(varcouple==1)[1]],signif[which(varcouple==2)[1]],"/",signif[which(varcouple==5)[1]],signif[which(varcouple==6)[1]]),
   #count=n(),
   strength=sum(abs(signif)),
   corrstrength = sum(abs(signif*val))

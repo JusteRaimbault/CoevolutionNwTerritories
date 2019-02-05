@@ -7,7 +7,7 @@ setwd(paste0(Sys.getenv('CS_HOME'),'/CoevolutionNwTerritories/Models/MacroCoevol
 
 periods = c("1831-1851","1841-1861","1851-1872","1881-1901","1891-1911","1921-1936","1946-1968","1962-1982","1975-1999")
 
-resdir = '20190203_CALIBPERIOD_REALNW_LOCAL/'
+resdir = '20190203_CALIBPERIOD_REALNW/'
 
 params = c("growthRate","gravityGamma","gravityDecay","gravityWeight"#,"feedbackGamma","feedbackDecay","feedbackWeight")
             ,"nwThreshold","nwExponent","nwGmax")
@@ -17,20 +17,22 @@ paramnames = list("growthRate"=expression(r[0]),"gravityGamma"=expression(gamma[
                   "nwGmax"=expression(g[max])
                   )
 
-figdir = paste0(Sys.getenv('CN_HOME'),'/Results/MacroCoEvol/Calibration/',resdir,'/');dir.create(figdir)
+figdir = paste0(Sys.getenv('CS_HOME'),'/CoevolutionNwTerritories/Results/MacroCoEvol/Calibration/',resdir,'/');dir.create(figdir)
 
 
-#filters=list();for(p in periods){filters[[p]]=c(100,100)}
-filters = list(c(24.5,21.92),c(25,22.8),c(25.5,23.6),
-               c(24.75,22),c(25,19.9),c(25.5,18),
-               c(27.1,19),c(28.1,19),c(27.1,16.22))
+filters=list();for(p in periods){filters[[p]]=c(0,100)}
+#filters = list(c(24.5,21.92),c(25,22.8),c(25.5,23.6),
+#               c(24.75,22),c(25,19.9),c(25.5,18),
+#               c(27.1,19),c(28.1,19),c(27.1,16.22))
 names(filters)<-periods
 
 filtered=T
 
 #plots=list()
-for(param in params){
-  cperiods = c();cparam=c();logmsepop=c();logmsedist=c()
+#for(param in params){
+#  cperiods = c();cparam=c();logmsepop=c();logmsedist=c()
+  
+  
   for(period in periods){
     latestgen = max(as.integer(sapply(strsplit(sapply(strsplit(list.files(paste0(resdir,'/',period)),"population"),function(s){s[2]}),".csv"),function(s){s[1]})))
     res <- as.tbl(read.csv(paste0(resdir,'/',period,'/population',latestgen,'.csv')))
@@ -46,7 +48,8 @@ for(param in params){
   #plots[[param]]=g+geom_point()+scale_colour_gradient(low="blue",high="red",name=param)+facet_wrap(~period,scales = "free")+xlab("log MSE population")+ylab("log MSE distance")
   g+geom_point()+scale_colour_gradient(low="blue",high="red",name=paramnames[[param]])+facet_wrap(~period,scales = "free")+xlab(expression(epsilon[G]))+ylab(expression(epsilon[D]))+stdtheme
   ggsave(paste0(figdir,"pareto_",param,"_filt",filtered,".pdf"),width=30,height=20,units='cm')
-}
+
+#}
 #multiplot(plotlist = plots,cols=3)
 
 

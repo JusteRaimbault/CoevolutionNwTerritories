@@ -65,12 +65,12 @@ to display-network
     ]
   ]
   
-  if network-type = "physical" [
+  if network-type = "physical" or network-type = "real" [
     if link-display-var = "relative-speed" [
       ;ask links [set thickness relative-speed / ((1 + network-reinforcment-gmax) ^ final-time-step)]
       ;ask links [set hidden? false] ask paths with [path-length < effective-length] [set hidden? true]
       let mi min [ln relative-speed] of links let ma max [ln relative-speed] of links
-      ask links [set thickness 10 * ((ln relative-speed) - mi) / (ma - mi) ]
+      ask links [set thickness 4 * ((ln relative-speed) - mi) / (ma - mi) ]
     ]
     if link-display-var = "flow" [
       ask links [set thickness 25 * ln (1 + flow)]
