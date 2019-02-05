@@ -42,11 +42,13 @@ to display-cities
   
   if visualization = "mse" [ask cities [set color-var (current-mse / population * ptot)]]
   if visualization = "mse-log" [ask cities [set color-var city-mse-log ticks]]
-
+  
+  
   let mi min [color-var] of cities let ma max [color-var] of cities
   ask cities [
     set size (ln population) ;/ 10
     ;set color gradient:scale (list extract-rgb blue extract-rgb red) color-var mi ma
+    ;set color scale-color red color-var (mi - 2) ma
     set color scale-color red color-var mi ma
   ]
 end
@@ -70,7 +72,8 @@ to display-network
       ;ask links [set thickness relative-speed / ((1 + network-reinforcment-gmax) ^ final-time-step)]
       ;ask links [set hidden? false] ask paths with [path-length < effective-length] [set hidden? true]
       let mi min [ln relative-speed] of links let ma max [ln relative-speed] of links
-      ask links [set thickness 4 * ((ln relative-speed) - mi) / (ma - mi) ]
+      ;ask links [set thickness 4 * ((ln relative-speed) - mi) / (ma - mi) ]
+      ask links [set thickness 1.5 * ((ln relative-speed) - mi) / (ma - mi) ]
     ]
     if link-display-var = "flow" [
       ask links [set thickness 25 * ln (1 + flow)]

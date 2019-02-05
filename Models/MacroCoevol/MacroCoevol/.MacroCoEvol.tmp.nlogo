@@ -497,7 +497,7 @@ CHOOSER
 period
 period
 "1831-1851" "1841-1861" "1851-1872" "1881-1901" "1891-1911" "1921-1936" "1946-1968" "1962-1982" "1975-1999" "full"
-6
+8
 
 PLOT
 983
@@ -573,7 +573,7 @@ CHOOSER
 setup-type
 setup-type
 "synthetic" "gis"
-0
+1
 
 SLIDER
 1
@@ -661,7 +661,7 @@ CHOOSER
 network-type
 network-type
 "virtual" "physical" "real" "fixed"
-1
+2
 
 SLIDER
 6
@@ -801,7 +801,7 @@ physical-network-reinforcment-threshold
 physical-network-reinforcment-threshold
 0
 0.1
-2.169884876234831E-5
+0.004322980941530613
 0.0005
 1
 NIL

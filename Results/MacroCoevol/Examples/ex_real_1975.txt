@@ -1,0 +1,12 @@
+
+adjust :
+ask links with [sum [count my-links] of both-ends <= 3][die]
+ask links with [sum [count my-links] of both-ends <= 4][die]
+observer> ask path 629 682 [die]
+
+After run :
+ - diplay.nls : + set color scale-color red color-var (mi - 2) ma
+display-cities
+
++ display-network : ask links [set thickness 1.5 * ((ln relative-speed) - mi) / (ma - mi) ]
+
