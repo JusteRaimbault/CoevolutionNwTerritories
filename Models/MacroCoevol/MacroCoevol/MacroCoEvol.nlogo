@@ -230,10 +230,10 @@ NIL
 HORIZONTAL
 
 OUTPUT
-984
-677
-1381
-847
+989
+788
+1386
+958
 10
 
 SLIDER
@@ -500,10 +500,10 @@ period
 6
 
 PLOT
-1003
-519
-1211
-669
+983
+633
+1191
+783
 profile-logmse
 NIL
 NIL
@@ -518,10 +518,10 @@ PENS
 "default" 1.0 0 -16777216 true "" ""
 
 PLOT
-1214
-519
-1406
-669
+1194
+633
+1386
+783
 profile-mselog
 NIL
 NIL
@@ -573,7 +573,7 @@ CHOOSER
 setup-type
 setup-type
 "synthetic" "gis"
-1
+0
 
 SLIDER
 1
@@ -637,9 +637,9 @@ HORIZONTAL
 
 PLOT
 932
-271
+248
 1125
-448
+425
 rank-size
 NIL
 NIL
@@ -661,7 +661,7 @@ CHOOSER
 network-type
 network-type
 "virtual" "physical" "real" "fixed"
-2
+1
 
 SLIDER
 6
@@ -695,9 +695,9 @@ HORIZONTAL
 
 PLOT
 1144
-276
+269
 1350
-417
+410
 distances
 NIL
 NIL
@@ -855,9 +855,9 @@ geo-paths?
 -1000
 
 CHOOSER
-163
+177
 291
-419
+293
 336
 slime-mould-reinforcment-function
 slime-mould-reinforcment-function

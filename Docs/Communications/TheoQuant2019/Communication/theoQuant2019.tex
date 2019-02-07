@@ -83,7 +83,7 @@ $^{3}$UMR CNRS 8504 G{\'e}ographie-cit{\'e}s
 
 
 \date{Theo Quant 2019\\\smallskip
-7 février 2019
+6 février 2019
 }
 
 \frame{\maketitle}
@@ -321,9 +321,25 @@ $\rightarrow$ Truly multi-scale models (coupling different ontologies and not ju
 
 }
 
-%\sframe{Real physical network}{
+\sframe{Real physical network}{
 % Railway network
-%}
+
+\textit{Parametrisation on the French system of cities with temporal windows (see \cite{raimbault2018indirect}); train network data from \cite{mimeur:hal-01616746}}
+
+
+\bigskip
+
+
+\centering
+
+\includegraphics[width=0.48\textwidth]{figures/ex_real_1975.png}\hspace{0.1cm}
+\includegraphics[width=0.48\textwidth]{figures/ex_real_1975_tf_adjusted.png}
+
+}
+
+
+
+
 
 
 \sframe{Model exploration and calibration}{
@@ -347,9 +363,30 @@ Large experience plan and bi-objective calibration on 9 periods $\rightarrow$ us
 \bigskip
 
 \textbf{Come to the demonstration tomorrow, and save the date for the next summer school (2020) !} 
-\\(\texttt{https://exmodelo.org/})
+\texttt{https://exmodelo.org/}
 
 }
+
+
+
+\sframe{Model behavior}{
+
+\textit{Qualitatively similar trajectories in time}
+
+\bigskip
+
+
+\begin{columns}
+	\begin{column}{0.45\linewidth}
+		\includegraphics[width=\textwidth]{figures/6-2-2-fig-macrocoevol-behavior-time.jpg}
+	\end{column}
+	\begin{column}{0.45\linewidth}
+		\includegraphics[width=\textwidth]{figures/closenessSummaries_mean_synthRankSize1_gravityWeight0_001_gravityDecay10_nwExponent1.png}\\\includegraphics[width=\textwidth]{figures/populationEntropies_synthRankSize1_gravityWeight0_001_gravityGamma0_5_nwExponent1.png}
+	\end{column}
+\end{columns}
+
+}
+
 
 
 \sframe{Model behavior}{
@@ -357,7 +394,7 @@ Large experience plan and bi-objective calibration on 9 periods $\rightarrow$ us
 % Systematic explorations of the model on synthetic data using the OpenMole software show that even with the same processes for network growth, qualitative behavior fundamentally differ.
 % -> OK ; ex no existence of the complexity maximum
 
-\textit{Strongly different qualitative behavior}
+\textit{Strongly different qualitative behavior for aggregated indicators}
 
 \bigskip
 
@@ -383,14 +420,24 @@ Large experience plan and bi-objective calibration on 9 periods $\rightarrow$ us
 
 
 
+%===============
 % with 20190201_174314_SYNTHETICPHYSICAL_GRID
 % unique(signs$sign)[grep('11',unique(signs$sign))]
 %[1] "00/11/11" "00/11/00" "00/01/11"
 % -> only three coevolution regimes
 
-% TODO redo with new runs
+% redo with new runs
 
-\textit{Less co-evolution regimes: similar results than \cite{raimbault2018unveiling} which explored the SimpopNet model}
+%===============
+% with 20190204_211508_SYNTHETICPHYSICAL_GRID
+%unique(signs$sign)[grep('11',unique(signs$sign))]
+%[1] "00/01/11" "00/11/01" "00/11/00" "00/11/11"
+
+
+\justify
+
+
+\textit{Less co-evolution regimes: similar results than \cite{raimbault2018unveiling} which explored the SimpopNet model} (only 3 against 19 co-evolutive regimes)
 
 \bigskip
 
@@ -400,9 +447,15 @@ Large experience plan and bi-objective calibration on 9 periods $\rightarrow$ us
 		\includegraphics[width=\textwidth]{figures/6-2-2-fig-macrocoevol-correlations.jpg}
 	\end{column}
 	\begin{column}{0.5\linewidth}
+		\includegraphics[width=\textwidth]{figures/laggedregimes_absrho_nwGmax0_05.png}
 	\end{column}
 \end{columns}
 
+% arma(1,1) behavior -> WTF ???
+
+\medskip
+
+\footnotesize \textit{Comparison of regimes with strongest entanglement: auto-correlation bias with virtual network; apparent AR(1) behavior with physical network: sensitivity to indicators definition ?}
 
 
 }
@@ -416,7 +469,28 @@ Large experience plan and bi-objective calibration on 9 periods $\rightarrow$ us
 % - rq : much much better results for abstract flows : few evolutions, do not accurately reflected by flow reinforcement.
 % - why so few points on the Pareto front ?
 
-% TODO results calib
+% TODO results calib : latest
+
+
+\justify
+
+\textit{Much more mediocre results for distance matrices, improvement for population fit on some time windows: converge with the difficulty to characterize co-evolution with the same data \cite{raimbault2018modeling} ?}
+
+\bigskip
+\bigskip
+
+
+\begin{columns}
+	\begin{column}{0.53\linewidth}
+		\includegraphics[width=\textwidth]{figures/pareto_comparison_filtFALSE.pdf}
+	\end{column}
+	\begin{column}{0.53\linewidth}
+		\includegraphics[width=\textwidth]{figures/pareto_filtFALSE.pdf}
+	\end{column}
+\end{columns}
+
+
+
 
 
 
@@ -450,7 +524,7 @@ Large experience plan and bi-objective calibration on 9 periods $\rightarrow$ us
 
 \medskip
 
-$\rightarrow$ Such hybrid models closer to the actual complexity of co-evolution ?
+$\rightarrow$ Such hybrid models closer or further to the actual complexity of co-evolution ?
 
 \medskip
 
@@ -464,11 +538,15 @@ $\rightarrow$ Implications for planning still to be determined (two different po
 \medskip
 
 % cf simpopnet chapter
-$\rightarrow$ fair comparison of number of interaction regimes using PSE algorithm 
+$\rightarrow$ Fair comparison of number of interaction regimes using PSE algorithm \cite{10.1371/journal.pone.0138212}; fair comparison of calibrations taking into account number of parameters \cite{piou2009proposing}
 
 \medskip
 
-$\rightarrow$ multi-modeling for network growth in the hybrid model
+$\rightarrow$ Multi-modeling for network growth in the hybrid model, including topological evolution \cite{raimbault2018multi}
+
+\medskip
+
+$\rightarrow$ Towards the inclusion of governance processes in co-evolution models \cite{lenechet:halshs-01272236}
 
 
 
@@ -491,7 +569,7 @@ $\rightarrow$ Towards multi-scalar models and multi-models, calibrated on severa
 
 \medskip
 
-$\rightarrow$ Towards an integration of complexities \cite{raimbault2018relating} \cite{}: foundations of integrative theories of territorial systems 
+$\rightarrow$ Towards an integration of complexities \cite{raimbault2018relating} \cite{2019arXiv190109869R}: foundations of integrative theories of territorial systems 
 %Réflexivité (entre autre complexité appliquée à la complexité) nécessaire pour une connaissance complexe \cite{morin1991methode} ; vers un perspectivisme appliqué ? \cite{banos2018spatialised}
 %Vers une intégration plus systématique (épistémologiquement et théoriquement) des différentes complexités pour l'étude des systèmes territoriaux ? \\\cite{raimbault2018relating}
 
@@ -499,7 +577,7 @@ $\rightarrow$ Towards an integration of complexities \cite{raimbault2018relating
 
 \footnotesize
 
-\textbf{References}
+\textbf{Some references}
 
 %Raimbault, J. (2018). Calibration of a density-based model of urban morphogenesis. PloS one, 13(9):e0203516
 
@@ -520,10 +598,11 @@ Raimbault, J. (2019). Modeling the co-evolution of cities and networks. Forthcom
 %Raimbault, J., Banos, A., \& Doursat, R. (2014, June). A Hybrid Network/Grid Model of Urban Morphogenesis and Optimization. In 4th International Conference on Complex Systems and Applications (pp. 51-60).
 
 \bigskip
+\bigskip
 
 
 % + dataverse
-\footnotesize{ - Code, data and results\\ \texttt{https://github.com/JusteRaimbault/CoevolutionNwTerritories}\\
+\footnotesize{ - Code, data and results at\\\texttt{https://github.com/JusteRaimbault/CoevolutionNwTerritories}\\
 - Acknowledgements to the \textit{European Grid Infrastructure} and its \textit{National Grid Initiatives} (\textit{France-Grilles} in particular) for the technical support and the infrastructure.
 
 }
@@ -536,9 +615,11 @@ Raimbault, J. (2019). Modeling the co-evolution of cities and networks. Forthcom
 \sframe{Reserve slides}{
 	
 	\centering
-	{\textbf \Huge
-	Reserve slides
-	}
+	
+	\Large
+
+\textbf{Reserve Slides}
+	
 }
 
 
@@ -639,6 +720,30 @@ where $\gamma_s$ is a hierarchy parameter, $\phi_0$ a threshold parameter and $g
  
 }
 
+
+\sframe{Synthetic system of cities}{
+
+\justify
+
+Generation of synthetic systems of cities for model exploration:
+
+\medskip
+
+\begin{itemize}
+	\item Cities at random locations (farther from each other by a fixed radius $r_0 = 10$); population distribution with a scaling law $P_i = P_0\cdot i^{-\alpha_S}$ ($\alpha_S$ parameter, $P_0 = 100000$, for $N = 30$ cities)
+	\item Create a grid network with nodes at a fixed distance $r_N = 15$; remove a fixed proportion $p_l = 0.2$ of links; jitter node positions by $\pm r_N$ for each coordinate (avoids ties in shortest routes and oscillating behaviors e.g.)
+	\item Connect cities to the network with euclidian projection to closest link
+\end{itemize}
+
+\medskip
+
+Applying the method of \cite{raimbault2018space} for spatial sensitivity to the SimpopNet model, \cite{raimbault2018unveiling} shows that the model is sensible to some (e.g. $\alpha_S$) $\rightarrow$ remains to be checked here.
+
+
+% TODO : vraiment pas teste la sensiiblite au nombre de villes ; should be okay as indicators are integrated ? -> but possibly different qualitative regimes. (here N=30 reasonable for the "spatial extent" and size of cities : scaled european-type urban system ?)
+
+
+}
 
 
 

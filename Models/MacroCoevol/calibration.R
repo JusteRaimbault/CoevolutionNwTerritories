@@ -7,7 +7,7 @@ setwd(paste0(Sys.getenv('CS_HOME'),'/CoevolutionNwTerritories/Models/MacroCoevol
 
 periods = c("1831-1851","1841-1861","1851-1872","1881-1901","1891-1911","1921-1936","1946-1968","1962-1982","1975-1999")
 
-resdir = '20190203_CALIBPERIOD_REALNW/'
+resdir = '20190205_CALIBPERIOD_REALNW/'
 
 params = c("growthRate","gravityGamma","gravityDecay","gravityWeight"#,"feedbackGamma","feedbackDecay","feedbackWeight")
             ,"nwThreshold","nwExponent","nwGmax")
@@ -22,17 +22,20 @@ figdir = paste0(Sys.getenv('CS_HOME'),'/CoevolutionNwTerritories/Results/MacroCo
 #synthCalibRes = paste0(Sys.getenv('CN_HOME'),'/Models/MacroCoevol/MacroCoevol/calibres/20170929_calibperiod_nsga_abstractnw_local/')
 synthCalibRes = list();for(p in periods){synthCalibRes[[p]]=paste0(Sys.getenv('CN_HOME'),'/Models/MacroCoevol/MacroCoevol/calibres/20171122_calibperiod_island_abstractnw_grid/',p)}
 
-physCalibRes = list(
-  "1831-1851"=paste0(getwd(),'/calibres/20190204_CALIBPERIOD_REALNW_GRID/1831-1851'),
-  "1841-1861"=paste0(getwd(),'/calibres/20190204_CALIBPERIOD_REALNW_GRID/1841-1861'),
-  "1851-1872"=paste0(getwd(),'/calibres/20190204_CALIBPERIOD_REALNW_LOCAL/1851-1872'),
-  "1881-1901"=paste0(getwd(),'/calibres/20190204_CALIBPERIOD_REALNW_LOCAL/1881-1901'),
-  "1891-1911"=paste0(getwd(),'/calibres/20190205_CALIBPERIOD_REALNW_LOCAL/1891-1911'),
-  "1921-1936"=paste0(getwd(),'/calibres/20190205_CALIBPERIOD_REALNW_LOCAL/1921-1936'),
-  "1946-1968"=paste0(getwd(),'/calibres/20190204_CALIBPERIOD_REALNW_LOCAL/1946-1968'),
-  "1962-1982"=paste0(getwd(),'/calibres/20190205_CALIBPERIOD_REALNW_LOCAL/1962-1982')#,
-  #"1975-1999"=paste0(getwd(),'/calibres/20190205_CALIBPERIOD_REALNW_LOCAL/1962-1982')
-)
+#physCalibRes = list(
+#  "1831-1851"=paste0(getwd(),'/calibres/20190204_CALIBPERIOD_REALNW_GRID/1831-1851'),
+#  "1841-1861"=paste0(getwd(),'/calibres/20190204_CALIBPERIOD_REALNW_GRID/1841-1861'),
+#  "1851-1872"=paste0(getwd(),'/calibres/20190204_CALIBPERIOD_REALNW_LOCAL/1851-1872'),
+#  "1881-1901"=paste0(getwd(),'/calibres/20190204_CALIBPERIOD_REALNW_LOCAL/1881-1901'),
+#  "1891-1911"=paste0(getwd(),'/calibres/20190205_CALIBPERIOD_REALNW_LOCAL/1891-1911'),
+#  "1921-1936"=paste0(getwd(),'/calibres/20190205_CALIBPERIOD_REALNW_LOCAL/1921-1936'),
+#  "1946-1968"=paste0(getwd(),'/calibres/20190204_CALIBPERIOD_REALNW_LOCAL/1946-1968'),
+#  "1962-1982"=paste0(getwd(),'/calibres/20190205_CALIBPERIOD_REALNW_LOCAL/1962-1982')#,
+#  #"1975-1999"=paste0(getwd(),'/calibres/20190205_CALIBPERIOD_REALNW_LOCAL/1962-1982')
+#)
+
+physCalibRes = list();for(p in periods){physCalibRes[[p]]=paste0(getwd(),'/calibres/20190205_CALIBPERIOD_REALNW_LOCAL/',p)}
+
 
 filters=list();for(p in periods){filters[[p]]=c(0,100)}
 #filters = list(c(24.5,21.92),c(25,22.8),c(25.5,23.6),
@@ -57,7 +60,7 @@ getFront<- function(period,resdirs,filtered,filters){
 #for(param in params){
 
   cperiods = c();cparam=c();logmsepop=c();logmsedist=c();ctypes=c()
-  for(period in periods[1:(length(periods)-1)]#periods
+  for(period in periods
       ){
     ressynth=getFront(period,synthCalibRes,filtered,filters)
     resphys=getFront(period,physCalibRes,filtered,filters)
@@ -69,15 +72,21 @@ getFront<- function(period,resdirs,filtered,filters){
     cperiods=append(cperiods,rep(period,nrow(resphys)));ctypes=append(ctypes,rep("physical",nrow(resphys)))
     #cparam=append(cparam,res[[param]])
   }
-  g=ggplot(data.frame(logmsepop=logmsepop,logmsedist=logmsedist,#param=cparam,
-                      period=cperiods,type=ctypes),
-           aes_string(x="logmsepop",y="logmsedist",colour="type"#colour="param"
-                      ))
+  
+  currentdata = data.frame(logmsepop=logmsepop,logmsedist=logmsedist,#param=cparam,
+                           period=cperiods,type=ctypes)
+  
+  g=ggplot(currentdata, aes_string(x="logmsepop",y="logmsedist",colour="type"))#colour="param" 
   #plots[[param]]=g+geom_point()+scale_colour_gradient(low="blue",high="red",name=param)+facet_wrap(~period,scales = "free")+xlab("log MSE population")+ylab("log MSE distance")
   g+geom_point()+#scale_colour_gradient(low="blue",high="red",name=paramnames[[param]])+
     facet_wrap(~period,scales = "free")+xlab(expression(epsilon[G]))+ylab(expression(epsilon[D]))+stdtheme
-  ggsave(paste0(figdir,"pareto_",param,"_filt",filtered,".pdf"),width=30,height=20,units='cm')
+  ggsave(paste0(figdir,"pareto_comparison_filt",filtered,".pdf"),width=30,height=20,units='cm')
 
+  # phys only
+  g=ggplot(currentdata[currentdata$type=="physical",],aes(x=logmsepop,y=logmsedist))
+  g+geom_point()+facet_wrap(~period,scales = "free")+xlab(expression(epsilon[G]))+ylab(expression(epsilon[D]))+stdtheme
+  ggsave(paste0(figdir,"pareto_filt",filtered,".pdf"),width=30,height=20,units='cm')
+  
 #}
 #multiplot(plotlist = plots,cols=3)
 
