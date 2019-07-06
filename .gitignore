@@ -1,3 +1,5 @@
 .texpadtmp
 .DS_Store
 *.eps
+.Rhistory
+
