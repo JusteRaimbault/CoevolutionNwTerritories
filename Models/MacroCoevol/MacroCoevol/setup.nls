@@ -80,8 +80,6 @@ end
 to setup:setup-globals
   set alpha0 3 set n0 3
   
-  set indicator-sampling-time-step 5
-  
   set slime-mould-node-distance 15;20
   
   set slime-mould-link-deletion-proportion 0.2
@@ -360,6 +358,8 @@ end
 
 
 to setup:setup-indicators
+  
+  set indicator-sampling-time-step 1
   
   set indicator-sample-cities to-list cities
   

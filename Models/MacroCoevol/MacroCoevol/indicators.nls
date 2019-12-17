@@ -280,6 +280,36 @@ to-report trajectories-complexity [var]
 end
 
 
+
+; history of variables
+to-report var-history [variable]
+  let res []
+  foreach seq 0 final-time-step indicator-sampling-time-step [t ->
+    let currentvar []
+    foreach indicator-sample-cities [? -> ask ? [set currentvar lput (table:get city-values-table (list t variable index)) currentvar]]
+    set res lput currentvar res
+  ]
+  report res
+end
+
+to-report populations-history
+  report var-history "city-population"
+end
+
+to-report closenesses-history
+  report var-history "city-closeness-centrality"
+end
+
+to-report accessibilities-history
+  report var-history "city-accessibility"
+end
+ 
+
+
+
+
+
+
 ;;
 ; hierarchy in the system
 to-report rank-size-hierarchy [x]
@@ -318,6 +348,7 @@ to-report population-summary [t]
   let pops matrix:get-column populations t
   report summary pops
 end
+
 
 
 to-report population-hierarchies

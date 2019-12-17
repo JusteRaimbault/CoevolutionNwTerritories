@@ -10,7 +10,7 @@ library(segmented)
 #' basic rank size hierarchy
 hierarchy <- function(values){
   x = values[values>0]
-  reg = lm(data = data.frame(x = log(1:length(x)),y = log(x)),y~x)
+  reg = lm(data = data.frame(x = log(1:length(x)),y = sort(log(x),decreasing = T)),y~x)
   return(list(slope = reg$coefficients[2],rsquared = summary(reg)$adj.r.squared))
 }
 
@@ -19,10 +19,10 @@ hierarchy <- function(values){
 segHierarchy <- function(values){
   tryCatch({
     x = values[values>0]
-    reg = lm(data = data.frame(x = log(1:length(x)),y = log(x)),y~x)
+    reg = lm(data = data.frame(x = log(1:length(x)),y = sort(log(x),decreasing = T)),y~x)
     seg<-segmented(reg,seg.Z=~x,npsi=1)
     return(list(slope1 = seg$coefficients[2], slope2 = seg$coefficients[3], breakRank = exp(seg$psi[2]),rsquared = summary(seg)$adj.r.squared))
-  },error = function(e){return(list(slope1=NA,slope2=NA,breakRank=NA,rsquared=NA))})
+  },error = function(e){return(list(slope1=0.0,slope2=0.0,breakRank=0.0,rsquared=0.0))})
 }
 
 hierarchies <- function(trajectories){

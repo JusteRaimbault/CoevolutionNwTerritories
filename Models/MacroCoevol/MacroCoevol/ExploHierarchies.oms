@@ -20,6 +20,13 @@ val feedbackDecay = Val[Double]
 
 val nwType = Val[String]
 
+
+// workflow variables
+val populations = Val[Array[Array[Double]]]
+val closenesses = Val[Array[Array[Double]]]
+val accessibilities = Val[Array[Array[Double]]]
+
+
 // indicators
 // distributions
 val hierarchiesPop = Val[Array[Double]]
@@ -43,11 +50,13 @@ val id = Val[Int]
 val replication = Val[Int]
 
 // setup-experiment-synthetic [synth-ranksize nw-type nw-threshold nw-gmax nw-exponent physical-nw-rein-quantile nw-slimemould-fun grav-weight grav-gamma grav-decay feed-weight feed-gamma feed-decay final-time seed
-val cmds = Seq("setup-experiment-synthetic ${synthRankSize} ${nwType} ${nwThreshold} ${nwGmax} ${nwExponent} ${nwPhysQuantile} ${nwSlimeMouldFun} ${gravityWeight} ${gravityGamma} ${gravityDecay} ${feedbackWeight} ${feedbackGamma} ${feedbackDecay} ${finalTime} ${replication}","run-experiment")
+val cmds = Seq("setup-experiment-synthetic ${synthRankSize} \"${nwType}\" ${nwThreshold} ${nwGmax} ${nwExponent} ${nwPhysQuantile} \"${nwSlimeMouldFun}\" ${gravityWeight} ${gravityGamma} ${gravityDecay} ${feedbackWeight} ${feedbackGamma} ${feedbackDecay} ${finalTime} ${replication}","run-experiment")
 
 val model = NetLogo6Task(workDirectory / "HEADLESS_MacroCoEvol.nlogo",cmds,embedWorkspace=true,reuseWorkspace=true) set(
     (inputs, outputs) += (synthRankSize,nwThreshold,nwGmax,nwExponent,nwPhysQuantile,nwSlimeMouldFun,finalTime,gravityWeight,gravityGamma,gravityDecay,feedbackWeight,feedbackGamma,feedbackDecay,nwType,replication,id),
-    outputs += (populations, closenesses, accessibilities)
+    outputs += populations mapped "populations-history",
+    outputs += closenesses mapped "closenesses-history",
+    outputs += accessibilities mapped "accessibilities-history"
 )
 
 val computeIndicators = RTask(
@@ -55,7 +64,9 @@ val computeIndicators = RTask(
   libraries = Seq("segmented")
   ) set (
   (inputs, outputs) += (synthRankSize,nwThreshold,nwGmax,nwExponent,nwPhysQuantile,nwSlimeMouldFun,finalTime,gravityWeight,gravityGamma,gravityDecay,feedbackWeight,feedbackGamma,feedbackDecay,nwType,replication,id),
-  inputs += (populations, closenesses, accessibilities),
+  inputs += populations mapped "populations",
+  inputs += closenesses mapped "closenesses",
+  inputs += accessibilities mapped "accessibilities",
   outputs += hierarchiesPop mapped "hierarchies(populations)",
   outputs += hierarchiesCloseness mapped "hierarchies(closenesses)",
   outputs += hierarchiesAccessibility mapped "hierarchies(accessibilities)",
@@ -71,32 +82,32 @@ val computeIndicators = RTask(
   resources += workDirectory / "indicators.R"
 )
 
-val eval = (model -- computeIndicators)
-
+val purpose = "HIERARCHIES_SYNTHETICVIRTUAL_GRID"
 //val purpose = "SYNTHETICPHYSICAL_GRID"
-val purpose = "TEST"
+//val purpose = "TEST"
 
 // output
-val indics_hook = AppendToCSVFileHook(workDirectory / "exploration" / ((new SimpleDateFormat("yyyyMMdd_HHmmss")).format(new Date()))+"_"+purpose+".csv",arrayOnRow = true)
+val indics_hook = AppendToCSVFileHook(workDirectory / "exploration" / (((new SimpleDateFormat("yyyyMMdd_HHmmss")).format(new Date()))+"_"+purpose+".csv"),arrayOnRow = true)
 
-val env = LocalEnvironment(10)
-//val env = EGIEnvironment("vo.complex-systems.eu",openMOLEMemory = 4000 megabytes)
+//val env = LocalEnvironment(5)
+val env = EGIEnvironment("vo.complex-systems.eu",openMOLEMemory = 4000 megabytes)
 
 
 // (synthRankSize,nwThreshold,nwGmax,finalTime,gravityWeight,gravityGamma,gravityDecay,feedbackWeight,feedbackGamma,feedbackDecay,replication,id)
 val exploration =  DirectSampling(
-  evaluation = (eval on env hook indics_hook),
-  //evaluation = (eval on env by 10 hook indics_hook),
-  /*sampling = ((//(synthRankSize in (0.5 to 1.5 by 0.5)) x
-    //(nwThreshold in (0.5 to 4.5 by 0.5)) x
-    //(nwExponent in (0.5 to 2.0 by 0.5)) x
-    (nwPhysQuantile in (0.05 to 0.85 by 0.2)) x
-    //(nwGmax in (0.0 to 0.05 by 0.05)) x
+  //evaluation = ((model on env) -- (computeIndicators on env hook indics_hook)),
+  evaluation = ((model on env by 500) -- (computeIndicators on env by 1000 hook indics_hook)),
+  sampling = ((
+    (synthRankSize in (0.5 to 1.5 by 0.5)) x
+    (nwThreshold in (0.5 to 4.5 by 1.0)) x
+    (nwExponent in (0.5 to 1.5 by 0.5)) x
+    //(nwPhysQuantile in (0.05 to 0.85 by 0.2)) x
+    (nwGmax in (0.0 to 0.05 by 0.05)) x
     (gravityWeight in (0.00025 to 0.001 by 0.00025)) x
     (gravityGamma in (0.5 to 1.5 by 0.5)) x
     (gravityDecay in (10.0 to 210.0 by 50.0))
-  ) withIndex id )*/
-  sampling = ((LHS (
+  ) withIndex id )
+  /*sampling = ((LHS (
     1
     ,synthRankSize in Range(0.5,1.5)
     ,nwThreshold in Range(0.0,5.0)
@@ -106,7 +117,7 @@ val exploration =  DirectSampling(
     ,gravityWeight in Range(0.0,0.001)
     ,gravityGamma in Range(0.0,2.0)
     ,gravityDecay in Range(0.0,200.0)
-  )) withIndex id)
+  )) withIndex id)*/
     x (nwType is "virtual") // {"virtual", "physical"}
     x (finalTime is 30)
     //x (synthRankSize is 1.0)
@@ -121,7 +132,7 @@ val exploration =  DirectSampling(
   x (feedbackWeight is 0.0)
   x (feedbackGamma is 1.0)
   x (feedbackDecay is 1.0)
-  x (replication in (UniformDistribution[Int]() take 5))
+  x (replication in (UniformDistribution[Int]() take 50))
 )
 
 exploration
