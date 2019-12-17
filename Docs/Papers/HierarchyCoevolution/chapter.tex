@@ -1,0 +1,215 @@
+\documentclass[english,fleqn,allpages]{ISTE_science}[2018/07/30]
+
+
+\setcounter{MaxMatrixCols}{30}
+\usepackage{amsthm}
+%\usepackage{OKS_ISTE}
+%\CropMarksOn
+\usepackage{natbib}
+\renewcommand\bibsection{\section{\bibname}}
+\setlength{\bibsep}{3pt} 
+\makeatletter
+
+%\newcounter{numdef}[chapter] \global\long\def\thenumdef{\thechapter.\arabic{numdef}}
+% \global\long\def\NumberedDefinition#1{%refstepcounter{numdef}GenericDefinition{Definition~thenumdef}{#1}
+%}
+
+
+\newsavebox{\fminibox} \newlength{\fminilength} \newenvironment{fminipage}[1][\linewidth]{%
+ \setlength{\fminilength}{#1 - 2\fboxsep - 2\fboxrule}
+ \begin{lrbox}{\fminibox}
+  \begin{minipage}{\fminilength}}{%
+  \end{minipage}
+ \end{lrbox}
+ \noindent
+ \fbox{\usebox{\fminibox}}}
+
+
+\title{Hierarchy and co-evolution processes}
+%
+%\maketitle
+%Rheology of non-spherical particle suspensions]%{%
+%Setting Monographs and Edited Collections\\
+%According to the \hermes{} Guidelines\\
+%with the \oh{} Package}
+
+
+%\author{%
+%Roger \Name{Rousseau} (class, styles, and tools design)\\[2pt]
+%Christian \Name{Scheen} (English documentation)}
+
+
+%\date{%
+%Version~\PackageVersion{}, \filedate{}}
+
+
+\begin{document}
+\raggedbottom
+%\hbadness=2000 \emergencystretch=2em \lefthyphenmin=3 \righthyphenmin=3
+
+%\frontmatter
+
+%\maketitle
+%\tableofcontents
+
+%\raggedbottom
+\mainmatter
+%\setcounter{chapter}{9}
+\chapter{Hierarchy and co-evolution processes}%{Juste \Name{Raimbault}}
+\label{chap-struct}
+
+\markboth{Hierarchy and co-evolution processes}{Hierarchy and co-evolution processes}
+
+
+\authorname{Juste \Name{Raimbault}}{Center for Advanced Spatial Analysis, University College London}
+
+
+
+\cite{pumain:halshs-02303136}
+
+%%%%%%%%%%%%%%%%
+\section{Introduction}
+
+% book subject "Centralités et hiérarchies des réseaux et des territoires"
+% => specific geo of networks and territories
+
+
+\subsection{Complexity and hierarchy}
+
+sci pol \cite{crumley1987dialectical}
+
+Physique \cite{10.1371/journal.pone.0033799}, Systèmes complexes \cite{pumain2006hierarchy}
+
+
+\cite{jiang2009street} transportation flows
+
+\cite{fanelli2013bibliometric} empirical evidence of ``hierarchy of sciences'', in the sense of possibility to reach theoretical and methodological consensus % I would also add empirical -> all knowledge domains indeed - diversity of ``valid'' perspectives => link project quantifying knowledge domains?
+
+\cite{lane2006hierarchy} classifies four frequent uses of the term hierarchy, namely (i) order hierarchy corresponding to the existence of an order relation for a set of elements, (ii) inclusion hierarchy which is a recursive inclusion of elements within each other, (iii) control hierarchy which is the ``common sense'' use of the term as ranked entities controlling other entities with lower rank, and (iv) level hierarchy which captures the multi-scale nature of complex systems as ontologically distinct levels (or scales). For the particular study of social systems, he concludes that hierarchical levels may be entangled, that upward and downward causations are both essential, and that at least three levels (micro, meso, macro) are generally needed to capture the complexity of such systems.
+% % - argumentation of jig: differentes def of hierarchy; all are kind of intrinsic to complexity; different type of complexities <-> different types of hierarchies ? (structural equivalences ?)
+
+
+\subsection{Territorial systems and hierarchy}
+
+% particular bib for network/territories
+
+\cite{batty2006hierarchy} shows that hierarchies are inherent to urban systems, as fat tail distribution of settlement size are already produced by simple models of urban growth, and suggests also that urban design processes imply underlying overlapping hierarchies.
+
+\cite{pumain2006alternative} links hierarchical selection and hierarchical diffusion of innovation across cities to the long-term dynamics of urban systems.
+
+
+
+
+\subsection{Co-evolution and hierarchy}
+
+
+
+Hierarchy in complex systems is furthermore intrinsically linked to the concept of co-evolution. Following \cite{lane2006hierarchy}, the approach to complex adaptive systems proposed by \cite{holland2012signals} integrates levels and nested hierarchies, since it considers complex systems as ensembles of boundaries that filter signals. 
+
+\cite{pumain2006introduction} methodological questions: how are hierarchies produced? How do hierarchies evolve? % both tackled here; missing the continuous or discrete hierarchical organisation
+
+Our contribution brings new elements of answer to these two questions, in the particular case of co-evolution of transportation networks and territories. More precisely, we systematically explore a macroscopic co-evolution model and study its properties regarding both hierarchies of cities and networks, in terms of final hierarchy produced but also in terms of dynamics of hierarchies.
+
+
+%%%%%%%%%%%%%%%%
+\section{Co-evolution model}
+
+\subsection{Context and rationale}
+
+The issue of interactions between transportation networks and territories remains an open question for which different approaches have been proposed \cite{offner1993effets,espacegeo2014effets}. \cite{raimbault2018caracterisation} has explored a co-evolution approach, in the sense that both dynamics have circular causal relationships. More precisely, \cite{raimbault2019modeling} introduces a definition of co-evolution in that particular context, based on co-evolution niches \cite{holland2012signals}
+
+\cite{raimbault2018modeling}
+
+\subsection{Model description}
+
+The co-evolution model for cities and transportation networks at the macroscopic scale extends the spatial interaction model introduced by \cite{raimbault2018indirect} by adding dynamical speeds to network links. More precisely, (i)  
+
+
+
+\subsection{Quantifying hierarchy in systems of cities}
+
+% - specific indicators for hierarchy (+ already existing : rank correlation, rank-size)
+
+\paragraph{Static quantification of hierarchy}
+
+A simple way to quantify hierarchy is to use Zipf rank-size law, or more generally scaling laws. Let $Y_i$ the dimension considered
+
+% additional params (complementarity of rank-size and primacy index e.g ~ piecewise linear ?)
+
+
+\subsection{Dynamical indicators}
+
+The rank correlation between initial and final distribution of a variable will measure how much an ordering hierarchy was modified, which is different from the variation of hierarchy given the variations of previous indicators such as the rank-size slope.
+
+Dynamical hierarchy regimes are defined the following way: 
+% piecewise linear: which indicator?
+
+
+\subsection{Spatialized indicators}
+
+A spatial non-stationary version of a scaling law would write
+
+
+
+
+%%%%%%%%%%%%%%%%
+\section{Results}
+
+
+% - PSE targeted on different regimes (dynamical ?) of hierarchy => piecewise linear fitting? 
+% - compare abstract network with physical (Theo Quant results)
+
+
+
+
+
+
+%%%%%%%%%%%%%%%%
+\section{Discussion}
+
+% - teachings on the role of self-reinforcement
+% ~ disc from jig ?
+
+
+
+
+
+
+
+
+
+
+\bibliographystyle{agsm}
+\bibliography{biblio}
+%\def\pagesname{pp.~}
+%\def\numbername{no.~}
+%\def\pagename{p.~}
+
+
+
+%\appendix
+%\chapter{Appendix}
+
+
+
+%\vfill\pagebreak
+%\
+%\thispagestyle{empty}
+
+
+\end{document} 
+
+
+%%%%%
+%% Template 
+
+%\begin{figure}[ptbh]
+%\centering
+%\includegraphics[width=10.6009cm,height=4.714cm]{GadalaExp.eps}\caption{Start and stop shear flow experiment;\break the torque would be proportional
+%to the shear stress, after\break Gadala-Maria and Acrivos \cite{Gadala80}}
+%\label{Fig 1}
+%\end{figure}\pagebreak
+
+
+
+
