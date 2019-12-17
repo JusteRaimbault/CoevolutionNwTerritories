@@ -45,11 +45,13 @@ to display-cities
   
   
   let mi min [color-var] of cities let ma max [color-var] of cities
+  if mi < ma [
   ask cities [
     set size (ln population) ;/ 10
     ;set color gradient:scale (list extract-rgb blue extract-rgb red) color-var mi ma
     ;set color scale-color red color-var (mi - 2) ma
     set color scale-color red color-var mi ma
+  ]
   ]
 end
 
@@ -73,7 +75,9 @@ to display-network
       ;ask links [set hidden? false] ask paths with [path-length < effective-length] [set hidden? true]
       let mi min [ln relative-speed] of links let ma max [ln relative-speed] of links
       ;ask links [set thickness 4 * ((ln relative-speed) - mi) / (ma - mi) ]
-      ask links [set thickness 1.5 * ((ln relative-speed) - mi) / (ma - mi) ]
+      if mi < ma [
+        ask links [set thickness 1.5 * ((ln relative-speed) - mi) / (ma - mi) ]
+      ]
     ]
     if link-display-var = "flow" [
       ask links [set thickness 25 * ln (1 + flow)]

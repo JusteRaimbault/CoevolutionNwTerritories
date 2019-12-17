@@ -391,7 +391,6 @@ to setup:setup-headless
   ;set synthetic-rank-size-exp 1.2
   set synthetic-max-pop 100000
   ;set network-reinforcment-exponent 1.0
-  ;set growth-rate 0.001
   
   ;set physical-network-reinforcment-threshold 0.1
   ;set physical-network-reinforcment-quantile 0.95

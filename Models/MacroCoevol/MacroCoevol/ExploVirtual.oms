@@ -8,7 +8,7 @@ val nwThreshold = Val[Double]
 val nwGmax = Val[Double]
 val nwExponent = Val[Double]
 val nwPhysQuantile = Val[Double]
-val nwSlimeMouldFun = Val[Double]
+val nwSlimeMouldFun = Val[String]
 
 val finalTime = Val[Int]
 val gravityWeight = Val[Double]
@@ -18,7 +18,7 @@ val feedbackWeight = Val[Double]
 val feedbackGamma = Val[Double]
 val feedbackDecay = Val[Double]
 
-val nwType = Val[Int]
+val nwType = Val[String]
 
 // indicators
 // distributions
@@ -129,7 +129,7 @@ val exploration =  DirectSampling(
     ,gravityGamma in Range(0.0,2.0)
     ,gravityDecay in Range(0.0,200.0)
   )) withIndex id)*/
-    x (nwType is 1)
+    x (nwType is "physical") // {"virtual", "physical"}
     x (finalTime is 30)
     x (synthRankSize is 1.0)
     x (nwThreshold is 1.0)

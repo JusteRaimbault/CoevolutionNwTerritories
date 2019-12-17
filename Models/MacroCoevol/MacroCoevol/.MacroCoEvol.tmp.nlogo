@@ -795,13 +795,13 @@ HORIZONTAL
 SLIDER
 3
 421
-275
+277
 454
 physical-network-reinforcment-threshold
 physical-network-reinforcment-threshold
 0
 0.1
-0.0023035374535688206
+2.5007231470848226E-5
 0.0005
 1
 NIL
@@ -826,7 +826,7 @@ physical-network-reinforcment-quantile
 physical-network-reinforcment-quantile
 0
 1
-0.2
+0.9
 0.1
 1
 NIL
@@ -862,7 +862,7 @@ CHOOSER
 slime-mould-reinforcment-function
 slime-mould-reinforcment-function
 "thresholded" "full-growth"
-1
+0
 
 @#$#@#$#@
 ## WHAT IS IT?

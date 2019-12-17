@@ -95,24 +95,21 @@ to setup-experiment-synthetic [synth-ranksize nw-type nw-threshold nw-gmax nw-ex
   set synthetic-rank-size-exp synth-ranksize ;1.2
   set network-reinforcment-threshold nw-threshold ;2.0
   set network-reinforcment-gmax nw-gmax ;0.05
-  set network-reinforcment-exponent nw-exponent
+  set network-reinforcment-exponent nw-exponent ; 1.0
   set physical-network-reinforcment-quantile physical-nw-rein-quantile ; 0.1
-  set final-time-step final-time
+  set final-time-step final-time ; 30
   set gravity-weight grav-weight ; ~ 0.001
   set gravity-gamma grav-gamma ; ~ 1
   set gravity-decay grav-decay ;  < 200 (world diag : 284)
-  set feedback-weight feed-weight
-  set feedback-gamma feed-gamma
-  set feedback-decay feed-decay
-  
-  ; multi-modeling params
-  if nw-type = 0 [set network-type "virtual"] if nw-type = 1 [set network-type "physical"]
-  if nw-slimemould-fun = 0 [set slime-mould-reinforcment-function "thresholded"] if nw-slimemould-fun = 1 [set slime-mould-reinforcment-function "full-growth"]
+  set feedback-weight feed-weight ; 0.0
+  set feedback-gamma feed-gamma ; 1.0
+  set feedback-decay feed-decay ; 10.0
+  set network-type nw-type ; {"virtual","physical"}
+  set slime-mould-reinforcment-function nw-slimemould-fun ;  {"thresholded","full-growth"}
   
   set setup-type "synthetic"
-  
-  ; NOTE : set to 0.01 by setup-headless in latest experiment
-  ;set growth-rate 0.0
+
+  set growth-rate 0.0
   
   setup:setup-headless
   
