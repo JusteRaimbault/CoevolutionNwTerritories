@@ -60,8 +60,8 @@ val model = NetLogo6Task(workDirectory / "HEADLESS_MacroCoEvol.nlogo",cmds,embed
 )
 
 val computeIndicators = RTask(
-  "source(\"indicators.R\")",
-  libraries = Seq("segmented")
+  "source(\"indicators.R\")"//,
+  //libraries = Seq("segmented") // fail install
   ) set (
   (inputs, outputs) += (synthRankSize,nwThreshold,nwGmax,nwExponent,nwPhysQuantile,nwSlimeMouldFun,finalTime,gravityWeight,gravityGamma,gravityDecay,feedbackWeight,feedbackGamma,feedbackDecay,nwType,replication,id),
   inputs += populations mapped "populations",
