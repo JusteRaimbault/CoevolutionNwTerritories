@@ -150,7 +150,7 @@ end
 ;;
 ;  do a profile along one parameter, all other being fixed
 to profile [parameter p-min p-max p-step]
-  let pvalues seq p-min p-max p-step
+  let pvalues utils:list:seq p-min p-max p-step
   let res-logmse [] let res-mselog []
   foreach pvalues [? ->
     show (word "profile : " parameter " = " ?)

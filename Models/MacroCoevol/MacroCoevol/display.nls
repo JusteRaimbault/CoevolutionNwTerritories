@@ -110,7 +110,7 @@ to display-plots
   let col scale-color red ticks 0 (length dates)
   set-plot-pen-color col;(approximate-rgb item 0 col item 1 col item 2 col)
   let pops map [? -> log ? 10] (sort-by [[?1 ?2] -> ?1 > ?2] (matrix:get-column populations ticks))
-  let ranks map [? -> log ? 10] (seq 1 count cities 1)
+  let ranks map [? -> log ? 10] (utils:list:seq 1 count cities 1)
   let i 0 plot-pen-up plotxy first ranks first pops
     plot-pen-down
     foreach pops [? ->

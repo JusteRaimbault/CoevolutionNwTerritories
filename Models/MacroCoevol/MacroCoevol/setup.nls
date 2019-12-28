@@ -237,8 +237,8 @@ end
 
 
 to setup:initial-network-slime-mould
-  foreach seq min-pxcor max-pxcor slime-mould-node-distance [x ->
-           foreach seq min-pycor max-pycor slime-mould-node-distance [ y ->
+  foreach utils:list:seq min-pxcor max-pxcor slime-mould-node-distance [x ->
+           foreach utils:list:seq min-pycor max-pycor slime-mould-node-distance [ y ->
              create-nodes 1 [setxy x y new-node]
           ]
         ]
@@ -311,7 +311,7 @@ to setup:setup-matrices
       let xcors [] let ycors [] let pops [] foreach sort-by [[?1 ?2] -> [index] of ?1 < [index] of ?2] cities [
         ? -> ask ? [set xcors lput xcor xcors set ycors lput ycor ycors set pops lput population pops]
       ]
-      let xi matrix:from-row-list (rep xcors n) let xj matrix:from-column-list (rep xcors n) let yi matrix:from-row-list (rep ycors n) let yj matrix:from-column-list (rep ycors n)
+      let xi matrix:from-row-list (utils:list:rep xcors n) let xj matrix:from-column-list (utils:list:rep xcors n) let yi matrix:from-row-list (utils:list:rep ycors n) let yj matrix:from-column-list (utils:list:rep ycors n)
       set distance-matrix matrix:map sqrt ((matrix:times-element-wise (xi matrix:- xj) (xi matrix:- xj)) matrix:+ (matrix:times-element-wise (yi matrix:- yj) (yi matrix:- yj)))
     ]
     
@@ -322,7 +322,7 @@ to setup:setup-matrices
     
     ; feedback distance matrix
     let xcors [] let ycors [] let pops [] foreach sort-by [[?1 ?2] -> [index] of ?1 < [index] of ?2] cities [? -> ask ? [set xcors lput xcor xcors set ycors lput ycor ycors set pops lput population pops]]
-    let xi matrix:from-row-list (rep xcors n) let xj matrix:from-column-list (rep xcors n) let yi matrix:from-row-list (rep ycors n) let yj matrix:from-column-list (rep ycors n)
+    let xi matrix:from-row-list (utils:list:rep xcors n) let xj matrix:from-column-list (utils:list:rep xcors n) let yi matrix:from-row-list (utils:list:rep ycors n) let yj matrix:from-column-list (utils:list:rep ycors n)
     let feedback-dist-rows []
     let k 0
     repeat n [
@@ -341,7 +341,7 @@ to setup:setup-matrices
     
     
     ; dates
-    set dates seq 0 final-time-step 1
+    set dates utils:list:seq 0 final-time-step 1
     
     ; population matrices
     set populations matrix:make-constant n (final-time-step + 1) 1 set real-populations matrix:make-constant n (final-time-step + 1) 1

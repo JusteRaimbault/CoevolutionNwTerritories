@@ -43,7 +43,7 @@ end
 ; @param from
 ; @param to
 ; @param by
-to-report seq [from t by]
+to-report utils:list:seq [from t by]
   let res [] let current-val from let n 0
   ifelse by = 0 [set n t][set n (floor ((t - from)/ by) + 1)]
   repeat n [
@@ -59,7 +59,7 @@ end
 ;
 ; @param element
 ; @times number of times repeted
-to-report rep [element times]
+to-report utils:list:rep [element times]
   let res [] repeat times [set res lput element res] report res
 end
 
@@ -209,7 +209,7 @@ end
 ; Multiplies two lists element-wise
 ; 
 ; same length not necessarily required, will return shortest list size.
-to-report list-times-element-wise [l1 l2]
+to-report utils:list:times-element-wise [l1 l2]
   let res []
   let i 0
   let shortest [] let longest [] ifelse length l1 < length l2 [set shortest l1 set longest l2][set shortest l2 set longest l1]

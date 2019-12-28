@@ -30,6 +30,12 @@ to indicators:compute-indicators
   output-print (word "complexity pop = " trajectories-complexity "city-population")  
   output-print (word "complexity clos = " trajectories-complexity "city-closeness-centrality")  
   output-print (word "complexity acc = " trajectories-complexity "city-accessibility")  
+  output-print (word "rank corr variables pop - closeness = " rank-correlations-vars "city-population" "city-closeness-centrality")
+  output-print (word "rank corr variables pop - access = " rank-correlations-vars "city-population" "city-accessibility")
+  output-print (word "rank corr variables pop - closeness = " rank-correlations-vars "city-closeness-centrality" "city-accessibility")
+  output-print (word "population seg hierarchies = " population-seg-hierarchies)
+  output-print (word "closeness seg hierarchies = " closeness-seg-hierarchies)
+  output-print (word "accessibility seg hierarchies = " accessibility-seg-hierarchies)
 end
 
 
@@ -67,7 +73,7 @@ to-report lagged-correlation [var1 var2 tau t0]
   let mx mean x set x map [? -> ? - mx] x let my mean y set y map [? -> ? - my] y
   let sx standard-deviation x let sy standard-deviation y
   if sx = 0 or sy = 0 [report 0]
-  report mean (list-times-element-wise x y) / (sx * sy)
+  report mean (utils:list:times-element-wise x y) / (sx * sy)
 end
 
 
@@ -178,14 +184,14 @@ to-report correlation [var1 var2 time]
   let mx mean x set x map [? -> ? - mx] x let my mean y set y map [? -> ? - my] y
   let sx standard-deviation x let sy standard-deviation y
   if sx = 0 or sy = 0 [report 0]
-  report mean (list-times-element-wise x y) / (sx * sy)
+  report mean (utils:list:times-element-wise x y) / (sx * sy)
 end
 
 
 ;;
 ; report correlation between cities in each euclidian distance bin
 to-report distance-correlation [var1 var2]
-  let dist-deciles quantile (remove 0 (concatenate matrix:to-row-list (table:get distance-matrices (first dates)))) (seq 0.1 1.0 0.1)
+  let dist-deciles quantile (remove 0 (concatenate matrix:to-row-list (table:get distance-matrices (first dates)))) (utils:list:seq 0.1 1.0 0.1)
   ;show dist-deciles
   ; for each bin, set provisory sampling cities ? DOES not work as all couples will be sampled -> must construct the vector by hand
   let res [] let i 0
@@ -201,7 +207,7 @@ to-report distance-correlation [var1 var2]
         ;distance myself > prev-dec and distance myself <= current-dec
         matrix:get distance-matrix index [index] of myself > prev-dec and matrix:get distance-matrix index [index] of myself <= current-dec
       ] [
-       foreach seq 1 final-time-step 1 [t ->
+       foreach utils:list:seq 1 final-time-step 1 [t ->
          set x lput ((table:get city-values-table (list t var1 index)) - (table:get city-values-table (list (t - 1) var1 index))) x
          set y lput ((table:get city-values-table (list t var2 [index] of myself)) - (table:get city-values-table (list (t - 1) var2 [index] of myself))) y
        ]
@@ -210,7 +216,7 @@ to-report distance-correlation [var1 var2]
     ;show (word "decile " current-dec " ; x = " x " ; y = " y)
     let mx mean x set x map [? -> ? - mx] x let my mean y set y map [? -> ? - my] y
     let sx standard-deviation x let sy standard-deviation y
-    ifelse sx = 0 or sy = 0 [set res lput 0 res][set res lput (mean (list-times-element-wise x y) / (sx * sy)) res]
+    ifelse sx = 0 or sy = 0 [set res lput 0 res][set res lput (mean (utils:list:times-element-wise x y) / (sx * sy)) res]
     set i i + 1
   ]
   report res
@@ -232,9 +238,38 @@ to-report rank-correlation [var]
   let m0 mean r0 set r0 map [? -> ? - m0] r0 let mf mean rf set rf map [? -> ? - mf] rf
   let sigma0 standard-deviation r0 let sigmaf standard-deviation rf
   if sigma0 = 0 or sigmaf = 0 [report 0] ; no NA, replace by 0
-  report mean (list-times-element-wise r0 rf) / (sigma0 * sigmaf)
+  report mean (utils:list:times-element-wise r0 rf) / (sigma0 * sigmaf)
 end
 
+
+;;
+; rank correlation between two variables at a given time
+to-report rank-correlation-vars [var1 var2 time]
+  let x [] let y []
+  foreach indicator-sample-cities [ ? -> ask ? [
+      set x lput (table:get city-values-table (list time var1 [index] of ?)) x
+      set y lput (table:get city-values-table (list time var2 [index] of ?)) y
+    ]
+  ]
+  let sortedx sort x let sortedy sort y
+  let rx [] let ry []
+  (foreach x y [ [xx yy] ->
+    set rx lput (position xx sortedx) rx set ry lput (position yy sortedy) ry
+  ])
+  ;show (word time " " var1 " " var2 " " rx)
+  report utils:statistics:pearson-correlation rx ry
+end
+
+;;
+; all rank correlations between two variables
+to-report rank-correlations-vars [var1 var2]
+  ;show (word var1 " - " var2)
+  let res []
+  foreach utils:list:seq 0 final-time-step indicator-sampling-time-step [t ->
+    set res lput (rank-correlation-vars var1 var2 t) res
+  ]
+  report res
+end
 
 
 ;;
@@ -244,8 +279,8 @@ to-report normalized-trajectories [var]
   let trajectories table:make
   ask cities [
     let traj []
-    foreach seq 0 final-time-step 1 [? -> set traj lput (table:get city-values-table (list ? var index)) traj]
-    let ma max traj let mi min traj ifelse (ma - mi) != 0 [table:put trajectories index (map [? -> (? - mi) / (ma - mi)] traj)][table:put trajectories index rep 0 (length traj)]
+    foreach utils:list:seq 0 final-time-step 1 [? -> set traj lput (table:get city-values-table (list ? var index)) traj]
+    let ma max traj let mi min traj ifelse (ma - mi) != 0 [table:put trajectories index (map [? -> (? - mi) / (ma - mi)] traj)][table:put trajectories index utils:list:rep 0 (length traj)]
   ]
   report trajectories
 end
@@ -271,7 +306,7 @@ to-report trajectories-complexity [var]
   ask cities [
     let traj table:get trajectories index
     let prev-sign 0 if item 1 traj != item 0 traj [set prev-sign (item 1 traj - item 0 traj) / abs  (item 1 traj - item 0 traj)]
-    foreach seq 2 final-time-step 1 [t ->
+    foreach utils:list:seq 2 final-time-step 1 [t ->
       let current-sign 0 if item t traj != item (t - 1) traj [set current-sign (item t traj - item (t - 1) traj) / abs  (item t traj - item (t - 1) traj)]
       if prev-sign != current-sign [set res res + 1]
     ]
@@ -284,7 +319,7 @@ end
 ; history of variables
 to-report var-history [variable]
   let res []
-  foreach seq 0 final-time-step indicator-sampling-time-step [t ->
+  foreach utils:list:seq 0 final-time-step indicator-sampling-time-step [t ->
     let currentvar []
     foreach indicator-sample-cities [? -> ask ? [set currentvar lput (table:get city-values-table (list t variable index)) currentvar]]
     set res lput currentvar res
@@ -314,9 +349,27 @@ end
 ; hierarchy in the system
 to-report rank-size-hierarchy [x]
   if max x = 0 and min x = 0 [report [0 0]]
-  let sol matrix:regress matrix:from-column-list (list (map [? -> log ? 10] sort-by [[?1 ?2] -> ?1 >= ?2] x) (map [? -> log ? 10] seq 1 length x 1))
+  let sol matrix:regress matrix:from-column-list (list (map [? -> log ? 10] sort-by [[?1 ?2] -> ?1 >= ?2] x) (map [? -> log ? 10] utils:list:seq 1 length x 1))
   report (list (last first sol) (first last sol))
 end
+
+
+;;
+; breakpoint estimate of rank size law
+to-report breakpoint-regression [x]
+  if max x = 0 and min x = 0 [report [0 0 0 0]]
+  let xx remove 0 x
+  let logranks (map [? -> log ? 10] utils:list:seq 1 length xx 1)
+  let logx (map [? -> log ? 10] sort-by [[?1 ?2] -> ?1 >= ?2] xx)
+  let breakpointreg [0 0 0 0]
+  carefully [
+   set breakpointreg utils:statistics:breakpoint-regression logranks logx
+  ][]
+  ; result is: [alpha1, alpha2, psi, rsq]
+  report breakpointreg
+end
+
+
 
 ;;
 ; entropy assuming that x > 0
@@ -339,6 +392,11 @@ to-report population-hierarchy [t]
   report rank-size-hierarchy pops
 end
 
+to-report population-seg-hierarchy [t]
+  let pops matrix:get-column populations t
+  report breakpoint-regression pops
+end
+
 to-report population-entropy [t]
   let pops matrix:get-column populations t
   report entropy pops
@@ -353,15 +411,21 @@ end
 
 to-report population-hierarchies
   let res []
-  foreach seq 0 final-time-step indicator-sampling-time-step [? ->
+  foreach utils:list:seq 0 final-time-step indicator-sampling-time-step [? ->
     set res lput population-hierarchy ? res
   ]
   report concatenate res
 end
 
+to-report population-seg-hierarchies
+  let res []
+  foreach utils:list:seq 0 final-time-step indicator-sampling-time-step [? -> set res lput population-seg-hierarchy ? res]
+  report concatenate res
+end
+
 to-report population-entropies
   let res []
-  foreach seq 0 final-time-step indicator-sampling-time-step [? ->
+  foreach utils:list:seq 0 final-time-step indicator-sampling-time-step [? ->
     set res lput population-entropy ? res
   ]
   report res
@@ -372,18 +436,43 @@ end
 ; summary stats for populations
 to-report population-summaries
   let res []
-  foreach seq 0 final-time-step indicator-sampling-time-step [? ->
+  foreach utils:list:seq 0 final-time-step indicator-sampling-time-step [? ->
     set res lput population-summary ? res
   ]
   report concatenate res
 end
 
 
+to-report indic-hierarchy [indic t]
+  let cl [] foreach indicator-sample-cities [? -> ask ? [set cl lput (table:get city-values-table (list t indic index)) cl]]
+  report rank-size-hierarchy cl
+end
+
+to-report indic-hierarchies [indic]
+  let res []
+  foreach utils:list:seq 0 final-time-step indicator-sampling-time-step [t ->
+    set res lput indic-hierarchy indic t res
+  ]
+  report concatenate res
+end
+
+to-report indic-seg-hierarchy [indic t]
+  let cl [] foreach indicator-sample-cities [? -> ask ? [set cl lput (table:get city-values-table (list t indic index)) cl]]
+  report breakpoint-regression cl
+end
+
+to-report indic-seg-hierarchies [indic]
+  let res []
+  foreach utils:list:seq 0 final-time-step indicator-sampling-time-step [t ->
+    set res lput indic-seg-hierarchy indic t res
+  ]
+  report concatenate res
+end
+
 ;;
 ; hierarchy of closeness at time t
 to-report closeness-hierarchy [t]
-  let cl [] foreach indicator-sample-cities [? -> ask ? [set cl lput (table:get city-values-table (list t "city-closeness-centrality" index)) cl]]
-  report rank-size-hierarchy cl
+  report indic-hierarchy "city-closeness-centrality" t
 end
 
 ;;
@@ -399,16 +488,16 @@ to-report closeness-summary [t]
 end
 
 to-report closeness-hierarchies
-  let res []
-  foreach seq 0 final-time-step indicator-sampling-time-step [? ->
-    set res lput closeness-hierarchy ? res
-  ]
-  report concatenate res
+  report indic-hierarchies "city-closeness-centrality"
+end
+
+to-report closeness-seg-hierarchies
+  report indic-seg-hierarchies "city-closeness-centrality"
 end
 
 to-report closeness-entropies
   let res []
-  foreach seq 0 final-time-step indicator-sampling-time-step [? ->
+  foreach utils:list:seq 0 final-time-step indicator-sampling-time-step [? ->
     set res lput closeness-entropy ? res
   ]
   report res
@@ -416,7 +505,7 @@ end
 
 to-report closeness-summaries
   let res []
-  foreach seq 0 final-time-step indicator-sampling-time-step [? ->
+  foreach utils:list:seq 0 final-time-step indicator-sampling-time-step [? ->
     set res lput closeness-summary ? res
   ]
   report concatenate res
@@ -424,8 +513,7 @@ end
 
 
 to-report accessibility-hierarchy [t]
-  let cl [] foreach indicator-sample-cities [? -> ask ? [set cl lput (table:get city-values-table (list t "city-accessibility" index)) cl]]
-  report rank-size-hierarchy cl
+  report indic-hierarchy "city-accessibility" t
 end
 
 to-report accessibility-entropy [t]
@@ -439,16 +527,16 @@ to-report accessibility-summary [t]
 end
 
 to-report accessibility-hierarchies
-  let res []
-  foreach seq 0 final-time-step indicator-sampling-time-step [? ->
-    set res lput accessibility-hierarchy ? res
-  ]
-  report concatenate res
+  report indic-hierarchies "city-accessibility"
+end
+
+to-report accessibility-seg-hierarchies
+  report indic-seg-hierarchies "city-accessibility"
 end
 
 to-report accessibility-entropies
   let res []
-  foreach seq 0 final-time-step indicator-sampling-time-step [? ->
+  foreach utils:list:seq 0 final-time-step indicator-sampling-time-step [? ->
     set res lput accessibility-entropy ? res
   ]
   report res
@@ -456,7 +544,7 @@ end
 
 to-report accessibility-summaries
   let res []
-  foreach seq 0 final-time-step indicator-sampling-time-step [? ->
+  foreach utils:list:seq 0 final-time-step indicator-sampling-time-step [? ->
     set res lput accessibility-summary ? res
   ]
   report concatenate res
@@ -522,7 +610,7 @@ to-report city-mse [t]
   let tt 0
   ifelse t > ticks [set tt ticks] [set tt t]
   let d list:minus (sublist population-history 0 (tt + 1)) (sublist expected-population-history 0 (tt + 1))
-  report sum list-times-element-wise d d
+  report sum utils:list:times-element-wise d d
 end
 
 ; idem
@@ -530,7 +618,7 @@ to-report city-mse-log [t]
   let tt 0
   ifelse t > ticks [set tt ticks] [set tt t]
   let d list:minus (sublist (map [? -> ln ?] population-history) 0 (tt + 1)) (sublist (map [? -> ln ?] expected-population-history) 0 (tt + 1))
-  report sum list-times-element-wise d d
+  report sum utils:list:times-element-wise d d
 end
 
 

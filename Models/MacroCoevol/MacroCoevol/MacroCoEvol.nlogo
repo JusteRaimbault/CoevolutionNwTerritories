@@ -34,6 +34,7 @@ __includes [
    "utils/Matrix.nls"
    "utils/List.nls"
    "utils/Network.nls"
+   "utils/Statistics.nls"
 
 
 ]
@@ -223,7 +224,7 @@ growth-rate
 growth-rate
 0
 0.05
-0.001
+0.0
 0.0001
 1
 NIL
@@ -245,7 +246,7 @@ gravity-weight
 gravity-weight
 0
 2e-2
-0.007899
+1.0E-4
 1e-6
 1
 NIL
@@ -260,7 +261,7 @@ gravity-gamma
 gravity-gamma
 0.5
 5
-1.67
+1.0
 0.01
 1
 NIL
@@ -275,7 +276,7 @@ gravity-decay
 gravity-decay
 1
 500
-152.0
+200.0
 0.1
 1
 NIL
@@ -305,7 +306,7 @@ feedback-gamma
 feedback-gamma
 0
 5
-0.1
+1.0
 0.1
 1
 NIL
@@ -320,7 +321,7 @@ feedback-decay
 feedback-decay
 0
 200
-0.1
+1.0
 0.1
 1
 NIL
@@ -599,7 +600,7 @@ synthetic-max-pop
 synthetic-max-pop
 0
 100000
-66000.0
+100000.0
 1000
 1
 NIL
@@ -661,7 +662,7 @@ CHOOSER
 network-type
 network-type
 "virtual" "physical" "real" "fixed"
-1
+0
 
 SLIDER
 6
@@ -672,7 +673,7 @@ network-reinforcment-threshold
 network-reinforcment-threshold
 0
 5
-4.0
+3.0
 0.1
 1
 NIL
@@ -687,7 +688,7 @@ network-reinforcment-exponent
 network-reinforcment-exponent
 0
 10
-1.03
+1.0
 0.01
 1
 NIL
@@ -720,7 +721,7 @@ network-reinforcment-gmax
 network-reinforcment-gmax
 0
 0.05
-0.05
+0.01
 1e-5
 1
 NIL
@@ -733,7 +734,7 @@ SWITCH
 742
 show-virtual-flows?
 show-virtual-flows?
-0
+1
 1
 -1000
 
@@ -756,7 +757,7 @@ synthetic-shortcut-number
 synthetic-shortcut-number
 0
 50
-8.0
+30.0
 1
 1
 NIL
@@ -771,7 +772,7 @@ synthetic-city-max-degree
 synthetic-city-max-degree
 0
 5
-3.0
+5.0
 1
 1
 NIL
@@ -786,7 +787,7 @@ synthetic-shortcut-radius
 synthetic-shortcut-radius
 0
 30
-13.0
+30.0
 1
 1
 NIL
@@ -826,7 +827,7 @@ physical-network-reinforcment-quantile
 physical-network-reinforcment-quantile
 0
 1
-0.2
+0.5
 0.1
 1
 NIL
@@ -862,7 +863,25 @@ CHOOSER
 slime-mould-reinforcment-function
 slime-mould-reinforcment-function
 "thresholded" "full-growth"
-1
+0
+
+PLOT
+974
+437
+1174
+587
+reg
+NIL
+NIL
+0.0
+1.0
+-1.0
+1.0
+true
+false
+"" ""
+PENS
+"default" 1.0 0 -16777216 true "" ""
 
 @#$#@#$#@
 ## WHAT IS IT?

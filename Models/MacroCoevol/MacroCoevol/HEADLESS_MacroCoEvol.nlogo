@@ -34,6 +34,8 @@ __includes [
    "utils/Matrix.nls"
    "utils/List.nls"
    "utils/Network.nls"
+  "utils/Statistics.nls"
+
 
 ]
 
