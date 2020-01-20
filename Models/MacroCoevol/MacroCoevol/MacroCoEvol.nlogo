@@ -246,7 +246,7 @@ gravity-weight
 gravity-weight
 0
 2e-2
-1.0E-4
+0.014118
 1e-6
 1
 NIL
@@ -276,7 +276,7 @@ gravity-decay
 gravity-decay
 1
 500
-200.0
+462.3
 0.1
 1
 NIL
@@ -662,7 +662,7 @@ CHOOSER
 network-type
 network-type
 "virtual" "physical" "real" "fixed"
-0
+1
 
 SLIDER
 6
@@ -688,7 +688,7 @@ network-reinforcment-exponent
 network-reinforcment-exponent
 0
 10
-1.0
+6.9
 0.01
 1
 NIL
@@ -802,7 +802,7 @@ physical-network-reinforcment-threshold
 physical-network-reinforcment-threshold
 0
 0.1
-0.0023035374535688206
+9.458749942569314E-5
 0.0005
 1
 NIL
@@ -827,7 +827,7 @@ physical-network-reinforcment-quantile
 physical-network-reinforcment-quantile
 0
 1
-0.5
+0.2
 0.1
 1
 NIL

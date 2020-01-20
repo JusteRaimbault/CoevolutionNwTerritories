@@ -236,6 +236,9 @@ to setup:setup-network
 end
 
 
+;;
+;  ! in some cases the network is not connected, a remaining node isolated (then cache network measures fails)
+;  e.g. setup-experiment-synthetic 1.0 "physical" 1.0 0.05 1.5 0.45 "thresholded" 5.0E-4 1.0 110.0 0.0 1.0 1.0 30 702955777
 to setup:initial-network-slime-mould
   foreach utils:list:seq min-pxcor max-pxcor slime-mould-node-distance [x ->
            foreach utils:list:seq min-pycor max-pycor slime-mould-node-distance [ y ->
