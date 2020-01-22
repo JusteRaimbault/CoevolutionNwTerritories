@@ -66,18 +66,19 @@ to network:grow-physical-network
     ; no new links in this heuristic
     
     if slime-mould-reinforcment-function = "thresholded" [
-      set physical-network-reinforcment-threshold quantile [flow] of links with [flow > 0] physical-network-reinforcment-quantile
+      set physical-network-reinforcment-threshold quantile [path:flow] of links with [path:flow > 0] physical-network-reinforcment-quantile
     
       ask paths [
-        set effective-length effective-length * (1 + (network-reinforcment-gmax * (physical-network-reinforcment-threshold ^ network-reinforcment-exponent - flow ^ network-reinforcment-exponent) / (physical-network-reinforcment-threshold ^ network-reinforcment-exponent + flow ^ network-reinforcment-exponent)))
+        set path:travel-time path:travel-time * (1 + (network-reinforcment-gmax * (physical-network-reinforcment-threshold ^ network-reinforcment-exponent - path:flow ^ network-reinforcment-exponent) / (physical-network-reinforcment-threshold ^ network-reinforcment-exponent + path:flow ^ network-reinforcment-exponent)))
+        set path:pace path:travel-time / path:length
       ]
     ]
     
     if slime-mould-reinforcment-function = "full-growth" [
     
-      let mf max [flow] of paths
+      let mf max [path:flow] of paths
       ask paths [
-        set effective-length effective-length * (1 - (network-reinforcment-gmax * ((flow / mf) ^ network-reinforcment-exponent) ))
+        set path:travel-time path:travel-time * (1 - (network-reinforcment-gmax * ((path:flow / mf) ^ network-reinforcment-exponent) ))
       ]
     ]
     
@@ -96,7 +97,7 @@ to network:update-distance-matrices
   
   ask cities [
     ask other cities [
-      matrix:set distance-matrix index [index] of myself (table:get nw-distances (list index [index] of myself))
+      matrix:set distance-matrix city:index [city:index] of myself (table:get nw-distances (list city:index [city:index] of myself))
     ]
   ]
 end
@@ -111,9 +112,9 @@ to local-shortcuts
   repeat synthetic-shortcut-number [
     ; draw randomly one city prop to pop conditionnally to degree
     let potential-cities (cities with [count my-links < synthetic-city-max-degree])
-    let ptot sum [population] of potential-cities let r random-float 1 let s 0 let found? false
+    let ptot sum [city:population] of potential-cities let r random-float 1 let s 0 let found? false
     ask potential-cities [
-      set s s + (population / ptot)
+      set s s + (city:population / ptot)
       if s > r and not found? [
         set found? true let potential-dest (((other cities) in-radius synthetic-shortcut-radius) with [count my-links < synthetic-city-max-degree and not link-neighbor? myself])
         if count potential-dest > 0 [create-link-with one-of potential-dest]
@@ -134,11 +135,11 @@ to network:cache-nw-measures
   ; caching shortest paths and measures
   nw:set-context turtles paths
   ask paths [
-    set path-length link-length set bw-centrality 0 set flow 0 set feedback-flow 0
-    set relative-speed path-length / effective-length
-    set speed 1 / effective-length
+    set path:bw-centrality 0
+    set path:flow 0
+    set path:feedback-flow 0
   ]
-  ask cities [set city-bw-centrality 0 set city-flow 0]
+  ask cities [set city:bw-centrality 0 set city:flow 0]
   set shortest-paths table:make set nw-relative-speeds table:make set nw-distances table:make set pairs-total-weight 0
   let clist to-list cities let n count cities
   let i 0 let j 1
@@ -149,24 +150,28 @@ to network:cache-nw-measures
     repeat (length clist - i - 1) [
       let c2 item j clist
       ; get current real flow
-      let current-flow matrix:get gravity-flows [index] of c1 [index] of c2
-      let current-feedback-flow matrix:get feedback-flows [index] of c1 [index] of c2
+      let current-flow matrix:get gravity-flows [city:index] of c1 [city:index] of c2
+      let current-feedback-flow matrix:get feedback-flows [city:index] of c1 [city:index] of c2
       ; compute shortest path
-      let currentpath [] let tpath [] ask c1 [set currentpath nw:weighted-path-to c2 "speed" set tpath nw:turtles-on-weighted-path-to c2 "speed"]
+      let currentpath [] let tpath [] ask c1 [set currentpath nw:weighted-path-to c2 "path:travel-time" set tpath nw:turtles-on-weighted-path-to c2 "path:travel-time"]
       ; update link betweeness
-      let l 0 foreach currentpath [? -> ask ? [set l l + effective-length set bw-centrality bw-centrality + 1 set flow flow + (current-flow * 2 / (n * (n - 1))) set feedback-flow feedback-flow + (current-feedback-flow * 2 / (n * (n - 1)))]]
+      let l 0 foreach currentpath [? -> ask ? [
+        set l l + path:travel-time
+        set path:bw-centrality path:bw-centrality + 1
+        set path:flow path:flow + (current-flow * 2 / (n * (n - 1)))
+        set path:feedback-flow path:feedback-flow + (current-feedback-flow * 2 / (n * (n - 1)))]]
       ; update node betweeness
       ;foreach tpath [ask ? [set city-bw-centrality city-bw-centrality + 1 set city-flow city-flow + (current-flow * 2 / (n * (n - 1)))]]
       ; update shortest path table
-      table:put shortest-paths (list [index] of c1 [index] of c2) currentpath table:put shortest-paths (list [index] of c2 [index] of c1) (rev currentpath)
+      table:put shortest-paths (list [city:index] of c1 [city:index] of c2) currentpath table:put shortest-paths (list [city:index] of c2 [city:index] of c1) (rev currentpath)
       ; update nw distance table
-      table:put nw-distances (list [index] of c1 [index] of c2) l table:put nw-distances (list [index] of c2 [index] of c1) l
+      table:put nw-distances (list [city:index] of c1 [city:index] of c2) l table:put nw-distances (list [city:index] of c2 [city:index] of c1) l
       ; update relative speed table
       let deucl 0 ask c1 [set deucl distance c2]
-      table:put nw-relative-speeds (list [index] of c1 [index] of c2) (deucl / l)
+      table:put nw-relative-speeds (list [city:index] of c1 [city:index] of c2) (deucl / l)
       ; TODO : also an absolute network perf, with effective-length instead of length
       
-      set pairs-total-weight pairs-total-weight + [population] of c1 + [population] of c2
+      set pairs-total-weight pairs-total-weight + [city:population] of c1 + [city:population] of c2
       set j j + 1
       set ltot ltot + l
     ]
@@ -190,15 +195,27 @@ end
 
 
 
-to new-node
+to node:new-node
   set hidden? true
 end
 
 
 
-to new-path
-  set path-length link-length
-  set relative-speed 1
-  set effective-length path-length
-  set flow 0 set hidden? false
+to path:new-path
+  set path:length link-length 
+  ifelse path:initial-pace = 0 [
+    set path:pace 1
+  ][
+    set path:pace path:initial-pace
+  ]
+  set path:travel-time path:length * path:pace
+  set path:flow 0
+  set hidden? false
 end
+
+
+
+
+
+
+

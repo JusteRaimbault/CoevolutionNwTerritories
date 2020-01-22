@@ -123,20 +123,35 @@ The co-evolution model for cities and transportation networks at the macroscopic
 
 
 
+%%%%%%%%%%%%
+\begin{figure}
+	\centering
+	
+	\\
+	\includegraphics[width=0.48\linewidth]{figures/ex_real_1975.png}
+	\includegraphics[width=0.48\linewidth]{figures/ex_real_1975_tf_adjusted.png}
+	\caption{\textbf{Application of the co-evolution model with a physical network for the French system of cities.} }
+\end{figure}
+%%%%%%%%%%%%
+
+
+
 \subsection{Quantifying hierarchy in systems of cities}
 
-% - specific indicators for hierarchy (+ already existing : rank correlation, rank-size)
+
+Indicators to understand macroscopic trajectories in simulated systems of cities have been introduced by \cite{raimbault2020unveiling}. They include some related to hierarchy but are not specifically focused on this aspect. We propose now to give a broad set of indicators to capture different dimensions of hierarchy.
+
 
 \subsubsection{Static quantification of hierarchy}
 
-A simple way to quantify hierarchy is to use Zipf rank-size law, or more generally scaling laws. Let $Y_i$ the variable for which the hierarchy is estimated. Assuming $i$ is ordered in decreasing order, the OLS estimation of $\log \left(Y_i\right) \sim \log \left( i\right)$ gives an estimation of the rank-size slope which is a proxy of hierarchy.
+The most straightforward way to quantify hierarchy is to use Zipf rank-size law, or more generally scaling laws. Let $Y_i$ the variable for which the hierarchy is estimated. Assuming $i$ is ordered in decreasing order, the OLS estimation of $\log \left(Y_i\right) \sim \log \left( i\right)$ gives an estimation of the rank-size slope which is a proxy of hierarchy.
 
 % additional params (complementarity of rank-size and primacy index e.g ~ piecewise linear ?)
 
 The correlation between two hierarchies informs how two dimensions correspond in terms of ranks, and is computed with $r_s\left[X_i,Y_i\right]$ for two variables $X_i,Y_i$ with $r_s$ an estimator of Spearman rank correlation.
 
 
-\subsection{Dynamical indicators}
+\subsubsection{Dynamical indicators}
 
 The rank correlation between initial and final distribution of a variable will measure how much an ordering hierarchy was modified, which is different from the variation of hierarchy given the variations of previous indicators such as the rank-size slope.
 
@@ -145,10 +160,9 @@ Dynamical hierarchy regimes are defined the following way:
 % piecewise linear: which indicator?
 
 
-\subsection{Spatialized indicators}
+\subsubsection{Spatialized indicators}
 
-A spatial non-stationary version of a scaling law would write $Y_i (\vec{x}) \sim \left(\frac{X_i(\vec{x})}{X_0 (\vec{x})}\right)^{\alpha (\vec{x})}$, where $\vec{x}$ is the spatial position and assuming that samples can be defined at each point in space. In practice, a discrete version could be more relevant, for which $\vec{x}_k$ center point are defined, samples consist of points within Thiessen polygons of centers and the exponents are estimated for each center $\alpha (\vec{x}_k)$. We develop the following heuristic to estimate such a discrete non-parametric scaling law: 
-
+A spatial non-stationary version of a scaling law would write $Y_i (\vec{x}) \sim \left(\frac{X_i(\vec{x})}{X_0 (\vec{x})}\right)^{\alpha (\vec{x})}$, where $\vec{x}$ is the spatial position and assuming that samples can be defined at each point in space. In practice, a discrete version could be more relevant, for which $\vec{x}_k$ center point are defined, samples consist of points within Thiessen polygons of centers and the exponents are estimated for each center $\alpha (\vec{x}_k)$. Some heuristics should be developed to estimate such a discrete non-parametric scaling law, and remains out of the scope of this paper.
 
 
 
@@ -166,14 +180,35 @@ The model is implemented in NetLogo \cite{tisue2004netlogo}, which is a good com
 % grid explo, compare virtual/physical
 % - compare abstract network with physical (Theo Quant results) (not necessary calibration here? )
 
+%%%%%%%%%%%%%%
+\begin{figure}
+\centering
+\includegraphics[width=0.48\linewidth]{figures/hierarchiesPopAlpha_nwExp1_wG0_001_xgravityDecay_colgravityGamma_facetsynthRankSize-nwThreshold.png}
+\includegraphics[width=0.48\linewidth]{figures/hierarchiesClosenessAlpha_nwExp1_wG0_001_xgravityDecay_colgravityGamma_facetsynthRankSize-nwThreshold.png}\\\includegraphics[width=0.48\linewidth]{figures/rankCorrsPopCloseness_nwExp1_wG0_001_xgravityDecay_colgravityGamma_facetsynthRankSize-nwThreshold.png}\includegraphics[width=0.48\linewidth]{figures/segHierarchiesPopPsi_nwExp1_wG0_001_xgravityDecay_colgravityGamma_facetsynthRankSize-nwThreshold.png}
+\caption{\textbf{Patterns of hierarchy in the model with a virtual network.} \textit{(Top Left)} Difference in the rank-size exponent between final time and initial time, }
+\end{figure}
+%%%%%%%%%%%%%%
+
+%%%%%%%%%%%%%%
+\begin{figure}
+\centering
+\includegraphics[width=0.48\linewidth]{figures/hierarchiesPopAlpha_nwExp1_wG0_001_xgravityDecay_colgravityGamma_facetsynthRankSize-nwPhysQuantile.png}
+\includegraphics[width=0.48\linewidth]{figures/hierarchiesClosenessAlpha_nwExp1_wG0_001_xgravityDecay_colgravityGamma_facetsynthRankSize-nwPhysQuantile.png}\\\includegraphics[width=0.48\linewidth]{figures/rankCorrsPopCloseness_nwExp1_wG0_001_xgravityDecay_colgravityGamma_facetsynthRankSize-nwPhysQuantile.png}\includegraphics[width=0.48\linewidth]{figures/segHierarchiesPopPsi_nwExp1_wG0_001_xgravityDecay_colgravityGamma_facetsynthRankSize-nwPhysQuantile.png}
+\caption{\textbf{Patterns of hierarchy in the model with a physical network.} \textit{(Top Left)}  }
+\end{figure}
+%%%%%%%%%%%%%%
+
+
+
+
+
+
+
 \subsection{Hierarchy regimes}
 
 % - PSE targeted on different regimes (dynamical ?) of hierarchy => piecewise linear fitting? 
 
 
-
-%\subsection{Spatial hierarchical niches}
-% possible experiment: optim algo to isolate optimal fitting niches; find typical niche size when varying parameters
 
 
 
@@ -182,9 +217,26 @@ The model is implemented in NetLogo \cite{tisue2004netlogo}, which is a good com
 %%%%%%%%%%%%%%%%
 \section{Discussion}
 
-% - teachings on the role of self-reinforcement
-% ~ disc from jig ?
 
+
+\subsection{Results on co-evolution and hierarchies}
+
+% what do we learn in this particular context ?
+% - teachings on the role of self-reinforcement
+
+
+
+
+\subsection{Developments}
+
+%\subsection{Spatial hierarchical niches}
+% possible experiment: optim algo to isolate optimal fitting niches; find typical niche size when varying parameters
+% (out of the scope / development of algo in itself)
+
+
+\subsection{Theoretical perspective}
+
+% ~ disc from jig ?
 
 % \textbf{Proposition : } \textit{les hiérarchies, au sens d'imbrication de sous-systèmes à de multiples niveaux, sont endogènes aux systèmes complexes}
 % des structures ``hiérarchiques'' au sens commun (structure de dépendance rigide et arborescente) sont simples et ni adaptatives ni résilientes
@@ -197,6 +249,8 @@ The model is implemented in NetLogo \cite{tisue2004netlogo}, which is a good com
 
 
 
+%%%%%%%%%%%%%%%%
+\section{Conclusion}
 
 
 

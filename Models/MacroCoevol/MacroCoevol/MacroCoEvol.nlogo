@@ -121,28 +121,29 @@ breed [cities city]
 cities-own [
 
   ; name
-  name
+  turtle:name
+  city:name
 
   ; current population
-  population
+  city:population
 
   ; row index in pop matrix
-  index
+  city:index
 
   ; history of population
-  population-history
-  expected-population-history ; convenience variable
+  city:population-history
+  city:expected-population-history ; convenience variable
 
   ; for comparing between runs : previous population history
-  previous-population-history
+  city:previous-population-history
 
-  current-mse
+  city:current-mse
 
-  color-var
+  city:color-var
 
   ; network variables
-  city-bw-centrality
-  city-flow
+  city:bw-centrality
+  city:flow
 
 ]
 
@@ -150,23 +151,24 @@ cities-own [
 breed [nodes node]
 
 nodes-own [
-  name
+  turtle:name
 ]
 
 undirected-link-breed [paths path]
 
 paths-own [
 
-  impedance
+  ;impedance
+  ;speed ; effective weight
+  path:pace ; time per unit of distance
+  path:travel-time
+  path:initial-pace ; used to reset
 
-  speed ; effective weight
-  relative-speed ; speed per unit of distance
-  effective-length
-
-  path-length
-  bw-centrality
-  flow
-  feedback-flow
+  ; geographical length
+  path:length
+  path:bw-centrality
+  path:flow
+  path:feedback-flow
 
 
 ]
@@ -246,7 +248,7 @@ gravity-weight
 gravity-weight
 0
 2e-2
-0.014118
+0.004706
 1e-6
 1
 NIL
@@ -261,7 +263,7 @@ gravity-gamma
 gravity-gamma
 0.5
 5
-1.0
+0.9
 0.01
 1
 NIL
@@ -276,7 +278,7 @@ gravity-decay
 gravity-decay
 1
 500
-462.3
+248.4
 0.1
 1
 NIL
@@ -412,7 +414,7 @@ BUTTON
 890
 734
 random path cities
-ask one-of cities [let c2 one-of other cities let n2 [one-of nodes with-min [distance myself]] of c2 ask one-of nodes with-min [distance myself] [let p nw:weighted-path-to n2 \"impedance\" if p != false [foreach p [? -> ask ? [set hidden? false set color red]]]]]
+test:shortest-path-random-cities
 NIL
 1
 T
@@ -430,8 +432,8 @@ CHOOSER
 703
 visualization
 visualization
-"mse" "mse-log" "delta-previous-mse" "delta-previous-mse-log" "feedback-strength"
-1
+"log-pop" "mse" "mse-log" "delta-previous-mse" "delta-previous-mse-log" "feedback-strength"
+0
 
 PLOT
 1138
@@ -550,10 +552,10 @@ NIL
 10.0
 true
 true
-"if setup-type = \"gis\" [let c one-of cities with [name = city-traj] if c != nobody [set-current-plot-pen \"sim\" plot [population] of c]]\nif setup-type = \"gis\" [let c one-of cities with [name = city-traj] if c != nobody [set-current-plot-pen \"real\" plot [population] of c]]" ""
+"if setup-type = \"gis\" [let c one-of cities with [city:name = city-traj] if c != nobody [set-current-plot-pen \"sim\" plot [city:population] of c]]\nif setup-type = \"gis\" [let c one-of cities with [city:name = city-traj] if c != nobody [set-current-plot-pen \"real\" plot [city:population] of c]]" ""
 PENS
-"sim" 1.0 0 -14070903 true "" "if setup-type = \"gis\" [let c one-of cities with [name = city-traj] if c != nobody [plot [last population-history] of c]]"
-"real" 1.0 0 -5298144 true "" "if setup-type = \"gis\" [let c one-of cities with [name = city-traj] if c != nobody [plot [last expected-population-history] of c]]"
+"sim" 1.0 0 -14070903 true "" "if setup-type = \"gis\" [let c one-of cities with [city:name = city-traj] if c != nobody [plot [last city:population-history] of c]]"
+"real" 1.0 0 -5298144 true "" "if setup-type = \"gis\" [let c one-of cities with [city:name = city-traj] if c != nobody [plot [last city:expected-population-history] of c]]"
 
 INPUTBOX
 919
@@ -688,7 +690,7 @@ network-reinforcment-exponent
 network-reinforcment-exponent
 0
 10
-6.9
+10.0
 0.01
 1
 NIL
@@ -721,7 +723,7 @@ network-reinforcment-gmax
 network-reinforcment-gmax
 0
 0.05
-0.01
+0.05
 1e-5
 1
 NIL
@@ -734,7 +736,7 @@ SWITCH
 742
 show-virtual-flows?
 show-virtual-flows?
-1
+0
 1
 -1000
 
@@ -802,7 +804,7 @@ physical-network-reinforcment-threshold
 physical-network-reinforcment-threshold
 0
 0.1
-9.458749942569314E-5
+0.0912012423936319
 0.0005
 1
 NIL
@@ -815,8 +817,8 @@ CHOOSER
 766
 link-display-var
 link-display-var
-"relative-speed" "flow"
-0
+"speed" "flow"
+1
 
 SLIDER
 6
@@ -827,8 +829,8 @@ physical-network-reinforcment-quantile
 physical-network-reinforcment-quantile
 0
 1
-0.2
-0.1
+0.8
+0.05
 1
 NIL
 HORIZONTAL
@@ -882,6 +884,23 @@ false
 "" ""
 PENS
 "default" 1.0 0 -16777216 true "" ""
+
+BUTTON
+779
+735
+910
+768
+rnd path cities nodes
+test:shortest-path-random-cities-nodes
+NIL
+1
+T
+OBSERVER
+NIL
+NIL
+NIL
+NIL
+1
 
 @#$#@#$#@
 ## WHAT IS IT?

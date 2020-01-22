@@ -1,3 +1,5 @@
+*.tmp.nlogo
+
 # 21Mo : ok
 #setup/mnt.asc
 #exploration

@@ -3,23 +3,23 @@
 ; display
 
 
-to update-display
+to display:update-display
   if headless? != true [
     ; cities
-    display-cities
+    display:display-cities
   
     ; network
-    display-network
+    display:display-network
   
     ; specific plots
-    display-plots
+    display:display-plots
   
   ]
 end
 
 
-to color-patches
-  if setup-type = "gis" [
+to display:color-patches
+  ifelse setup-type = "gis" and geo-paths? = true [
     ;ask patches [set pcolor scale-color brown elevation 0 4000]
     ask patches [set pcolor scale-color yellow elevation 0 4000]
     
@@ -33,61 +33,66 @@ to color-patches
     ;  set pcolor gradient:scale (list extract-rgb brown extract-rgb white) elevation gradient-mid 4000
    ; 
     ;]
+  ][
+    ask patches [set pcolor 9]
   ]
 end
 
 
-to display-cities
-  let ptot sum [population] of cities
+to display:display-cities
+  let ptot sum [city:population] of cities
   
-  if visualization = "mse" [ask cities [set color-var (current-mse / population * ptot)]]
-  if visualization = "mse-log" [ask cities [set color-var city-mse-log ticks]]
+  if visualization = "mse" [ask cities [set city:color-var (city:current-mse / city:population * ptot)]]
+  if visualization = "mse-log" [ask cities [set city:color-var city-mse-log ticks]]
+  if visualization = "log-pop" [ask cities [set city:color-var ln city:population]]
   
-  
-  let mi min [color-var] of cities let ma max [color-var] of cities
+  let mi min [city:color-var] of cities let ma max [city:color-var] of cities
   if mi < ma [
   ask cities [
-    set size (ln population) ;/ 10
+    set size (ln city:population) ;/ 10
     ;set color gradient:scale (list extract-rgb blue extract-rgb red) color-var mi ma
     ;set color scale-color red color-var (mi - 2) ma
-    set color scale-color red color-var mi ma
+    set color scale-color red city:color-var mi ma
   ]
   ]
 end
 
 
-to display-network
+to display:display-network
   
   if network-type = "virtual" [
     if show-virtual-flows? [
       ask links [die]
       let distance-diff distance-matrix matrix:- (table:get distance-matrices (first dates))
       ask cities [
-        let currentdistdiff matrix:get-row distance-diff index
-        ask other cities [let d item index currentdistdiff if d < 0 [create-link-with myself [set thickness (abs d) / 10]]]
+        let currentdistdiff matrix:get-row distance-diff city:index
+        ask other cities [let d item city:index currentdistdiff if d < 0 [create-link-with myself [set thickness (abs d) / 10]]]
       ]
     ]
   ]
   
   if network-type = "physical" or network-type = "real" [
-    if link-display-var = "relative-speed" [
+    if link-display-var = "speed" [
       ;ask links [set thickness relative-speed / ((1 + network-reinforcment-gmax) ^ final-time-step)]
       ;ask links [set hidden? false] ask paths with [path-length < effective-length] [set hidden? true]
-      let mi min [ln relative-speed] of links let ma max [ln relative-speed] of links
+      ; ! relative-speed is a pace
+      let mi min [ln (1 / path:pace)] of links let ma max [ln (1 / path:pace)] of links
       ;ask links [set thickness 4 * ((ln relative-speed) - mi) / (ma - mi) ]
-      if mi < ma [
-        ask links [set thickness 1.5 * ((ln relative-speed) - mi) / (ma - mi) ]
+      ifelse mi < ma [
+        ask links [set thickness 3.0 * ((ln (1 / path:pace)) - mi) / (ma - mi) ]
+      ][
+        ask links [set thickness 0]
       ]
     ]
     if link-display-var = "flow" [
-      ask links [set thickness 25 * ln (1 + flow)]
-      if ticks > 0 [ask links [set hidden? false] ask links with [flow = 0] [set hidden? true]]
+      ask links [set thickness 25 * ln (1 + path:flow)]
+      if ticks > 0 [ask links [set hidden? false] ask links with [path:flow = 0] [set hidden? true]]
     ]
   ]
 end
 
 
-to display-plots
+to display:display-plots
   ; fit plot
   if setup-type = "gis" [
     set-current-plot "fit" set-current-plot-pen "default"

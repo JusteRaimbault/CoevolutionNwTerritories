@@ -40,6 +40,30 @@ to go
   indicators:update-indicators
   
   ; display
-  update-display
+  display:update-display
   
+end
+
+
+
+to test:shortest-path-random-cities-nodes
+  ask paths [set color grey]
+  nw:set-context turtles paths
+  ask one-of cities [
+    show city:name
+    let c2 one-of other cities
+    ask c2 [show city:name]
+    let n2 [one-of nodes with-min [distance myself]] of c2
+    ask one-of nodes with-min [distance myself] [let p nw:weighted-path-to n2 "path:travel-time" if p != false [foreach p [? -> ask ? [set hidden? false set color red]]]]]
+end
+
+to test:shortest-path-random-cities
+  ask paths [set color grey]
+  nw:set-context turtles paths
+  ask one-of cities [
+    show city:name
+    let c2 one-of other cities
+    ask c2 [show city:name]
+    let p nw:weighted-path-to c2 "path:travel-time" if p != false [foreach p [? -> ask ? [set hidden? false set color red]]]
+  ]
 end

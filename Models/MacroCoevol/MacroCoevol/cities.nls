@@ -118,43 +118,45 @@ end
 
 to update-cities-populations
   ask cities [
-    set population matrix:get populations index ticks
+    set city:population matrix:get populations city:index ticks
     ; update histories
-    set population-history lput population population-history
-    set expected-population-history lput matrix:get real-populations index ticks expected-population-history
-    set current-mse city-mse ticks
+    set city:population-history lput city:population city:population-history
+    set city:expected-population-history lput matrix:get real-populations city:index ticks city:expected-population-history
+    set city:current-mse city-mse ticks
   ]
 end
 
 
 ;;
-; city indicators
+; city indicators / procedures
 
-to-report city-population
-  report population
-end
 
-to-report city-closeness-centrality
-   let d matrix:get-row distance-matrix index
-   let s 0 let i 0 foreach d [? -> if i != index [set s s + 1 / ?] set i i + 1]
+to-report city:closeness-centrality
+   let d matrix:get-row distance-matrix city:index
+   let s 0 let i 0 foreach d [? -> if i != city:index [set s s + 1 / ?] set i i + 1]
    report s / ((length d) - 1)
 end
 
-to-report city-accessibility
-  let d matrix:get-row distance-matrix index
-  let pops replace-item index (matrix:get-column populations ticks) 0
+to-report city:accessibility
+  let d matrix:get-row distance-matrix city:index
+  let pops replace-item city:index (matrix:get-column populations ticks) 0
   report sum utils:list:times-element-wise pops (map [? -> exp (- ? / gravity-decay)] d)
 end
 
 
-to new-city
+to city:new-city
   set shape "circle" set color red
-  set size ln population
-  if name != 0 [set label name]
-  set population-history (list population) set expected-population-history (list population)
+  set size ln city:population
+  if city:name != 0 [
+    set label city:name set label-color 125
+    set turtle:name city:name
+  ]
+  set city:population-history (list city:population) set city:expected-population-history (list city:population)
 end
 
-to set-coords-l93 [x y]
+;;
+; city procedure that can be used by any turtle (network nodes in particular)
+to turtle:set-coords-l93 [x y]
   ;setxy random-xcor random-ycor
 
   ; conversion lambert93 -> world coordinates - LAMBERT II ?
@@ -164,3 +166,7 @@ to set-coords-l93 [x y]
   let yy min-pycor + ((max-pycor - min-pycor) * (y - l93ymin) / (l93ymax - l93ymin))
   setxy (min list (max list min-pxcor xx) max-pxcor) (min list (max list min-pycor yy) max-pycor)
 end
+
+
+
+

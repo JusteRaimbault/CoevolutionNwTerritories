@@ -58,17 +58,16 @@ to setup:reset
   setup:setup-indicators
   reset-ticks
   clear-all-plots
-  update-display
-  ; for virtual
-  if network-type = "virtual" [ask links [die]]
+  display:update-display
+  display:color-patches
 end
 
 to setup:reset-populations
-  ask cities [set population matrix:get populations index 0]
+  ask cities [set city:population matrix:get populations city:index 0]
 end
 
 to setup:reset-links
-  ask paths [new-path]
+  ask paths [path:new-path]
   if network-type = "virtual" [ask links [die]]
 end
 
@@ -124,7 +123,7 @@ to setup:setup-world
         create-paths-with other nodes in-radius 1.5 with [not link-neighbor? myself] [
           set hidden? true
           let slope atan (abs ([elevation] of end1 - [elevation] of end2)) (link-length * 1000)
-          set impedance link-length * (1 + (slope / alpha0)^ n0)
+          set path:travel-time link-length * (1 + (slope / alpha0)^ n0)
         ]
       ]
     ]
@@ -159,9 +158,9 @@ to setup:setup-cities
     create-cities synthetic-cities-number [
       ;setxy random-xcor random-ycor
       move-to one-of patches with [count cities in-radius 10 = 0]
-      set index (i - 1)
-      set population synthetic-max-pop / (i ^ synthetic-rank-size-exp) set i i + 1
-      new-city
+      set city:index (i - 1)
+      set city:population synthetic-max-pop / (i ^ synthetic-rank-size-exp) set i i + 1
+      city:new-city
      ]
   ]
   
@@ -171,7 +170,7 @@ to setup:setup-cities
     let i 0
     foreach coords [? ->
       let cname first ? let x read-from-string item 1 ? let y read-from-string last ?
-      create-cities 1 [set name cname set-coords-l93 x y set index i set population matrix:get real-populations i 0 new-city]
+      create-cities 1 [set city:name cname turtle:set-coords-l93 x y set city:index i set city:population matrix:get real-populations i 0 city:new-city]
       set i i + 1 
     ]
   ]
@@ -191,8 +190,8 @@ to setup:setup-network
      ; FIXME does not seem to work
      if physical-network-heuristic = "breakdown" [setup:initial-network-breakdown]
    
-    ask paths [new-path]
-    ask paths with [path-length = 0] [die]   
+    ask paths [path:new-path]
+    ask paths with [path:length = 0] [die]   
   ]
  
  
@@ -220,14 +219,21 @@ to setup:setup-network
     let nodedata file:read-csv (word "setup/graphs/" first dates "_graph_res10000_cities50_nodes.csv") ","
     foreach nodedata [row ->
       let nodename first row
-      if count cities with [name = nodename] = 0 [create-nodes 1 [new-node set-coords-l93 (read-from-string item 1 row) (read-from-string item 2 row) set name nodename]]
+      if count cities with [city:name = nodename] = 0 [create-nodes 1 [node:new-node turtle:set-coords-l93 (read-from-string item 1 row) (read-from-string item 2 row) set turtle:name nodename]]
     ]
      
     let edgedata file:read-csv (word "setup/graphs/" first dates "_graph_res10000_cities50_edges.csv") ","
     foreach edgedata [row -> 
       let n1name first row let n2name item 1 row let relspeed (read-from-string item 2 row)
-      let n1 one-of turtles with [name = n1name] let n2 one-of turtles with [name = n2name]
-      if n1 != nobody and n2 != nobody [ask n1 [create-path-with n2 [new-path set relative-speed relspeed set effective-length link-length * relspeed]]]
+      let n1 one-of turtles with [turtle:name = n1name] let n2 one-of turtles with [turtle:name = n2name]
+      if n1 != nobody and n2 != nobody [
+        ask n1 [
+          create-path-with n2 [
+            set path:initial-pace relspeed
+            path:new-path
+          ]
+        ]
+      ]
     ]
    ]
   
@@ -242,11 +248,11 @@ end
 to setup:initial-network-slime-mould
   foreach utils:list:seq min-pxcor max-pxcor slime-mould-node-distance [x ->
            foreach utils:list:seq min-pycor max-pycor slime-mould-node-distance [ y ->
-             create-nodes 1 [setxy x y new-node]
+             create-nodes 1 [setxy x y node:new-node]
           ]
         ]
         
-        ask nodes [create-paths-with (other nodes in-radius (slime-mould-node-distance * sqrt 2)) [new-path]]
+        ask nodes [create-paths-with (other nodes in-radius (slime-mould-node-distance * sqrt 2)) [path:new-path]]
         ask n-of (slime-mould-link-deletion-proportion * count links) links [die]
         planarize-network nodes paths
         ask nodes [ ; jitter
@@ -311,8 +317,8 @@ to setup:setup-matrices
     if network-type = "virtual" [
       ; distance matrix
       
-      let xcors [] let ycors [] let pops [] foreach sort-by [[?1 ?2] -> [index] of ?1 < [index] of ?2] cities [
-        ? -> ask ? [set xcors lput xcor xcors set ycors lput ycor ycors set pops lput population pops]
+      let xcors [] let ycors [] let pops [] foreach sort-by [[?1 ?2] -> [city:index] of ?1 < [city:index] of ?2] cities [
+        ? -> ask ? [set xcors lput xcor xcors set ycors lput ycor ycors set pops lput city:population pops]
       ]
       let xi matrix:from-row-list (utils:list:rep xcors n) let xj matrix:from-column-list (utils:list:rep xcors n) let yi matrix:from-row-list (utils:list:rep ycors n) let yj matrix:from-column-list (utils:list:rep ycors n)
       set distance-matrix matrix:map sqrt ((matrix:times-element-wise (xi matrix:- xj) (xi matrix:- xj)) matrix:+ (matrix:times-element-wise (yi matrix:- yj) (yi matrix:- yj)))
@@ -324,12 +330,12 @@ to setup:setup-matrices
     ]
     
     ; feedback distance matrix
-    let xcors [] let ycors [] let pops [] foreach sort-by [[?1 ?2] -> [index] of ?1 < [index] of ?2] cities [? -> ask ? [set xcors lput xcor xcors set ycors lput ycor ycors set pops lput population pops]]
+    let xcors [] let ycors [] let pops [] foreach sort-by [[?1 ?2] -> [city:index] of ?1 < [city:index] of ?2] cities [? -> ask ? [set xcors lput xcor xcors set ycors lput ycor ycors set pops lput city:population pops]]
     let xi matrix:from-row-list (utils:list:rep xcors n) let xj matrix:from-column-list (utils:list:rep xcors n) let yi matrix:from-row-list (utils:list:rep ycors n) let yj matrix:from-column-list (utils:list:rep ycors n)
     let feedback-dist-rows []
     let k 0
     repeat n [
-      let cityk one-of cities with [index = k]
+      let cityk one-of cities with [city:index = k]
       let xk matrix:make-constant n n [xcor] of cityk let yk matrix:make-constant n n [ycor] of cityk
       let xik matrix:map cities:zero-infinite (matrix:map sqrt ((matrix:times-element-wise (xi matrix:- xk) (xi matrix:- xk)) matrix:+ (matrix:times-element-wise (yi matrix:- yk) (yi matrix:- yk))))
       let xjk matrix:map cities:zero-infinite (matrix:map sqrt ((matrix:times-element-wise (xj matrix:- xk) (xj matrix:- xk)) matrix:+ (matrix:times-element-wise (yj matrix:- yk) (yj matrix:- yk))))
@@ -373,8 +379,10 @@ end
 
 to setup:setup-display
   if headless? != true [
-    color-patches
-    display-plots
+    display:color-patches
+    display:display-cities
+    display:display-network
+    display:display-plots
   ]
 end
 
