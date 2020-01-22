@@ -1,0 +1,122 @@
+import java.text.SimpleDateFormat
+import java.util.Date
+
+// variables
+val synthRankSize = Val[Double]
+
+val nwThreshold = Val[Double]
+val nwGmax = Val[Double]
+val nwExponent = Val[Double]
+val nwPhysQuantile = Val[Double]
+val nwSlimeMouldFun = Val[String]
+
+val finalTime = Val[Int]
+val gravityWeight = Val[Double]
+val gravityGamma = Val[Double]
+val gravityDecay = Val[Double]
+val feedbackWeight = Val[Double]
+val feedbackGamma = Val[Double]
+val feedbackDecay = Val[Double]
+
+val nwType = Val[String]
+
+
+// indicators
+// distributions
+val hierarchiesPop = Val[Array[Double]]
+val hierarchiesCloseness = Val[Array[Double]]
+val hierarchiesAccessibility = Val[Array[Double]]
+val segHierarchiesPop = Val[Array[Double]]
+val segHierarchiesCloseness = Val[Array[Double]]
+val segHierarchiesAccessibility = Val[Array[Double]]
+
+// cross-variables rank corrs in time
+val rankCorrsPopCloseness = Val[Array[Double]]
+val rankCorrsPopAccessibility = Val[Array[Double]]
+val rankCorrsClosenessAccessibility = Val[Array[Double]]
+
+// trajectories
+val rankCorrPop = Val[Double]
+val rankCorrCloseness = Val[Double]
+val rankCorrAccessibility = Val[Double]
+
+val id = Val[Int]
+val replication = Val[Int]
+
+// setup-experiment-synthetic [synth-ranksize nw-type nw-threshold nw-gmax nw-exponent physical-nw-rein-quantile nw-slimemould-fun grav-weight grav-gamma grav-decay feed-weight feed-gamma feed-decay final-time seed
+val cmds = Seq("setup-experiment-synthetic ${synthRankSize} \"${nwType}\" ${nwThreshold} ${nwGmax} ${nwExponent} ${nwPhysQuantile} \"${nwSlimeMouldFun}\" ${gravityWeight} ${gravityGamma} ${gravityDecay} ${feedbackWeight} ${feedbackGamma} ${feedbackDecay} ${finalTime} ${replication}","run-experiment")
+
+val model = NetLogo6Task(workDirectory / "HEADLESS_MacroCoEvol.nlogo",cmds,embedWorkspace=true,reuseWorkspace=true) set(
+    (inputs, outputs) += (synthRankSize,nwThreshold,nwGmax,nwExponent,nwPhysQuantile,nwSlimeMouldFun,finalTime,gravityWeight,gravityGamma,gravityDecay,feedbackWeight,feedbackGamma,feedbackDecay,nwType,replication,id),
+    outputs += hierarchiesPop mapped "population-hierarchies",
+    outputs += hierarchiesCloseness mapped "closeness-hierarchies",
+    outputs += hierarchiesAccessibility mapped "accessibility-hierarchies",
+    outputs += segHierarchiesPop mapped "population-seg-hierarchies",
+    outputs += segHierarchiesCloseness mapped "closeness-seg-hierarchies",
+    outputs += segHierarchiesAccessibility mapped "accessibility-seg-hierarchies",
+    outputs += rankCorrPop mapped "rank-correlation \"city-population\"",
+    outputs += rankCorrCloseness mapped "rank-correlation \"city-closeness-centrality\"",
+    outputs += rankCorrAccessibility mapped "rank-correlation \"city-accessibility\"",
+    outputs += rankCorrsPopCloseness mapped "rank-correlations-vars \"city-population\" \"city-closeness-centrality\"",
+    outputs += rankCorrsPopAccessibility mapped "rank-correlations-vars \"city-population\" \"city-accessibility\"",
+    outputs += rankCorrsClosenessAccessibility mapped "rank-correlations-vars \"city-closeness-centrality\" \"city-accessibility\""
+)
+
+
+//val purpose = "HIERARCHIES_SYNTHETICVIRTUAL_GRID"
+//val purpose = "HIERARCHIES_SYNTHETICVIRTUAL_TARGETED_GRID"
+//val purpose = "HIERARCHIES_SYNTHETICPHYSICAL_GRID"
+val purpose = "HIERARCHIES_SYNTHETICPHYSICAL_TARGETED_GRID"
+//val purpose = "SYNTHETICPHYSICAL_GRID"
+//val purpose = "TEST"
+
+// output
+val indics_hook = AppendToCSVFileHook(workDirectory / "exploration" / (((new SimpleDateFormat("yyyyMMdd_HHmmss")).format(new Date()))+"_"+purpose+".csv"),arrayOnRow = true)
+
+//val env = LocalEnvironment(5)
+val env = EGIEnvironment("vo.complex-systems.eu",openMOLEMemory = 4000 megabytes)
+
+
+// (synthRankSize,nwThreshold,nwGmax,finalTime,gravityWeight,gravityGamma,gravityDecay,feedbackWeight,feedbackGamma,feedbackDecay,replication,id)
+val exploration =  DirectSampling(
+  //evaluation = (model on env hook indics_hook),
+  evaluation = (model on env by 100 hook indics_hook),
+  sampling = ((
+    (synthRankSize in (0.5 to 1.5 by 0.5)) x
+    //(nwThreshold in (0.5 to 4.5 by 2.0)) x
+    //(nwExponent in (0.5 to 1.5 by 0.5)) x
+    (nwPhysQuantile in Seq(0.05, 0.45, 0.85)) x
+    //(nwGmax in (0.0 to 0.05 by 0.05)) x
+    //(gravityWeight in (0.0005 to 0.001 by 0.0005)) x
+    (gravityGamma in (0.5 to 1.5 by 0.2)) x
+    (gravityDecay in (10.0 to 210.0 by 50.0))
+  ) withIndex id )
+  /*sampling = ((LHS (
+    1
+    ,synthRankSize in Range(0.5,1.5)
+    ,nwThreshold in Range(0.0,5.0)
+    ,nwExponent in Range(0.0,2.0)
+    //,nwPhysQuantile in Range(0.0,1.0)
+    //,nwGmax in Range(0.0,0.05)
+    ,gravityWeight in Range(0.0,0.001)
+    ,gravityGamma in Range(0.0,2.0)
+    ,gravityDecay in Range(0.0,200.0)
+  )) withIndex id)*/
+    x (nwType is "physical") // {"virtual", "physical"}
+    x (finalTime is 30)
+    //x (synthRankSize is 1.0)
+    x (nwThreshold is 1.0)
+    x (nwGmax is 0.05)
+    x (nwExponent is 1.0)
+    //x (nwPhysQuantile is 0.1)
+    x (nwSlimeMouldFun is "thresholded") // {"thresholded", "full-growth"}
+  x (gravityWeight is 0.001)
+  //x (gravityGamma is 1.0)
+  //x (gravityDecay is 50.0)
+  x (feedbackWeight is 0.0)
+  x (feedbackGamma is 1.0)
+  x (feedbackDecay is 1.0)
+  x (replication in (UniformDistribution[Int]() take 100))
+)
+
+exploration
