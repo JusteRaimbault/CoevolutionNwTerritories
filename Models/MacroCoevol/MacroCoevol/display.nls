@@ -71,6 +71,7 @@ to display:display-network
     ]
   ]
   
+  
   if global:network-type = "physical" or global:network-type = "real" [
     if global:link-display-var = "speed" [
       ;ask links [set thickness relative-speed / ((1 + network-reinforcment-gmax) ^ final-time-step)]
@@ -79,7 +80,9 @@ to display:display-network
       let mi min [ln (1 / path:pace)] of links let ma max [ln (1 / path:pace)] of links
       ;ask links [set thickness 4 * ((ln relative-speed) - mi) / (ma - mi) ]
       ifelse mi < ma [
-        ask links [set thickness 3.0 * ((ln (1 / path:pace)) - mi) / (ma - mi) ]
+         ; hardcoded link width is hardcore
+        let maxthickness 5.0 if global:network-type = "real" [set maxthickness 3.0]
+        ask links [set thickness maxthickness * ((ln (1 / path:pace)) - mi) / (ma - mi) ]
       ][
         ask links [set thickness 0]
       ]
@@ -122,6 +125,24 @@ to display:display-plots
        plotxy item i ranks ? set i i + 1
     ]
   
+end
+
+;;
+; plot drawing population trajectory of a given city
+to display:setup-real-sim-city-plot
+  if global:setup-type = "gis" [let c one-of cities with [city:name = city-traj] if c != nobody [set-current-plot-pen "sim" plot [city:population] of c]]
+  if global:setup-type = "gis" [let c one-of cities with [city:name = city-traj] if c != nobody [set-current-plot-pen "real" plot [city:population] of c]]
+end
+
+;;
+; update city traj sim-real plot
+to display:update-real-sim-city-plot [mode]
+  if global:setup-type = "gis" [
+    let c one-of cities with [city:name = city-traj] if c != nobody [
+      let pop 0 ifelse mode = "simulated" [set pop [last city:population-history] of c][set pop [last city:expected-population-history] of c]
+      plot pop
+    ]
+  ]
 end
 
 

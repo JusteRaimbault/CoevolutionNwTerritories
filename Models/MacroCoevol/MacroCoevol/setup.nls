@@ -71,7 +71,10 @@ to setup:reset-links
   if global:network-type = "virtual" [ask links [die]]
 end
 
+;;
+;
 to setup:reset-distances
+  if not table:has-key? global:distance-matrices (first global:dates) [error (word "Partial setup error: distance matrix for date " (first global:dates) " was not set - do a full setup")]
   set global:distance-matrix matrix:copy table:get global:distance-matrices (first global:dates)
 end
 
@@ -278,7 +281,9 @@ end
 
 
 ;;
-; 
+; 20200122 : missing distance matrices -> recompute fdist 1876 in $CN_HOME/Models/DataProcessing/Train/buildNetwork.R ; 1912: copy 1911
+;  NOTE: if the network is physical and real in the gis case, should not use precomputed distance matrices? -> yes should as history of the physical network is not loaded -> for evaluating fit on expected distances
+;  NOTE: physical network on full period does not make sense as links are not added: absurd network at the first date due to the connexification heuristic in network construction
 to setup:setup-matrices
   
   if global:setup-type = "gis" [

@@ -175,10 +175,10 @@ paths-own [
 ]
 @#$#@#$#@
 GRAPHICS-WINDOW
-294
-20
-905
-632
+346
+19
+957
+631
 -1
 -1
 3.0
@@ -202,10 +202,10 @@ ticks
 30.0
 
 BUTTON
-0
-496
-59
-529
+7
+599
+66
+632
 setup
 setup:setup
 NIL
@@ -219,12 +219,12 @@ NIL
 1
 
 SLIDER
-10
-536
-144
-569
-growth-rate
-growth-rate
+5
+638
+170
+671
+global:growth-rate
+global:growth-rate
 0
 0.05
 0.0
@@ -234,19 +234,19 @@ NIL
 HORIZONTAL
 
 OUTPUT
-989
-788
-1386
-958
+1025
+806
+1422
+976
 10
 
 SLIDER
-8
-573
-142
-606
-gravity-weight
-gravity-weight
+4
+672
+194
+705
+global:gravity-weight
+global:gravity-weight
 0
 2e-2
 0.004706
@@ -256,12 +256,12 @@ NIL
 HORIZONTAL
 
 SLIDER
-8
-610
-142
-643
-gravity-gamma
-gravity-gamma
+15
+714
+208
+747
+global:gravity-gamma
+global:gravity-gamma
 0.5
 5
 0.9
@@ -271,12 +271,12 @@ NIL
 HORIZONTAL
 
 SLIDER
-8
-647
-142
-680
-gravity-decay
-gravity-decay
+15
+751
+207
+784
+global:gravity-decay
+global:gravity-decay
 1
 500
 248.4
@@ -286,12 +286,12 @@ NIL
 HORIZONTAL
 
 SLIDER
-146
-573
-287
-606
-feedback-weight
-feedback-weight
+210
+674
+392
+707
+global:feedback-weight
+global:feedback-weight
 0
 0.1
 0.0
@@ -301,12 +301,12 @@ NIL
 HORIZONTAL
 
 SLIDER
-146
-611
-288
-644
-feedback-gamma
-feedback-gamma
+214
+715
+411
+748
+global:feedback-gamma
+global:feedback-gamma
 0
 5
 1.0
@@ -316,12 +316,12 @@ NIL
 HORIZONTAL
 
 SLIDER
-146
-649
-288
-682
-feedback-decay
-feedback-decay
+209
+750
+413
+783
+global:feedback-decay
+global:feedback-decay
 0
 200
 1.0
@@ -331,10 +331,10 @@ NIL
 HORIZONTAL
 
 BUTTON
-60
-495
-126
-528
+67
+599
+133
+632
 reset
 setup:reset
 NIL
@@ -348,10 +348,10 @@ NIL
 1
 
 BUTTON
-198
-494
-292
-527
+205
+598
+299
+631
 go full period
 go-full-period
 NIL
@@ -431,16 +431,16 @@ CHOOSER
 658
 764
 703
-visualization
-visualization
+global:visualization
+global:visualization
 "log-pop" "mse" "mse-log" "delta-previous-mse" "delta-previous-mse-log" "feedback-strength"
 0
 
 PLOT
-1138
-10
-1403
-259
+1169
+19
+1434
+268
 fit
 real
 sim
@@ -455,10 +455,10 @@ PENS
 "default" 1.0 0 -16777216 true "" ""
 
 BUTTON
-128
-494
-191
-527
+135
+598
+198
+631
 NIL
 go
 NIL
@@ -472,10 +472,10 @@ NIL
 1
 
 INPUTBOX
-455
-658
-505
-718
+458
+720
+508
+780
 orig
 0.0
 1
@@ -483,10 +483,10 @@ orig
 Number
 
 INPUTBOX
-507
-658
-557
-718
+510
+720
+560
+780
 dest
 0.0
 1
@@ -494,20 +494,20 @@ dest
 Number
 
 CHOOSER
-362
-658
-454
-703
-period
-period
+450
+660
+542
+705
+global:period
+global:period
 "1831-1851" "1841-1861" "1851-1872" "1881-1901" "1891-1911" "1921-1936" "1946-1968" "1962-1982" "1975-1999" "full"
 8
 
 PLOT
-983
-633
-1191
-783
+1019
+651
+1227
+801
 profile-logmse
 NIL
 NIL
@@ -522,10 +522,10 @@ PENS
 "default" 1.0 0 -16777216 true "" ""
 
 PLOT
-1194
-633
-1386
-783
+1234
+650
+1426
+800
 profile-mselog
 NIL
 NIL
@@ -540,10 +540,10 @@ PENS
 "default" 1.0 0 -16777216 true "" ""
 
 PLOT
-921
-12
-1125
-179
+961
+24
+1165
+191
 city-traj
 NIL
 NIL
@@ -553,16 +553,16 @@ NIL
 10.0
 true
 true
-"if setup-type = \"gis\" [let c one-of cities with [city:name = city-traj] if c != nobody [set-current-plot-pen \"sim\" plot [city:population] of c]]\nif setup-type = \"gis\" [let c one-of cities with [city:name = city-traj] if c != nobody [set-current-plot-pen \"real\" plot [city:population] of c]]" ""
+"display:setup-real-sim-city-plot" ""
 PENS
-"sim" 1.0 0 -14070903 true "" "if setup-type = \"gis\" [let c one-of cities with [city:name = city-traj] if c != nobody [plot [last city:population-history] of c]]"
-"real" 1.0 0 -5298144 true "" "if setup-type = \"gis\" [let c one-of cities with [city:name = city-traj] if c != nobody [plot [last city:expected-population-history] of c]]"
+"sim" 1.0 0 -14070903 true "" "display:update-real-sim-city-plot \"simulated\""
+"real" 1.0 0 -5298144 true "" "display:update-real-sim-city-plot \"real\""
 
 INPUTBOX
-919
-187
-1049
-247
+959
+199
+1089
+259
 city-traj
 0
 1
@@ -570,22 +570,22 @@ city-traj
 String
 
 CHOOSER
-14
-18
-106
-63
-setup-type
-setup-type
+11
+11
+117
+56
+global:setup-type
+global:setup-type
 "synthetic" "gis"
-0
+1
 
 SLIDER
 1
-70
+105
+205
 138
-103
-synthetic-cities-number
-synthetic-cities-number
+global:synthetic-cities-number
+global:synthetic-cities-number
 0
 50
 30.0
@@ -595,12 +595,12 @@ NIL
 HORIZONTAL
 
 SLIDER
--1
-103
-168
-136
-synthetic-max-pop
-synthetic-max-pop
+0
+142
+213
+175
+global:synthetic-max-pop
+global:synthetic-max-pop
 0
 100000
 100000.0
@@ -610,12 +610,12 @@ NIL
 HORIZONTAL
 
 SLIDER
-137
-70
-292
-103
-synthetic-rank-size-exp
-synthetic-rank-size-exp
+2
+69
+212
+102
+global:synthetic-rank-size-exp
+global:synthetic-rank-size-exp
 0
 1.5
 1.0
@@ -625,12 +625,12 @@ NIL
 HORIZONTAL
 
 SLIDER
-148
-536
-282
-569
-final-time-step
-final-time-step
+209
+638
+368
+671
+global:final-time-step
+global:final-time-step
 0
 100
 30.0
@@ -640,10 +640,10 @@ NIL
 HORIZONTAL
 
 PLOT
-932
-248
-1125
-425
+1009
+291
+1202
+468
 rank-size
 NIL
 NIL
@@ -658,22 +658,22 @@ PENS
 "default" 1.0 0 -16777216 true "" ""
 
 CHOOSER
-6
-223
-166
-268
-network-type
-network-type
+5
+282
+165
+327
+global:network-type
+global:network-type
 "virtual" "physical" "real" "fixed"
-1
+2
 
 SLIDER
-6
-321
-225
-354
-network-reinforcment-threshold
-network-reinforcment-threshold
+13
+425
+307
+458
+global:network-reinforcment-threshold
+global:network-reinforcment-threshold
 0
 5
 3.0
@@ -683,25 +683,25 @@ NIL
 HORIZONTAL
 
 SLIDER
-6
-354
-224
-387
-network-reinforcment-exponent
-network-reinforcment-exponent
+13
+458
+322
+491
+global:network-reinforcment-exponent
+global:network-reinforcment-exponent
 0
 10
-10.0
+4.0
 0.01
 1
 NIL
 HORIZONTAL
 
 PLOT
-1144
-269
-1350
-410
+1204
+299
+1410
+440
 distances
 NIL
 NIL
@@ -716,48 +716,48 @@ PENS
 "pen-2" 1.0 0 -2674135 true "" "plot first matrix:min matrix:map cities:zero-infinite global:distance-matrix"
 
 SLIDER
-7
-388
-225
-421
-network-reinforcment-gmax
-network-reinforcment-gmax
+14
+492
+315
+525
+global:network-reinforcment-gmax
+global:network-reinforcment-gmax
 0
-0.05
-0.05
-1e-5
+0.5
+0.2
+0.01
 1
 NIL
 HORIZONTAL
 
 SWITCH
-296
-709
-451
-742
-show-virtual-flows?
-show-virtual-flows?
+570
+786
+791
+819
+global:show-virtual-flows?
+global:show-virtual-flows?
 0
 1
 -1000
 
 CHOOSER
-7
-269
-165
-314
-physical-network-heuristic
-physical-network-heuristic
+6
+330
+240
+375
+global:physical-network-heuristic
+global:physical-network-heuristic
 "slime-mould" "breakdown"
 0
 
 SLIDER
-4
-137
-144
-170
-synthetic-shortcut-number
-synthetic-shortcut-number
+1
+176
+227
+209
+global:synthetic-shortcut-number
+global:synthetic-shortcut-number
 0
 50
 30.0
@@ -767,12 +767,12 @@ NIL
 HORIZONTAL
 
 SLIDER
-145
-137
-287
-170
-synthetic-city-max-degree
-synthetic-city-max-degree
+6
+245
+228
+278
+global:synthetic-city-max-degree
+global:synthetic-city-max-degree
 0
 5
 5.0
@@ -782,12 +782,12 @@ NIL
 HORIZONTAL
 
 SLIDER
-4
-170
-179
-203
-synthetic-shortcut-radius
-synthetic-shortcut-radius
+5
+209
+223
+242
+global:synthetic-shortcut-radius
+global:synthetic-shortcut-radius
 0
 30
 30.0
@@ -797,37 +797,37 @@ NIL
 HORIZONTAL
 
 SLIDER
-3
-421
-275
-454
-physical-network-reinforcment-threshold
-physical-network-reinforcment-threshold
+10
+525
+314
+558
+global:physical-network-reinforcment-threshold
+global:physical-network-reinforcment-threshold
 0
 0.1
-0.0912012423936319
+0.06932380922855588
 0.0005
 1
 NIL
 HORIZONTAL
 
 CHOOSER
-458
-721
-596
-766
-link-display-var
-link-display-var
+569
+731
+734
+776
+global:link-display-var
+global:link-display-var
 "speed" "flow"
-1
+0
 
 SLIDER
-6
-457
-264
-490
-physical-network-reinforcment-quantile
-physical-network-reinforcment-quantile
+13
+561
+330
+594
+global:physical-network-reinforcment-quantile
+global:physical-network-reinforcment-quantile
 0
 1
 0.8
@@ -837,42 +837,42 @@ NIL
 HORIZONTAL
 
 SWITCH
-168
-206
-292
-239
-fixed-dist?
-fixed-dist?
+175
+262
+340
+295
+global:fixed-dist?
+global:fixed-dist?
 1
 1
 -1000
 
 SWITCH
-167
-240
-294
-273
-geo-paths?
-geo-paths?
+174
+296
+343
+329
+global:geo-paths?
+global:geo-paths?
 1
 1
 -1000
 
 CHOOSER
-176
-273
-292
-318
-slime-mould-reinforcment-function
-slime-mould-reinforcment-function
+4
+377
+252
+422
+global:slime-mould-reinforcment-function
+global:slime-mould-reinforcment-function
 "thresholded" "full-growth"
 0
 
 PLOT
-974
-437
-1174
-587
+1014
+473
+1214
+623
 reg
 NIL
 NIL
