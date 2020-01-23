@@ -42,6 +42,10 @@ to go
   ; display
   display:update-display
   
+  ;log
+  show (word "average log population " mean [ln city:population] of cities)
+  show (word "average travel time " mean (utils:list:concatenate matrix:to-row-list global:distance-matrix))
+  
 end
 
 

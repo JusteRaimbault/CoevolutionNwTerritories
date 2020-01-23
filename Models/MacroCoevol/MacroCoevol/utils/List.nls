@@ -76,7 +76,7 @@ end
 
 ;;
 ; concatenate a list of lists
-to-report concatenate [lists]
+to-report utils:list:concatenate [lists]
   let res []
   foreach lists [l ->
     foreach l [? ->

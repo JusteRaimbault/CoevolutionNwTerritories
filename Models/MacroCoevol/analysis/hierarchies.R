@@ -135,7 +135,8 @@ ggsave(file=paste0(resdir,"summarizedindics/",indic,'_nwExp',nwExp,'_wG',wg,'_xg
 # => rerun new experiments with more repets for standard devs and more gravity_gamma
 # 
 
-resprefix = '20200120_175200_HIERARCHIES_SYNTHETICVIRTUAL_TARGETED_GRID'
+#resprefix = '20200120_175200_HIERARCHIES_SYNTHETICVIRTUAL_TARGETED_GRID' # rerun with quantile param
+resprefix = ''
 res <- as.tbl(read.csv(paste0('exploration/',resprefix,'.csv'),stringsAsFactors = FALSE))
 resdir=paste0(Sys.getenv('CS_HOME'),'/CoevolutionNwTerritories/Results/MacroCoevol/',resprefix,'/');dir.create(resdir);dir.create(paste0(resdir,'targeted'))
 params = c("synthRankSize","nwExponent","nwThreshold","gravityWeight","gravityGamma","gravityDecay")

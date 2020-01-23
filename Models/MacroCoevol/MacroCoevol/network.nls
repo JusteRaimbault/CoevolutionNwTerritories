@@ -12,6 +12,9 @@ to network:evolve-network
       ; simple growth equation :
       ;   d_ij (t+1) = d_ij (t) * (1 + g_max * \frac{ (phi_ij/phi_0) ^ \gamma - 1 }{(phi_ij/phi_0) ^ \gamma + 1}
     
+      ; network reinforcement threshold can be set either directly or by quantiles
+      if global:network-threshold-type = "quantile" [set global:network-reinforcment-threshold quantile (remove 0 (utils:list:concatenate matrix:to-row-list global:gravity-flows)) global:network-reinforcment-quantile]
+      
       ;set distance-matrix (matrix:times-element-wise distance-matrix (matrix:map [(network-reinforcment-threshold / (? + 1e-7)) ^ network-reinforcment-exponent] gravity-flows)) 
       set global:distance-matrix (matrix:times-element-wise global:distance-matrix (matrix:map [? -> 1 + (global:network-reinforcment-gmax * (1 - (? / global:network-reinforcment-threshold)^ global:network-reinforcment-exponent) / (1 + (? / global:network-reinforcment-threshold)^ global:network-reinforcment-exponent))] global:gravity-flows))
     
@@ -66,10 +69,10 @@ to network:grow-physical-network
     ; no new links in this heuristic
     
     if global:slime-mould-reinforcment-function = "thresholded" [
-      set global:physical-network-reinforcment-threshold quantile [path:flow] of links with [path:flow > 0] global:physical-network-reinforcment-quantile
+      set global:network-reinforcment-threshold quantile [path:flow] of links with [path:flow > 0] global:network-reinforcment-quantile
     
       ask paths [
-        set path:travel-time path:travel-time * (1 + (global:network-reinforcment-gmax * (global:physical-network-reinforcment-threshold ^ global:network-reinforcment-exponent - path:flow ^ global:network-reinforcment-exponent) / (global:physical-network-reinforcment-threshold ^ global:network-reinforcment-exponent + path:flow ^ global:network-reinforcment-exponent)))
+        set path:travel-time path:travel-time * (1 + (global:network-reinforcment-gmax * (global:network-reinforcment-threshold ^ global:network-reinforcment-exponent - path:flow ^ global:network-reinforcment-exponent) / (global:network-reinforcment-threshold ^ global:network-reinforcment-exponent + path:flow ^ global:network-reinforcment-exponent)))
         set path:pace path:travel-time / path:length
       ]
     ]
@@ -97,6 +100,7 @@ to network:update-distance-matrices
   
   ask cities [
     ask other cities [
+      ; FIXME this is just a copy of the distance matric - could directly use travel time matrix ? - unconvenient dual implementation
       matrix:set global:distance-matrix city:index [city:index] of myself (table:get global:nw-travel-times (list city:index [city:index] of myself))
     ]
   ]

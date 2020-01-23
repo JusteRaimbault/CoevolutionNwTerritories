@@ -101,6 +101,7 @@ globals [
   global:show-virtual-flows?
   global:network-type
   global:network-reinforcment-threshold
+  global:network-reinforcment-quantile
   global:network-reinforcment-exponent
   global:network-reinforcment-gmax
   global:final-time-step
@@ -112,13 +113,13 @@ globals [
   global:feedback-gamma
   global:feedback-decay
 
+  global:network-threshold-type
+
   global:slime-mould-node-distance
   global:slime-mould-reinforcment-function
   global:slime-mould-link-deletion-proportion
 
   global:physical-network-heuristic
-  global:physical-network-reinforcment-threshold
-  global:physical-network-reinforcment-quantile
 
   global:link-display-var
 
@@ -136,6 +137,8 @@ globals [
   global:fixed-dist?
 
   global:failed?
+
+  city-traj
 
 ]
 
@@ -199,9 +202,6 @@ paths-own [
   path:travel-time
 
 ]
-
-
-
 
 
 @#$#@#$#@
@@ -273,6 +273,23 @@ BUTTON
 188
 NIL
 test-experiment-synthetic-physical
+NIL
+1
+T
+OBSERVER
+NIL
+NIL
+NIL
+NIL
+1
+
+BUTTON
+29
+207
+190
+240
+NIL
+test-experiment-pse
 NIL
 1
 T

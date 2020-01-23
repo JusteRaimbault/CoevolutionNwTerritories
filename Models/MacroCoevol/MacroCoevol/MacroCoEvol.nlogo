@@ -86,6 +86,8 @@ globals [
   ;slime-mould-reinforcment-function
   global:slime-mould-link-deletion-proportion
 
+  global:physical-network-reinforcment-threshold
+
   ; network measures
   global:shortest-paths
   global:nw-speeds
@@ -570,20 +572,20 @@ city-traj
 String
 
 CHOOSER
-11
-11
-117
-56
+7
+10
+113
+55
 global:setup-type
 global:setup-type
 "synthetic" "gis"
-1
+0
 
 SLIDER
 1
-105
+91
 205
-138
+124
 global:synthetic-cities-number
 global:synthetic-cities-number
 0
@@ -596,9 +598,9 @@ HORIZONTAL
 
 SLIDER
 0
-142
+128
 213
-175
+161
 global:synthetic-max-pop
 global:synthetic-max-pop
 0
@@ -611,9 +613,9 @@ HORIZONTAL
 
 SLIDER
 2
-69
+55
 212
-102
+88
 global:synthetic-rank-size-exp
 global:synthetic-rank-size-exp
 0
@@ -659,40 +661,40 @@ PENS
 
 CHOOSER
 5
-282
+274
 165
-327
+319
 global:network-type
 global:network-type
 "virtual" "physical" "real" "fixed"
-2
+0
 
 SLIDER
-13
-425
-307
-458
+8
+461
+302
+494
 global:network-reinforcment-threshold
 global:network-reinforcment-threshold
 0
 5
-3.0
+2.18761607196435
 0.1
 1
 NIL
 HORIZONTAL
 
 SLIDER
-13
-458
-322
-491
+8
+494
+317
+527
 global:network-reinforcment-exponent
 global:network-reinforcment-exponent
 0
 10
-4.0
-0.01
+2.0
+0.1
 1
 NIL
 HORIZONTAL
@@ -716,15 +718,15 @@ PENS
 "pen-2" 1.0 0 -2674135 true "" "plot first matrix:min matrix:map cities:zero-infinite global:distance-matrix"
 
 SLIDER
-14
-492
-315
-525
+9
+528
+310
+561
 global:network-reinforcment-gmax
 global:network-reinforcment-gmax
 0
 0.5
-0.2
+0.01
 0.01
 1
 NIL
@@ -753,9 +755,9 @@ global:physical-network-heuristic
 
 SLIDER
 1
-176
+162
 227
-209
+195
 global:synthetic-shortcut-number
 global:synthetic-shortcut-number
 0
@@ -768,9 +770,9 @@ HORIZONTAL
 
 SLIDER
 6
-245
+231
 228
-278
+264
 global:synthetic-city-max-degree
 global:synthetic-city-max-degree
 0
@@ -783,30 +785,15 @@ HORIZONTAL
 
 SLIDER
 5
-209
+195
 223
-242
+228
 global:synthetic-shortcut-radius
 global:synthetic-shortcut-radius
 0
 30
 30.0
 1
-1
-NIL
-HORIZONTAL
-
-SLIDER
-10
-525
-314
-558
-global:physical-network-reinforcment-threshold
-global:physical-network-reinforcment-threshold
-0
-0.1
-0.06932380922855588
-0.0005
 1
 NIL
 HORIZONTAL
@@ -819,18 +806,18 @@ CHOOSER
 global:link-display-var
 global:link-display-var
 "speed" "flow"
-0
+1
 
 SLIDER
 13
 561
 330
 594
-global:physical-network-reinforcment-quantile
-global:physical-network-reinforcment-quantile
+global:network-reinforcment-quantile
+global:network-reinforcment-quantile
 0
 1
-0.8
+0.9
 0.05
 1
 NIL
@@ -838,9 +825,9 @@ HORIZONTAL
 
 SWITCH
 175
-262
+266
 340
-295
+299
 global:fixed-dist?
 global:fixed-dist?
 1
@@ -849,9 +836,9 @@ global:fixed-dist?
 
 SWITCH
 174
-296
+300
 343
-329
+333
 global:geo-paths?
 global:geo-paths?
 1
@@ -901,6 +888,16 @@ NIL
 NIL
 NIL
 NIL
+1
+
+CHOOSER
+0
+418
+216
+463
+global:network-threshold-type
+global:network-threshold-type
+"threshold" "quantile"
 1
 
 @#$#@#$#@

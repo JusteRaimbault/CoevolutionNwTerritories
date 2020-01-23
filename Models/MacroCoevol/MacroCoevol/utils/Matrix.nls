@@ -59,7 +59,7 @@ end
 
 
 to-report matrix:quantile [m q]
-  report quantile (concatenate matrix:to-row-list m) q
+  report quantile (utils:list:concatenate matrix:to-row-list m) q
 end
 
 

@@ -32,7 +32,7 @@ to planarize-network [vertices-agentset edges-agentset]
         ask t22 [create-path-with myself]
       ]
       ;remove and kill
-      set edge-list concatenate (list edge-list (to-list [my-links] of new-inter))
+      set edge-list utils:list:concatenate (list edge-list (to-list [my-links] of new-inter))
       set edge-list remove l2 remove l1 edge-list
       ask l1 [die] ask l2 [die]
       set current-inter get-first-inter edge-list

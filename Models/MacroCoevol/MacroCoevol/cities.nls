@@ -22,7 +22,7 @@ to cities:evolve-populations
   let diag-pops (matrix:make-diag prev-populations)
   let diag-pops-gravity matrix:map [? -> ? ^ global:gravity-gamma] (matrix:times-scalar diag-pops sum prev-populations) ; ? should be 1 / sum prev-populations -> ok the term simplifies when normalized by mean-pot-gravity
   let pots-gravity matrix:times diag-pops-gravity (matrix:times global:gravity-weights diag-pops-gravity)
-  show sum map sum matrix:to-row-list global:gravity-weights
+  ;show sum map sum matrix:to-row-list global:gravity-weights
   matrix:set-diag-scalar pots-gravity 0
   let mean-pot-gravity (matrix:sum pots-gravity) / (n * n)
   if mean-pot-gravity = 0 [set mean-pot-gravity 1]
@@ -88,7 +88,7 @@ end
 to-report cities:flatten-dists-feedback [m]
   let res [] let i 1
   foreach but-last matrix:to-row-list m [? ->
-     set res (concatenate list res (sublist ? i (length ?)))
+     set res (utils:list:concatenate list res (sublist ? i (length ?)))
      set i i + 1
   ]
   report res
