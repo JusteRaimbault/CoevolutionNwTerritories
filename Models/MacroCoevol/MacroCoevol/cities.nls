@@ -13,34 +13,34 @@ to cities:evolve-populations
 
   ; current time
   let t ticks
-  let delta_t item t dates - item (t - 1) dates
+  let delta_t item t global:dates - item (t - 1) global:dates
 
   ; previous populations as list
-  let prev-populations matrix:get-column populations (t - 1)
+  let prev-populations matrix:get-column global:populations (t - 1)
   let n length prev-populations
 
   let diag-pops (matrix:make-diag prev-populations)
-  let diag-pops-gravity matrix:map [? -> ? ^ gravity-gamma] (matrix:times-scalar diag-pops sum prev-populations) ; ? should be 1 / sum prev-populations -> ok the term simplifies when normalized by mean-pot-gravity
-  let pots-gravity matrix:times diag-pops-gravity (matrix:times gravity-weights diag-pops-gravity)
-  show sum map sum matrix:to-row-list gravity-weights
+  let diag-pops-gravity matrix:map [? -> ? ^ global:gravity-gamma] (matrix:times-scalar diag-pops sum prev-populations) ; ? should be 1 / sum prev-populations -> ok the term simplifies when normalized by mean-pot-gravity
+  let pots-gravity matrix:times diag-pops-gravity (matrix:times global:gravity-weights diag-pops-gravity)
+  show sum map sum matrix:to-row-list global:gravity-weights
   matrix:set-diag-scalar pots-gravity 0
   let mean-pot-gravity (matrix:sum pots-gravity) / (n * n)
   if mean-pot-gravity = 0 [set mean-pot-gravity 1]
   set pots-gravity matrix:times-scalar pots-gravity (1 / mean-pot-gravity)
 
   ; update gravity flows
-  set gravity-flows matrix:copy pots-gravity
+  set global:gravity-flows matrix:copy pots-gravity
 
   ; update feedback flows
-  let diag-pops-feedback matrix:map [? -> ? ^ feedback-gamma] diag-pops
+  let diag-pops-feedback matrix:map [? -> ? ^ global:feedback-gamma] diag-pops
   let pots-feedback-flows matrix:times diag-pops-feedback (matrix:times (matrix:make-constant n n 1) diag-pops-feedback) matrix:set-diag-scalar pots-feedback-flows 0
-  set feedback-flows matrix:copy pots-feedback-flows
+  set global:feedback-flows matrix:copy pots-feedback-flows
 
   ; feedbacks -> computation depends on heuristic
   ; lets compute the euclidian by default, quite costless
-  let pots-feedback matrix:times feedback-weights (cities:flatten-pops-feedback (matrix:map [? -> ? ^ feedback-gamma] (matrix:times (matrix:times diag-pops (matrix:make-constant n n 1)) diag-pops)))
+  let pots-feedback matrix:times global:feedback-weights (cities:flatten-pops-feedback (matrix:map [? -> ? ^ global:feedback-gamma] (matrix:times (matrix:times diag-pops (matrix:make-constant n n 1)) diag-pops)))
 
-  if network-type = "physical" or network-type = "real" [
+  if global:network-type = "physical" or global:network-type = "real" [
     ; recompute pots-feedbacks on link flows : ! parameter gamma is different : specific var feedback-flow
 
     ;  - cache nw measures (!! normalisation feedback-flows)
@@ -54,15 +54,15 @@ to cities:evolve-populations
   let mean-pot-feedback (matrix:sum pots-feedback) / n
 
   ;; current populations
-  let gravity-growth (matrix:times-scalar (matrix:times pots-gravity (matrix:make-constant n 1 1)) (gravity-weight / n))
-  let feedback-growth (matrix:times-scalar pots-feedback (2 * feedback-weight / (n * (n - 1) * mean-pot-feedback)))
-  let r (matrix:times-scalar (matrix:times-element-wise (matrix:as-column-matrix prev-populations) (((matrix:make-constant n 1 growth-rate) matrix:+ gravity-growth) matrix:+ feedback-growth)) delta_t)
+  let gravity-growth (matrix:times-scalar (matrix:times pots-gravity (matrix:make-constant n 1 1)) (global:gravity-weight / n))
+  let feedback-growth (matrix:times-scalar pots-feedback (2 * global:feedback-weight / (n * (n - 1) * mean-pot-feedback)))
+  let r (matrix:times-scalar (matrix:times-element-wise (matrix:as-column-matrix prev-populations) (((matrix:make-constant n 1 global:growth-rate) matrix:+ gravity-growth) matrix:+ feedback-growth)) delta_t)
   ;show matrix:max r show matrix:min r
   ;show matrix:as-column-matrix prev-populations
   let current-populations matrix:plus (matrix:as-column-matrix prev-populations) r
   ;show current-populations
 
-  matrix:set-column populations t map [? -> first ?] matrix:to-row-list current-populations
+  matrix:set-column global:populations t map [? -> first ?] matrix:to-row-list current-populations
 
 
   ; update agent cities pop
@@ -107,8 +107,8 @@ end
 
 to cities:update-weights
   ;; weights
-  set gravity-weights matrix:map [? -> exp (- ? / gravity-decay)] distance-matrix
-  set feedback-weights matrix:map [? -> exp (- ? / feedback-decay)] feedback-distance-matrix
+  set global:gravity-weights matrix:map [? -> exp (- ? / global:gravity-decay)] global:distance-matrix
+  set global:feedback-weights matrix:map [? -> exp (- ? / global:feedback-decay)] global:feedback-distance-matrix
 
 end
 
@@ -118,10 +118,10 @@ end
 
 to update-cities-populations
   ask cities [
-    set city:population matrix:get populations city:index ticks
+    set city:population matrix:get global:populations city:index ticks
     ; update histories
     set city:population-history lput city:population city:population-history
-    set city:expected-population-history lput matrix:get real-populations city:index ticks city:expected-population-history
+    set city:expected-population-history lput matrix:get global:real-populations city:index ticks city:expected-population-history
     set city:current-mse city-mse ticks
   ]
 end
@@ -132,15 +132,15 @@ end
 
 
 to-report city:closeness-centrality
-   let d matrix:get-row distance-matrix city:index
+   let d matrix:get-row global:distance-matrix city:index
    let s 0 let i 0 foreach d [? -> if i != city:index [set s s + 1 / ?] set i i + 1]
    report s / ((length d) - 1)
 end
 
 to-report city:accessibility
-  let d matrix:get-row distance-matrix city:index
-  let pops replace-item city:index (matrix:get-column populations ticks) 0
-  report sum utils:list:times-element-wise pops (map [? -> exp (- ? / gravity-decay)] d)
+  let d matrix:get-row global:distance-matrix city:index
+  let pops replace-item city:index (matrix:get-column global:populations ticks) 0
+  report sum utils:list:times-element-wise pops (map [? -> exp (- ? / global:gravity-decay)] d)
 end
 
 

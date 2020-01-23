@@ -12,25 +12,25 @@ to setup-experiment-real-calibration [calibperiod growthrate grav-weight grav-ga
 
   ca
 
-  set headless? true
+  set global:headless? true
 
-  set period calibperiod
-  set growth-rate growthrate
-  set gravity-weight grav-weight
-  set gravity-gamma grav-gamma
-  set gravity-decay grav-decay
-  set feedback-weight feed-weight
-  set feedback-gamma feed-gamma
-  set feedback-decay feed-decay
+  set global:period calibperiod
+  set global:growth-rate growthrate
+  set global:gravity-weight grav-weight
+  set global:gravity-gamma grav-gamma
+  set global:gravity-decay grav-decay
+  set global:feedback-weight feed-weight
+  set global:feedback-gamma feed-gamma
+  set global:feedback-decay feed-decay
   
-  if nw-type = 0 [set network-type "real"] if nw-type = 1 [set network-type "virtual"]
-  if slimemouldfun = 0 [set slime-mould-reinforcment-function "thresholded"] if slimemouldfun = 1 [set slime-mould-reinforcment-function "full-growth"]
+  if nw-type = 0 [set global:network-type "real"] if nw-type = 1 [set global:network-type "virtual"]
+  if slimemouldfun = 0 [set global:slime-mould-reinforcment-function "thresholded"] if slimemouldfun = 1 [set global:slime-mould-reinforcment-function "full-growth"]
   
-  set physical-network-reinforcment-quantile nw-threshold-quantile ; \in [0,10]
-  set network-reinforcment-exponent nw-exp ; \in [0,10]
-  set network-reinforcment-gmax nw-gmax ; \in [0,0.1]
+  set global:physical-network-reinforcment-quantile nw-threshold-quantile ; \in [0,10]
+  set global:network-reinforcment-exponent nw-exp ; \in [0,10]
+  set global:network-reinforcment-gmax nw-gmax ; \in [0,0.1]
   
-  set setup-type "gis"
+  set global:setup-type "gis"
   
   setup:setup-headless
   
@@ -87,29 +87,29 @@ to setup-experiment-synthetic [synth-ranksize nw-type nw-threshold nw-gmax nw-ex
   
   ca
   
-  set headless? true
+  set global:headless? true
   
   random-seed seed
   
   ; setup parameters
-  set synthetic-rank-size-exp synth-ranksize ;1.2
-  set network-reinforcment-threshold nw-threshold ;2.0
-  set network-reinforcment-gmax nw-gmax ;0.05
-  set network-reinforcment-exponent nw-exponent ; 1.0
-  set physical-network-reinforcment-quantile physical-nw-rein-quantile ; 0.1
-  set final-time-step final-time ; 30
-  set gravity-weight grav-weight ; ~ 0.001
-  set gravity-gamma grav-gamma ; ~ 1
-  set gravity-decay grav-decay ;  < 200 (world diag : 284)
-  set feedback-weight feed-weight ; 0.0
-  set feedback-gamma feed-gamma ; 1.0
-  set feedback-decay feed-decay ; 10.0
-  set network-type nw-type ; {"virtual","physical"}
-  set slime-mould-reinforcment-function nw-slimemould-fun ;  {"thresholded","full-growth"}
+  set global:synthetic-rank-size-exp synth-ranksize ;1.2
+  set global:network-reinforcment-threshold nw-threshold ;2.0
+  set global:network-reinforcment-gmax nw-gmax ;0.05
+  set global:network-reinforcment-exponent nw-exponent ; 1.0
+  set global:physical-network-reinforcment-quantile physical-nw-rein-quantile ; 0.1
+  set global:final-time-step final-time ; 30
+  set global:gravity-weight grav-weight ; ~ 0.001
+  set global:gravity-gamma grav-gamma ; ~ 1
+  set global:gravity-decay grav-decay ;  < 200 (world diag : 284)
+  set global:feedback-weight feed-weight ; 0.0
+  set global:feedback-gamma feed-gamma ; 1.0
+  set global:feedback-decay feed-decay ; 10.0
+  set global:network-type nw-type ; {"virtual","physical"}
+  set global:slime-mould-reinforcment-function nw-slimemould-fun ;  {"thresholded","full-growth"}
   
-  set setup-type "synthetic"
+  set global:setup-type "synthetic"
 
-  set growth-rate 0.0
+  set global:growth-rate 0.0
   
   setup:setup-headless
   
@@ -120,11 +120,10 @@ end
 
 
 
-
 to run-experiment
   carefully[
     go-full-period
-  ][set failed? true]
+  ][set global:failed? true]
 end
 
 
@@ -139,6 +138,16 @@ to test-experiment-synthetic
   
 end
 
+
+to test-experiment-synthetic-physical
+  ca
+  
+  ;setup-experiment-synthetic synth-ranksize nw-type nw-threshold nw-gmax nw-exponent physical-nw-rein-quantile nw-slimemould-fun grav-weight grav-gamma grav-decay feed-weight feed-gamma feed-decay final-time seed
+  setup-experiment-synthetic 1.0 "physical" 3.0 0.01 1.0 0.5 "thresholded" 0.0001 1.0 200.0 0.0 1.0 1.0 30 random 10000
+  run-experiment
+  indicators:compute-indicators
+  
+end
 
 
 

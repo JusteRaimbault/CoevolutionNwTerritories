@@ -45,96 +45,97 @@ globals [
 
   ;;
   ; dates
-  dates
+  global:dates
 
   ;;
   ; matrix of cities population in time
-  populations
+  global:populations
 
   ;;
   ; corresponding real populations
-  real-populations
+  global:real-populations
 
   ;;
   ; distance matrices
-  distance-matrix
-  initial-distance-matrix
-  feedback-distance-matrix
+  global:distance-matrix
+  global:initial-distance-matrix
+  global:feedback-distance-matrix
 
-  distance-matrices
+  global:distance-matrices
 
-  real-distance-matrices
-  real-feedback-distance-matrices
+  global:real-distance-matrices
+  global:real-feedback-distance-matrices
 
-  gravity-weights
-  feedback-weights
+  global:gravity-weights
+  global:feedback-weights
 
   ; matrice of gravity flows
-  gravity-flows
-  feedback-flows
+  global:gravity-flows
+  global:feedback-flows
 
   ;;
   ; shortest paths params
-  alpha0
-  n0
+  global:alpha0
+  global:n0
 
   ;
   ;total-time-steps
 
   ; indicators
-  indicator-sample-cities
-  city-values-table
-  indicator-sampling-time-step
+  global:indicator-sample-cities
+  global:city-values-table
+  global:indicator-sampling-time-step
 
-  headless?
+  global:headless?
 
-  visualization
-  period
+  global:visualization
+  global:period
 
   ;;
   ; HEADLESS
 
-  setup-type
-  synthetic-cities-number
-  synthetic-rank-size-exp
-  synthetic-max-pop
-  show-virtual-flows?
-  network-type
-  network-reinforcment-threshold
-  network-reinforcment-exponent
-  network-reinforcment-gmax
-  final-time-step
-  growth-rate
-  gravity-weight
-  gravity-gamma
-  gravity-decay
-  feedback-weight
-  feedback-gamma
-  feedback-decay
+  global:setup-type
+  global:synthetic-cities-number
+  global:synthetic-rank-size-exp
+  global:synthetic-max-pop
+  global:show-virtual-flows?
+  global:network-type
+  global:network-reinforcment-threshold
+  global:network-reinforcment-exponent
+  global:network-reinforcment-gmax
+  global:final-time-step
+  global:growth-rate
+  global:gravity-weight
+  global:gravity-gamma
+  global:gravity-decay
+  global:feedback-weight
+  global:feedback-gamma
+  global:feedback-decay
 
-  slime-mould-node-distance
-  slime-mould-reinforcment-function
-  slime-mould-link-deletion-proportion
+  global:slime-mould-node-distance
+  global:slime-mould-reinforcment-function
+  global:slime-mould-link-deletion-proportion
 
-  physical-network-heuristic
-  physical-network-reinforcment-threshold
-  physical-network-reinforcment-quantile
+  global:physical-network-heuristic
+  global:physical-network-reinforcment-threshold
+  global:physical-network-reinforcment-quantile
 
-  link-display-var
+  global:link-display-var
 
-  synthetic-shortcut-number
-  synthetic-city-max-degree
-  synthetic-shortcut-radius
+  global:synthetic-shortcut-number
+  global:synthetic-city-max-degree
+  global:synthetic-shortcut-radius
 
-  shortest-paths
-  nw-relative-speeds
-  nw-distances
-  pairs-total-weight
+  global:shortest-paths
+  global:nw-speeds
+  global:nw-travel-times
+  global:nw-detours
+  global:pairs-total-weight
 
-  geo-paths?
-  fixed-dist?
+  global:geo-paths?
+  global:fixed-dist?
 
-  failed?
+  global:failed?
 
 ]
 
@@ -151,28 +152,30 @@ breed [cities city]
 
 cities-own [
 
+  turtle:name
+
   ; name
-  name
+  city:name
 
   ; current population
-  population
+  city:population
 
   ; row index in pop matrix
-  index
+  city:index
 
   ; history of population
-  population-history
-  expected-population-history ; convenience variable
+  city:population-history
+  city:expected-population-history ; convenience variable
 
   ; for comparing between runs : previous population history
-  previous-population-history
+  city:previous-population-history
 
-  current-mse
+  city:current-mse
 
-  color-var
+  city:color-var
 
-  city-bw-centrality
-  city-flow
+  city:bw-centrality
+  city:flow
 
 ]
 
@@ -180,24 +183,27 @@ cities-own [
 breed [nodes node]
 
 nodes-own [
-  name
+  turtle:name
 ]
 
 undirected-link-breed [paths path]
 
 paths-own [
-  impedance
 
-  path-length
-  bw-centrality
-  flow
-  feedback-flow
-  speed
-  relative-speed
-  effective-length
-
+  path:length
+  path:bw-centrality
+  path:flow
+  path:feedback-flow
+  path:pace
+  path:initial-pace
+  path:travel-time
 
 ]
+
+
+
+
+
 @#$#@#$#@
 GRAPHICS-WINDOW
 294
@@ -250,6 +256,23 @@ BUTTON
 135
 NIL
 test-experiment-calib
+NIL
+1
+T
+OBSERVER
+NIL
+NIL
+NIL
+NIL
+1
+
+BUTTON
+26
+155
+278
+188
+NIL
+test-experiment-synthetic-physical
 NIL
 1
 T

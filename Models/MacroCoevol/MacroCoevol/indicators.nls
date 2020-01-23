@@ -43,12 +43,12 @@ end
 
 to indicators:update-indicators
   let current-time ticks
-  foreach indicator-sample-cities [
+  foreach global:indicator-sample-cities [
     ? ->
      ask ? [
-       table:put city-values-table (list current-time "city-population" city:index) city:population
-       table:put city-values-table (list current-time "city-closeness-centrality" city:index) city:closeness-centrality
-       table:put city-values-table (list current-time "city-accessibility" city:index) city:accessibility
+       table:put global:city-values-table (list current-time "city-population" city:index) city:population
+       table:put global:city-values-table (list current-time "city-closeness-centrality" city:index) city:closeness-centrality
+       table:put global:city-values-table (list current-time "city-accessibility" city:index) city:accessibility
      ]
   ]
 end
@@ -64,9 +64,9 @@ to-report indicators:lagged-correlation [var1 var2 tau t0]
   if tau > 0 [set firstvar var2 set secvar var1]
   let t (tau + 1 + t0)
   repeat (current-time - tau - 1 - t0) [
-    foreach indicator-sample-cities [? -> ask ? [
-       set x lput ((table:get city-values-table (list t firstvar [city:index] of ?)) - (table:get city-values-table (list (t - 1) firstvar [city:index] of ?))) x
-       set y lput ((table:get city-values-table (list (t - tau) secvar [city:index] of ?)) - (table:get city-values-table (list (t - tau - 1) secvar [city:index] of ?))) y
+    foreach global:indicator-sample-cities [? -> ask ? [
+       set x lput ((table:get global:city-values-table (list t firstvar [city:index] of ?)) - (table:get global:city-values-table (list (t - 1) firstvar [city:index] of ?))) x
+       set y lput ((table:get global:city-values-table (list (t - tau) secvar [city:index] of ?)) - (table:get global:city-values-table (list (t - tau - 1) secvar [city:index] of ?))) y
     ]]
     set t t + 1
   ]
@@ -174,11 +174,11 @@ end
 ; correlation between two vars
 to-report correlation [var1 var2 time]
   let x [] let y []
-  foreach indicator-sample-cities [
+  foreach global:indicator-sample-cities [
     ? ->
     ask ? [
-      set x lput (table:get city-values-table (list time var1 [city:index] of ?)) x
-      set y lput (table:get city-values-table (list time var2 [city:index] of ?)) y
+      set x lput (table:get global:city-values-table (list time var1 [city:index] of ?)) x
+      set y lput (table:get global:city-values-table (list time var2 [city:index] of ?)) y
     ]
   ]
   let mx mean x set x map [? -> ? - mx] x let my mean y set y map [? -> ? - my] y
@@ -191,7 +191,7 @@ end
 ;;
 ; report correlation between cities in each euclidian distance bin
 to-report distance-correlation [var1 var2]
-  let dist-deciles quantile (remove 0 (concatenate matrix:to-row-list (table:get distance-matrices (first dates)))) (utils:list:seq 0.1 1.0 0.1)
+  let dist-deciles quantile (remove 0 (concatenate matrix:to-row-list (table:get global:distance-matrices (first global:dates)))) (utils:list:seq 0.1 1.0 0.1)
   ;show dist-deciles
   ; for each bin, set provisory sampling cities ? DOES not work as all couples will be sampled -> must construct the vector by hand
   let res [] let i 0
@@ -205,11 +205,11 @@ to-report distance-correlation [var1 var2]
       ask (other cities) with [
         ; FIXME : need to work on the actual distance matrix as it is how deciles are computed (different for the slime-mould model)
         ;distance myself > prev-dec and distance myself <= current-dec
-        matrix:get distance-matrix city:index [city:index] of myself > prev-dec and matrix:get distance-matrix city:index [city:index] of myself <= current-dec
+        matrix:get global:distance-matrix city:index [city:index] of myself > prev-dec and matrix:get global:distance-matrix city:index [city:index] of myself <= current-dec
       ] [
-       foreach utils:list:seq 1 final-time-step 1 [t ->
-         set x lput ((table:get city-values-table (list t var1 city:index)) - (table:get city-values-table (list (t - 1) var1 city:index))) x
-         set y lput ((table:get city-values-table (list t var2 [city:index] of myself)) - (table:get city-values-table (list (t - 1) var2 [city:index] of myself))) y
+       foreach utils:list:seq 1 global:final-time-step 1 [t ->
+         set x lput ((table:get global:city-values-table (list t var1 city:index)) - (table:get global:city-values-table (list (t - 1) var1 city:index))) x
+         set y lput ((table:get global:city-values-table (list t var2 [city:index] of myself)) - (table:get global:city-values-table (list (t - 1) var2 [city:index] of myself))) y
        ]
       ]
     ]
@@ -227,13 +227,13 @@ end
 ;;
 ;  rank correlation for a given variable
 to-report rank-correlation [var]
-  let xf [] let x0 [] foreach indicator-sample-cities [? -> ask ? [set xf lput (table:get city-values-table (list final-time-step var city:index)) xf set x0 lput (table:get city-values-table (list 0 var city:index)) x0]]
+  let xf [] let x0 [] foreach global:indicator-sample-cities [? -> ask ? [set xf lput (table:get global:city-values-table (list global:final-time-step var city:index)) xf set x0 lput (table:get global:city-values-table (list 0 var city:index)) x0]]
   let sortedxf sort xf let sortedx0 sort x0
   let rf [] let r0 []
-  foreach indicator-sample-cities [? -> ask ? [
+  foreach global:indicator-sample-cities [? -> ask ? [
       ; dirty : must not have similar values : ok, no zeroes.
-      set rf lput (position (table:get city-values-table (list final-time-step var city:index)) sortedxf) rf
-      set r0 lput (position (table:get city-values-table (list 0 var city:index)) sortedx0) r0
+      set rf lput (position (table:get global:city-values-table (list global:final-time-step var city:index)) sortedxf) rf
+      set r0 lput (position (table:get global:city-values-table (list 0 var city:index)) sortedx0) r0
   ]]
   let m0 mean r0 set r0 map [? -> ? - m0] r0 let mf mean rf set rf map [? -> ? - mf] rf
   let sigma0 standard-deviation r0 let sigmaf standard-deviation rf
@@ -246,9 +246,9 @@ end
 ; rank correlation between two variables at a given time
 to-report rank-correlation-vars [var1 var2 time]
   let x [] let y []
-  foreach indicator-sample-cities [ ? -> ask ? [
-      set x lput (table:get city-values-table (list time var1 [city:index] of ?)) x
-      set y lput (table:get city-values-table (list time var2 [city:index] of ?)) y
+  foreach global:indicator-sample-cities [ ? -> ask ? [
+      set x lput (table:get global:city-values-table (list time var1 [city:index] of ?)) x
+      set y lput (table:get global:city-values-table (list time var2 [city:index] of ?)) y
     ]
   ]
   let sortedx sort x let sortedy sort y
@@ -271,7 +271,7 @@ end
 to-report rank-correlations-vars [var1 var2]
   ;show (word var1 " - " var2)
   let res []
-  foreach utils:list:seq 0 final-time-step indicator-sampling-time-step [t ->
+  foreach utils:list:seq 0 global:final-time-step global:indicator-sampling-time-step [t ->
     set res lput (rank-correlation-vars var1 var2 t) res
   ]
   report res
@@ -285,7 +285,7 @@ to-report normalized-trajectories [var]
   let trajectories table:make
   ask cities [
     let traj []
-    foreach utils:list:seq 0 final-time-step 1 [? -> set traj lput (table:get city-values-table (list ? var city:index)) traj]
+    foreach utils:list:seq 0 global:final-time-step 1 [? -> set traj lput (table:get global:city-values-table (list ? var city:index)) traj]
     let ma max traj let mi min traj ifelse (ma - mi) != 0 [table:put trajectories city:index (map [? -> (? - mi) / (ma - mi)] traj)][table:put trajectories city:index utils:list:rep 0 (length traj)]
   ]
   report trajectories
@@ -299,7 +299,7 @@ to-report trajectories-diversity [var]
       let diff (map - (table:get trajectories city:index) (table:get trajectories [city:index] of myself))
       set res res + (sqrt (sum (map * diff diff)))]
   ]
-  report res / (count cities * (count cities - 1) * (final-time-step + 1))
+  report res / (count cities * (count cities - 1) * (global:final-time-step + 1))
 end
 
 
@@ -312,12 +312,12 @@ to-report trajectories-complexity [var]
   ask cities [
     let traj table:get trajectories city:index
     let prev-sign 0 if item 1 traj != item 0 traj [set prev-sign (item 1 traj - item 0 traj) / abs  (item 1 traj - item 0 traj)]
-    foreach utils:list:seq 2 final-time-step 1 [t ->
+    foreach utils:list:seq 2 global:final-time-step 1 [t ->
       let current-sign 0 if item t traj != item (t - 1) traj [set current-sign (item t traj - item (t - 1) traj) / abs  (item t traj - item (t - 1) traj)]
       if prev-sign != current-sign [set res res + 1]
     ]
   ]
-  report res / (count cities * (final-time-step + 1))
+  report res / (count cities * (global:final-time-step + 1))
 end
 
 
@@ -325,9 +325,9 @@ end
 ; history of variables
 to-report var-history [variable]
   let res []
-  foreach utils:list:seq 0 final-time-step indicator-sampling-time-step [t ->
+  foreach utils:list:seq 0 global:final-time-step global:indicator-sampling-time-step [t ->
     let currentvar []
-    foreach indicator-sample-cities [? -> ask ? [set currentvar lput (table:get city-values-table (list t variable city:index)) currentvar]]
+    foreach global:indicator-sample-cities [? -> ask ? [set currentvar lput (table:get global:city-values-table (list t variable city:index)) currentvar]]
     set res lput currentvar res
   ]
   report res
@@ -394,7 +394,7 @@ end
 ;;
 ; hierarchy of pop at time t, suppose trajectories already realized
 to-report population-hierarchy [t]
-  let pops matrix:get-column populations t
+  let pops matrix:get-column global:populations t
   report rank-size-hierarchy pops
 end
 
@@ -403,17 +403,17 @@ to-report population-hierarchy-current
 end
 
 to-report population-seg-hierarchy [t]
-  let pops matrix:get-column populations t
+  let pops matrix:get-column global:populations t
   report breakpoint-regression pops
 end
 
 to-report population-entropy [t]
-  let pops matrix:get-column populations t
+  let pops matrix:get-column global:populations t
   report entropy pops
 end
 
 to-report population-summary [t]
-  let pops matrix:get-column populations t
+  let pops matrix:get-column global:populations t
   report summary pops
 end
 
@@ -421,7 +421,7 @@ end
 
 to-report population-hierarchies
   let res []
-  foreach utils:list:seq 0 final-time-step indicator-sampling-time-step [? ->
+  foreach utils:list:seq 0 global:final-time-step global:indicator-sampling-time-step [? ->
     set res lput population-hierarchy ? res
   ]
   report concatenate res
@@ -429,13 +429,13 @@ end
 
 to-report population-seg-hierarchies
   let res []
-  foreach utils:list:seq 0 final-time-step indicator-sampling-time-step [? -> set res lput population-seg-hierarchy ? res]
+  foreach utils:list:seq 0 global:final-time-step global:indicator-sampling-time-step [? -> set res lput population-seg-hierarchy ? res]
   report concatenate res
 end
 
 to-report population-entropies
   let res []
-  foreach utils:list:seq 0 final-time-step indicator-sampling-time-step [? ->
+  foreach utils:list:seq 0 global:final-time-step global:indicator-sampling-time-step [? ->
     set res lput population-entropy ? res
   ]
   report res
@@ -446,7 +446,7 @@ end
 ; summary stats for populations
 to-report population-summaries
   let res []
-  foreach utils:list:seq 0 final-time-step indicator-sampling-time-step [? ->
+  foreach utils:list:seq 0 global:final-time-step global:indicator-sampling-time-step [? ->
     set res lput population-summary ? res
   ]
   report concatenate res
@@ -454,26 +454,26 @@ end
 
 
 to-report indic-hierarchy [indic t]
-  let cl [] foreach indicator-sample-cities [? -> ask ? [set cl lput (table:get city-values-table (list t indic city:index)) cl]]
+  let cl [] foreach global:indicator-sample-cities [? -> ask ? [set cl lput (table:get global:city-values-table (list t indic city:index)) cl]]
   report rank-size-hierarchy cl
 end
 
 to-report indic-hierarchies [indic]
   let res []
-  foreach utils:list:seq 0 final-time-step indicator-sampling-time-step [t ->
+  foreach utils:list:seq 0 global:final-time-step global:indicator-sampling-time-step [t ->
     set res lput indic-hierarchy indic t res
   ]
   report concatenate res
 end
 
 to-report indic-seg-hierarchy [indic t]
-  let cl [] foreach indicator-sample-cities [? -> ask ? [set cl lput (table:get city-values-table (list t indic city:index)) cl]]
+  let cl [] foreach global:indicator-sample-cities [? -> ask ? [set cl lput (table:get global:city-values-table (list t indic city:index)) cl]]
   report breakpoint-regression cl
 end
 
 to-report indic-seg-hierarchies [indic]
   let res []
-  foreach utils:list:seq 0 final-time-step indicator-sampling-time-step [t ->
+  foreach utils:list:seq 0 global:final-time-step global:indicator-sampling-time-step [t ->
     set res lput indic-seg-hierarchy indic t res
   ]
   report concatenate res
@@ -493,12 +493,12 @@ end
 ;;
 ; entropy of closeness at time t
 to-report closeness-entropy [t]
-  let cl [] foreach indicator-sample-cities [? -> ask ? [set cl lput (table:get city-values-table (list t "city-closeness-centrality" city:index)) cl]]
+  let cl [] foreach global:indicator-sample-cities [? -> ask ? [set cl lput (table:get global:city-values-table (list t "city-closeness-centrality" city:index)) cl]]
   report entropy cl
 end
 
 to-report closeness-summary [t]
-  let cl [] foreach indicator-sample-cities [? -> ask ? [set cl lput (table:get city-values-table (list t "city-closeness-centrality" city:index)) cl]]
+  let cl [] foreach global:indicator-sample-cities [? -> ask ? [set cl lput (table:get global:city-values-table (list t "city-closeness-centrality" city:index)) cl]]
   report summary cl
 end
 
@@ -512,7 +512,7 @@ end
 
 to-report closeness-entropies
   let res []
-  foreach utils:list:seq 0 final-time-step indicator-sampling-time-step [? ->
+  foreach utils:list:seq 0 global:final-time-step global:indicator-sampling-time-step [? ->
     set res lput closeness-entropy ? res
   ]
   report res
@@ -520,7 +520,7 @@ end
 
 to-report closeness-summaries
   let res []
-  foreach utils:list:seq 0 final-time-step indicator-sampling-time-step [? ->
+  foreach utils:list:seq 0 global:final-time-step global:indicator-sampling-time-step [? ->
     set res lput closeness-summary ? res
   ]
   report concatenate res
@@ -532,12 +532,12 @@ to-report accessibility-hierarchy [t]
 end
 
 to-report accessibility-entropy [t]
-  let cl [] foreach indicator-sample-cities [? -> ask ? [set cl lput (table:get city-values-table (list t "city-accessibility" city:index)) cl]]
+  let cl [] foreach global:indicator-sample-cities [? -> ask ? [set cl lput (table:get global:city-values-table (list t "city-accessibility" city:index)) cl]]
   report entropy cl
 end
 
 to-report accessibility-summary [t]
-  let cl [] foreach indicator-sample-cities [? -> ask ? [set cl lput (table:get city-values-table (list t "city-accessibility" city:index)) cl]]
+  let cl [] foreach global:indicator-sample-cities [? -> ask ? [set cl lput (table:get global:city-values-table (list t "city-accessibility" city:index)) cl]]
   report summary cl
 end
 
@@ -551,7 +551,7 @@ end
 
 to-report accessibility-entropies
   let res []
-  foreach utils:list:seq 0 final-time-step indicator-sampling-time-step [? ->
+  foreach utils:list:seq 0 global:final-time-step global:indicator-sampling-time-step [? ->
     set res lput accessibility-entropy ? res
   ]
   report res
@@ -559,7 +559,7 @@ end
 
 to-report accessibility-summaries
   let res []
-  foreach utils:list:seq 0 final-time-step indicator-sampling-time-step [? ->
+  foreach utils:list:seq 0 global:final-time-step global:indicator-sampling-time-step [? ->
     set res lput accessibility-summary ? res
   ]
   report concatenate res
@@ -575,8 +575,8 @@ end
 ;;
 ; log of total mean square error
 to-report log-mse-population
-ifelse failed? != true [
-    let mse (matrix:map [[?1 ?2] -> (?1 - ?2)^ 2] real-populations populations)
+ifelse global:failed? != true [
+    let mse (matrix:map [[?1 ?2] -> (?1 - ?2)^ 2] global:real-populations global:populations)
   report ln sum (map sum (matrix:to-row-list mse))
 ][report 1e100]
 end
@@ -584,8 +584,8 @@ end
 ;;
 ; mse on log of populations
 to-report mse-log-population
-ifelse failed? != true [
-    let mse (matrix:map [[?1 ?2] -> (ln ?1 - ln ?2)^ 2] real-populations populations)
+ifelse global:failed? != true [
+    let mse (matrix:map [[?1 ?2] -> (ln ?1 - ln ?2)^ 2] global:real-populations global:populations)
   report sum (map sum (matrix:to-row-list mse)) 
 ][report 1e100]
 end
@@ -595,10 +595,10 @@ end
 ; log of total mse on distances
 ;  note : distances DO NOT follow a power law : no sense to do the mse-log
 to-report log-mse-distance
-  ifelse failed? != true [
+  ifelse global:failed? != true [
     let tot 0
-    foreach dates [? ->
-      let mse (matrix:map [[?1 ?2] -> (?1 - ?2)^ 2] (table:get real-distance-matrices ?) (table:get distance-matrices ?))
+    foreach global:dates [? ->
+      let mse (matrix:map [[?1 ?2] -> (?1 - ?2)^ 2] (table:get global:real-distance-matrices ?) (table:get global:distance-matrices ?))
       ;show sum (map sum (matrix:to-row-list mse))
        set tot tot + sum (map sum (matrix:to-row-list mse))
     ]
@@ -647,5 +647,5 @@ end
 ;;
 ; current date
 to-report current-date
-  report item ticks dates
+  report item ticks global:dates
 end

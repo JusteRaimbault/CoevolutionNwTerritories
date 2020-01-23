@@ -4,7 +4,7 @@
 
 
 to display:update-display
-  if headless? != true [
+  if global:headless? != true [
     ; cities
     display:display-cities
   
@@ -19,7 +19,7 @@ end
 
 
 to display:color-patches
-  ifelse setup-type = "gis" and geo-paths? = true [
+  ifelse global:setup-type = "gis" and global:geo-paths? = true [
     ;ask patches [set pcolor scale-color brown elevation 0 4000]
     ask patches [set pcolor scale-color yellow elevation 0 4000]
     
@@ -42,9 +42,9 @@ end
 to display:display-cities
   let ptot sum [city:population] of cities
   
-  if visualization = "mse" [ask cities [set city:color-var (city:current-mse / city:population * ptot)]]
-  if visualization = "mse-log" [ask cities [set city:color-var city-mse-log ticks]]
-  if visualization = "log-pop" [ask cities [set city:color-var ln city:population]]
+  if global:visualization = "mse" [ask cities [set city:color-var (city:current-mse / city:population * ptot)]]
+  if global:visualization = "mse-log" [ask cities [set city:color-var city-mse-log ticks]]
+  if global:visualization = "log-pop" [ask cities [set city:color-var ln city:population]]
   
   let mi min [city:color-var] of cities let ma max [city:color-var] of cities
   if mi < ma [
@@ -60,10 +60,10 @@ end
 
 to display:display-network
   
-  if network-type = "virtual" [
-    if show-virtual-flows? [
+  if global:network-type = "virtual" [
+    if global:show-virtual-flows? [
       ask links [die]
-      let distance-diff distance-matrix matrix:- (table:get distance-matrices (first dates))
+      let distance-diff global:distance-matrix matrix:- (table:get global:distance-matrices (first global:dates))
       ask cities [
         let currentdistdiff matrix:get-row distance-diff city:index
         ask other cities [let d item city:index currentdistdiff if d < 0 [create-link-with myself [set thickness (abs d) / 10]]]
@@ -71,8 +71,8 @@ to display:display-network
     ]
   ]
   
-  if network-type = "physical" or network-type = "real" [
-    if link-display-var = "speed" [
+  if global:network-type = "physical" or global:network-type = "real" [
+    if global:link-display-var = "speed" [
       ;ask links [set thickness relative-speed / ((1 + network-reinforcment-gmax) ^ final-time-step)]
       ;ask links [set hidden? false] ask paths with [path-length < effective-length] [set hidden? true]
       ; ! relative-speed is a pace
@@ -84,7 +84,7 @@ to display:display-network
         ask links [set thickness 0]
       ]
     ]
-    if link-display-var = "flow" [
+    if global:link-display-var = "flow" [
       ask links [set thickness 25 * ln (1 + path:flow)]
       if ticks > 0 [ask links [set hidden? false] ask links with [path:flow = 0] [set hidden? true]]
     ]
@@ -94,14 +94,14 @@ end
 
 to display:display-plots
   ; fit plot
-  if setup-type = "gis" [
+  if global:setup-type = "gis" [
     set-current-plot "fit" set-current-plot-pen "default"
     ;let col gradient:scale (list extract-rgb blue extract-rgb red) ticks 0 (length dates)
-    let col scale-color red ticks 0 (length dates)
+    let col scale-color red ticks 0 (length global:dates)
     ;set-plot-pen-color (approximate-rgb item 0 col item 1 col item 2 col)
     set-plot-pen-color col
-    let sim map ln (sort-by [[?1 ?2] -> ?1 > ?2] (matrix:get-column populations ticks))
-    let real map ln (sort-by [[?1 ?2] ->  ?1 > ?2] (matrix:get-column real-populations ticks))
+    let sim map ln (sort-by [[?1 ?2] -> ?1 > ?2] (matrix:get-column global:populations ticks))
+    let real map ln (sort-by [[?1 ?2] ->  ?1 > ?2] (matrix:get-column global:real-populations ticks))
     let i 0 plot-pen-up plotxy first real first sim
     plot-pen-down
     foreach sim [? ->
@@ -112,9 +112,9 @@ to display:display-plots
   ; rank-size plot
   set-current-plot "rank-size" set-current-plot-pen "default"
   ;let col gradient:scale (list extract-rgb blue extract-rgb red) ticks 0 (length dates)
-  let col scale-color red ticks 0 (length dates)
+  let col scale-color red ticks 0 (length global:dates)
   set-plot-pen-color col;(approximate-rgb item 0 col item 1 col item 2 col)
-  let pops map [? -> log ? 10] (sort-by [[?1 ?2] -> ?1 > ?2] (matrix:get-column populations ticks))
+  let pops map [? -> log ? 10] (sort-by [[?1 ?2] -> ?1 > ?2] (matrix:get-column global:populations ticks))
   let ranks map [? -> log ? 10] (utils:list:seq 1 count cities 1)
   let i 0 plot-pen-up plotxy first ranks first pops
     plot-pen-down

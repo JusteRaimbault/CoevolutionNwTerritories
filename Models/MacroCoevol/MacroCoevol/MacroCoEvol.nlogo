@@ -45,65 +45,66 @@ globals [
 
   ;;
   ; dates
-  dates
+  global:dates
 
   ;;
   ; matrix of cities population in time
-  populations
+  global:populations
 
   ;;
   ; corresponding real populations
-  real-populations
+  global:real-populations
 
   ;;
   ; distance matrices
-  distance-matrix
-  feedback-distance-matrix
+  global:distance-matrix
+  global:feedback-distance-matrix
 
   ; history of distance matrices
-  distance-matrices
+  global:distance-matrices
 
   ; real distance matrices (real network)
-  real-distance-matrices
-  real-feedback-distance-matrices
+  global:real-distance-matrices
+  global:real-feedback-distance-matrices
 
-  gravity-weights
-  feedback-weights
+  global:gravity-weights
+  global:feedback-weights
 
   ; matrice of gravity flows
-  gravity-flows
-  feedback-flows
+  global:gravity-flows
+  global:feedback-flows
 
   ;;
   ; shortest paths params
-  alpha0
-  n0
+  global:alpha0
+  global:n0
 
 
   ;;
   ; network growth
-  slime-mould-node-distance
+  global:slime-mould-node-distance
   ;slime-mould-reinforcment-function
-  slime-mould-link-deletion-proportion
+  global:slime-mould-link-deletion-proportion
 
   ; network measures
-  shortest-paths
-  nw-relative-speeds
-  nw-distances
-  pairs-total-weight
+  global:shortest-paths
+  global:nw-speeds
+  global:nw-detours
+  global:nw-travel-times
+  global:pairs-total-weight
 
   ;
   ;total-time-steps
 
   ; indicators
-  indicator-sample-cities
-  city-values-table
-  indicator-sampling-time-step
+  global:indicator-sample-cities
+  global:city-values-table
+  global:indicator-sampling-time-step
 
 
-  headless?
+  global:headless?
 
-  failed?
+  global:failed?
 
 ]
 
@@ -712,7 +713,7 @@ true
 false
 "" ""
 PENS
-"pen-2" 1.0 0 -2674135 true "" "plot first matrix:min matrix:map cities:zero-infinite distance-matrix"
+"pen-2" 1.0 0 -2674135 true "" "plot first matrix:min matrix:map cities:zero-infinite global:distance-matrix"
 
 SLIDER
 7

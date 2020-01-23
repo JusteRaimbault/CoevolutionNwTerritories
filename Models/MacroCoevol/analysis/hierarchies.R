@@ -229,7 +229,8 @@ for(nwExp in unique(sdata$nwExponent)){
 
 
 #resprefix = '20200120_194245_HIERARCHIES_SYNTHETICPHYSICAL_TARGETED_GRID' # one param value missing in this grid
-resprefix = '20200121_114422_HIERARCHIES_SYNTHETICPHYSICAL_TARGETED_GRID'
+#resprefix = '20200121_114422_HIERARCHIES_SYNTHETICPHYSICAL_TARGETED_GRID' # not correct implementation
+resprefix = '20200122_202902_HIERARCHIES_SYNTHETICPHYSICAL_TARGETED_GRID'
 res <- as.tbl(read.csv(paste0('exploration/',resprefix,'.csv'),stringsAsFactors = FALSE))
 resdir=paste0(Sys.getenv('CS_HOME'),'/CoevolutionNwTerritories/Results/MacroCoevol/',resprefix,'/');dir.create(resdir);dir.create(paste0(resdir,'targeted'))
 params = c("synthRankSize","nwExponent","nwPhysQuantile","gravityWeight","gravityGamma","gravityDecay")
