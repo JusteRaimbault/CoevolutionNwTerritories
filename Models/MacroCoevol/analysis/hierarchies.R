@@ -11,7 +11,7 @@ res <- as.tbl(read.csv(paste0('exploration/',resprefix,'.csv'),stringsAsFactors 
 
 resdir=paste0(Sys.getenv('CS_HOME'),'/CoevolutionNwTerritories/Results/MacroCoevol/',resprefix,'/');dir.create(resdir)
 
-params = c("synthRankSize","nwExponent","nwThreshold","gravityWeight","gravityGamma","gravityDecay")
+params = c("synthRankSize","nwExponent","nwThresholdQuantile","gravityWeight","gravityGamma","gravityDecay")
 indics = c("hierarchiesPop","hierarchiesCloseness","hierarchiesAccessibility",
            "segHierarchiesPop","segHierarchiesCloseness","segHierarchiesAccessibility",
            "rankCorrPop","rankCorrCloseness","rankCorrAccessibility",
@@ -29,7 +29,7 @@ timeindicsstruct = list("hierarchiesPop"=c("Alpha","RSquared"),"hierarchiesClose
 
 # the arrayOnRows option may not be the right one - kind of a hell to switch to a proper long format
 # local function - depends on parameter names but not correct level of code in group_by
-sumdata <- function(p){
+sumdata <- function(){
 timedata = data.frame()
 sdata = data.frame()
 for(timeindic in names(timeindicsstruct)){
@@ -42,17 +42,10 @@ for(timeindic in names(timeindicsstruct)){
     toreshape=res[,c(params,paste0(timeindic,varyinginds))]
     names(toreshape)[(length(params)+1):(length(params)+length(varyinginds))]<-0:finalTime
     reshaped = melt(toreshape,id.vars=params,variable.name="time",value.name = "value")
-    if (p=='virtual'){
-     sdelta=left_join(reshaped[reshaped$time==finalTime,],reshaped[reshaped$time==0,],by=c('synthRankSize'='synthRankSize','nwExponent'='nwExponent','nwThreshold'='nwThreshold','gravityWeight'='gravityWeight','gravityGamma'='gravityGamma','gravityDecay'='gravityDecay')) %>%
-       group_by(synthRankSize,nwExponent,nwThreshold,gravityWeight,gravityGamma,gravityDecay) %>% summarize(valueSd=sd(value.x-value.y),value=mean(value.x-value.y))
-     #sdelta = as.tbl(reshaped[reshaped$time==finalTime,]-reshaped[reshaped$time==0,]) %>% group_by(synthRankSize,nwExponent,nwThreshold,gravityWeight,gravityGamma,gravityDecay) %>% summarize(valueSd=sd(value),value=mean(value))
-     #sf = as.tbl(reshaped[reshaped$time==finalTime,]) %>% group_by(synthRankSize,nwExponent,nwThreshold,gravityWeight,gravityGamma,gravityDecay) %>% summarize(value=mean(value))
-    }else{
-      sdelta=left_join(reshaped[reshaped$time==finalTime,],reshaped[reshaped$time==0,],by=c('synthRankSize'='synthRankSize','nwExponent'='nwExponent','nwPhysQuantile'='nwPhysQuantile','gravityWeight'='gravityWeight','gravityGamma'='gravityGamma','gravityDecay'='gravityDecay')) %>%
-        group_by(synthRankSize,nwExponent,nwPhysQuantile,gravityWeight,gravityGamma,gravityDecay) %>% summarize(valueSd=sd(value.x-value.y),value=mean(value.x-value.y))
-      #s0 = as.tbl(reshaped[reshaped$time==0,]) %>% group_by(synthRankSize,nwExponent,nwPhysQuantile,gravityWeight,gravityGamma,gravityDecay) %>% summarize(value=mean(value))
-      #sf = as.tbl(reshaped[reshaped$time==finalTime,]) %>% group_by(synthRankSize,nwExponent,nwPhysQuantile,gravityWeight,gravityGamma,gravityDecay) %>% summarize(value=mean(value))
-    }
+    
+     sdelta=left_join(reshaped[reshaped$time==finalTime,],reshaped[reshaped$time==0,],by=c('synthRankSize'='synthRankSize','nwExponent'='nwExponent','nwThresholdQuantile'='nwThresholdQuantile','gravityWeight'='gravityWeight','gravityGamma'='gravityGamma','gravityDecay'='gravityDecay')) %>%
+       group_by(synthRankSize,nwExponent,nwThresholdQuantile,gravityWeight,gravityGamma,gravityDecay) %>% summarize(valueSd=sd(value.x-value.y),value=mean(value.x-value.y))
+    
     if(ncol(timedata)==0){
       timedata = reshaped
       colnames(timedata)[ncol(timedata)]<-finalindicname
@@ -67,7 +60,7 @@ for(timeindic in names(timeindicsstruct)){
 }
 return(list(timedata=timedata,sdata=sdata))
 }
-d = sumdata(p="virtual")
+d = sumdata()
 timedata = d$timedata;sdata = d$sdata
 
 allindics = names(timedata)[-(1:(length(params)+1))]
@@ -136,11 +129,11 @@ ggsave(file=paste0(resdir,"summarizedindics/",indic,'_nwExp',nwExp,'_wG',wg,'_xg
 # 
 
 #resprefix = '20200120_175200_HIERARCHIES_SYNTHETICVIRTUAL_TARGETED_GRID' # rerun with quantile param
-resprefix = ''
+resprefix = '20200123_183857_HIERARCHIES_SYNTHETICVIRTUAL_TARGETED_GRID'
 res <- as.tbl(read.csv(paste0('exploration/',resprefix,'.csv'),stringsAsFactors = FALSE))
 resdir=paste0(Sys.getenv('CS_HOME'),'/CoevolutionNwTerritories/Results/MacroCoevol/',resprefix,'/');dir.create(resdir);dir.create(paste0(resdir,'targeted'))
-params = c("synthRankSize","nwExponent","nwThreshold","gravityWeight","gravityGamma","gravityDecay")
-d = sumdata(p='virtual')
+params = c("synthRankSize","nwExponent","nwThresholdQuantile","gravityWeight","gravityGamma","gravityDecay")
+d = sumdata()
 timedata = d$timedata;sdata = d$sdata
 
 # rank correlation pop closeness
@@ -148,44 +141,53 @@ g = ggplot(sdata,aes(x=gravityDecay,y=rankCorrsPopCloseness,color=gravityGamma,g
 g+geom_point()+geom_line()+
   # error bars are ~ significant but unease reading
   #geom_errorbar(aes(ymin=rankCorrsPopCloseness-rankCorrsPopClosenessSd,ymax=rankCorrsPopCloseness+rankCorrsPopClosenessSd))+
-  facet_grid(synthRankSize~nwThreshold,scales='free')+
+  facet_grid(synthRankSize~nwThresholdQuantile,scales='free')+
   xlab(expression(d[G]))+ylab(expression(rho[r*","*Delta]*"[P,C]"))+scale_color_continuous(name=expression(gamma[G]))+
   stdtheme
-ggsave(file=paste0(resdir,"targeted/rankCorrsPopCloseness_nwExp1_wG0_001_xgravityDecay_colgravityGamma_facetsynthRankSize-nwThreshold.png"),width=20,height=18,units='cm')
+ggsave(file=paste0(resdir,"targeted/rankCorrsPopCloseness_nwExp1_wG0_001_xgravityDecay_colgravityGamma_facetsynthRankSize-nwThresholdQuantile.png"),width=20,height=18,units='cm')
 
 # hierarchy closenesses
 g = ggplot(sdata,aes(x=gravityDecay,y=hierarchiesClosenessAlpha,color=gravityGamma,group=gravityGamma))
 g+geom_point()+geom_line()+ 
-  facet_grid(synthRankSize~nwThreshold,scales='free')+
+  facet_grid(synthRankSize~nwThresholdQuantile,scales='free')+
   xlab(expression(d[G]))+ylab(expression(alpha[Delta]*"[C]"))+scale_color_continuous(name=expression(gamma[G]))+
   stdtheme
-ggsave(file=paste0(resdir,"targeted/hierarchiesClosenessAlpha_nwExp1_wG0_001_xgravityDecay_colgravityGamma_facetsynthRankSize-nwThreshold.png"),width=20,height=18,units='cm')
+ggsave(file=paste0(resdir,"targeted/hierarchiesClosenessAlpha_nwExp1_wG0_001_xgravityDecay_colgravityGamma_facetsynthRankSize-nwThresholdQuantile.png"),width=20,height=18,units='cm')
 
 # hierarchy pops
 g = ggplot(sdata,aes(x=gravityDecay,y=hierarchiesPopAlpha,color=gravityGamma,group=gravityGamma))
 g+geom_point()+geom_line()+ 
-  facet_grid(synthRankSize~nwThreshold,scales='free')+
+  facet_grid(synthRankSize~nwThresholdQuantile,scales='free')+
   xlab(expression(d[G]))+ylab(expression(alpha[Delta]*"[P]"))+scale_color_continuous(name=expression(gamma[G]))+
   stdtheme
-ggsave(file=paste0(resdir,"targeted/hierarchiesPopAlpha_nwExp1_wG0_001_xgravityDecay_colgravityGamma_facetsynthRankSize-nwThreshold.png"),width=20,height=18,units='cm')
+ggsave(file=paste0(resdir,"targeted/hierarchiesPopAlpha_nwExp1_wG0_001_xgravityDecay_colgravityGamma_facetsynthRankSize-nwThresholdQuantile.png"),width=20,height=18,units='cm')
 
 # Psi pops
 g = ggplot(sdata,aes(x=gravityDecay,y=segHierarchiesPopPsi,color=gravityGamma,group=gravityGamma))
 g+geom_point()+geom_line()+ 
-  facet_grid(synthRankSize~nwThreshold,scales='free')+
+  facet_grid(synthRankSize~nwThresholdQuantile,scales='free')+
   xlab(expression(d[G]))+ylab(expression(Psi[Delta]*"[P]"))+scale_color_continuous(name=expression(gamma[G]))+
   stdtheme
-ggsave(file=paste0(resdir,"targeted/segHierarchiesPopPsi_nwExp1_wG0_001_xgravityDecay_colgravityGamma_facetsynthRankSize-nwThreshold.png"),width=20,height=18,units='cm')
+ggsave(file=paste0(resdir,"targeted/segHierarchiesPopPsi_nwExp1_wG0_001_xgravityDecay_colgravityGamma_facetsynthRankSize-nwThresholdQuantile.png"),width=20,height=18,units='cm')
 
 # Psi closeness
 g = ggplot(sdata,aes(x=gravityDecay,y=segHierarchiesClosenessPsi,color=gravityGamma,group=gravityGamma))
 g+geom_point()+geom_line()+ 
-  facet_grid(synthRankSize~nwThreshold,scales='free')+
+  facet_grid(synthRankSize~nwThresholdQuantile,scales='free')+
   xlab(expression(d[G]))+ylab(expression(Psi[Delta]*"[C]"))+scale_color_continuous(name=expression(gamma[G]))+
   stdtheme
-ggsave(file=paste0(resdir,"targeted/segHierarchiesClosenessPsi_nwExp1_wG0_001_xgravityDecay_colgravityGamma_facetsynthRankSize-nwThreshold.png"),width=20,height=18,units='cm')
+ggsave(file=paste0(resdir,"targeted/segHierarchiesClosenessPsi_nwExp1_wG0_001_xgravityDecay_colgravityGamma_facetsynthRankSize-nwThresholdQuantile.png"),width=20,height=18,units='cm')
 
 
+##
+## distribution of initial hierarchies of closeness
+# (for pse indicators: in order to know if alpha_C of [alpha_C - alpha_C0] is better)
+
+#timedata$synthRankSizeF = cut(timedata$synthRankSize,5) # note: no param influences distrib of closeness
+# except for the physical if would have changed nw generation params - but initial pop rank size no as only distances, not access!
+g=ggplot(timedata[as.numeric(as.character(timedata$time))%%5==0,],aes(x=hierarchiesClosenessAlpha,color=time,group=time))
+g+geom_density()+scale_color_discrete(name='Time')+xlab(expression(alpha[C]))+ylab('Density')+stdtheme
+ggsave(file=paste0(resdir,"targeted/alphaClosenessDistributions.png"),width=20,height=18,units='cm')
 
 
 
@@ -231,54 +233,59 @@ for(nwExp in unique(sdata$nwExponent)){
 
 #resprefix = '20200120_194245_HIERARCHIES_SYNTHETICPHYSICAL_TARGETED_GRID' # one param value missing in this grid
 #resprefix = '20200121_114422_HIERARCHIES_SYNTHETICPHYSICAL_TARGETED_GRID' # not correct implementation
-resprefix = '20200122_202902_HIERARCHIES_SYNTHETICPHYSICAL_TARGETED_GRID'
+#resprefix = '20200122_202902_HIERARCHIES_SYNTHETICPHYSICAL_TARGETED_GRID' # do similar DOE than virtual
+resprefix = '20200123_194611_HIERARCHIES_SYNTHETICPHYSICAL_TARGETED_GRID'
 res <- as.tbl(read.csv(paste0('exploration/',resprefix,'.csv'),stringsAsFactors = FALSE))
 resdir=paste0(Sys.getenv('CS_HOME'),'/CoevolutionNwTerritories/Results/MacroCoevol/',resprefix,'/');dir.create(resdir);dir.create(paste0(resdir,'targeted'))
-params = c("synthRankSize","nwExponent","nwPhysQuantile","gravityWeight","gravityGamma","gravityDecay")
-d = sumdata(p='physical')
+params = c("synthRankSize","nwExponent","nwThresholdQuantile","gravityWeight","gravityGamma","gravityDecay")
+d = sumdata()
 timedata = d$timedata;sdata = d$sdata
 
 # rank correlation pop closeness
 g = ggplot(sdata,aes(x=gravityDecay,y=rankCorrsPopCloseness,color=gravityGamma,group=gravityGamma))
 g+geom_point()+geom_line()+
-  facet_grid(synthRankSize~nwPhysQuantile,scales='free')+
+  facet_grid(synthRankSize~nwThresholdQuantile,scales='free')+
   xlab(expression(d[G]))+ylab(expression(rho[r*","*Delta]*"[P,C]"))+scale_color_continuous(name=expression(gamma[G]))+
   stdtheme
-ggsave(file=paste0(resdir,"targeted/rankCorrsPopCloseness_nwExp1_wG0_001_xgravityDecay_colgravityGamma_facetsynthRankSize-nwPhysQuantile.png"),width=20,height=18,units='cm')
+ggsave(file=paste0(resdir,"targeted/physical_rankCorrsPopCloseness_nwExp1_wG0_001_xgravityDecay_colgravityGamma_facetsynthRankSize-nwThresholdQuantile.png"),width=20,height=18,units='cm')
 
 # hierarchy closenesses
 g = ggplot(sdata,aes(x=gravityDecay,y=hierarchiesClosenessAlpha,color=gravityGamma,group=gravityGamma))
 g+geom_point()+geom_line()+ 
-  facet_grid(synthRankSize~nwPhysQuantile,scales='free')+
+  facet_grid(synthRankSize~nwThresholdQuantile,scales='free')+
   xlab(expression(d[G]))+ylab(expression(alpha[Delta]*"[C]"))+scale_color_continuous(name=expression(gamma[G]))+
   stdtheme
-ggsave(file=paste0(resdir,"targeted/hierarchiesClosenessAlpha_nwExp1_wG0_001_xgravityDecay_colgravityGamma_facetsynthRankSize-nwPhysQuantile.png"),width=20,height=18,units='cm')
+ggsave(file=paste0(resdir,"targeted/physical_hierarchiesClosenessAlpha_nwExp1_wG0_001_xgravityDecay_colgravityGamma_facetsynthRankSize-nwThresholdQuantile.png"),width=20,height=18,units='cm')
 
 # hierarchy pops
 g = ggplot(sdata,aes(x=gravityDecay,y=hierarchiesPopAlpha,color=gravityGamma,group=gravityGamma))
 g+geom_point()+geom_line()+ 
-  facet_grid(synthRankSize~nwPhysQuantile,scales='free')+
+  facet_grid(synthRankSize~nwThresholdQuantile,scales='free')+
   xlab(expression(d[G]))+ylab(expression(alpha[Delta]*"[P]"))+scale_color_continuous(name=expression(gamma[G]))+
   stdtheme
-ggsave(file=paste0(resdir,"targeted/hierarchiesPopAlpha_nwExp1_wG0_001_xgravityDecay_colgravityGamma_facetsynthRankSize-nwPhysQuantile.png"),width=20,height=18,units='cm')
+ggsave(file=paste0(resdir,"targeted/physical_hierarchiesPopAlpha_nwExp1_wG0_001_xgravityDecay_colgravityGamma_facetsynthRankSize-nwThresholdQuantile.png"),width=20,height=18,units='cm')
 
 # Psi pops
 g = ggplot(sdata,aes(x=gravityDecay,y=segHierarchiesPopPsi,color=gravityGamma,group=gravityGamma))
 g+geom_point()+geom_line()+ 
-  facet_grid(synthRankSize~nwPhysQuantile,scales='free')+
+  facet_grid(synthRankSize~nwThresholdQuantile,scales='free')+
   xlab(expression(d[G]))+ylab(expression(Psi[Delta]*"[P]"))+scale_color_continuous(name=expression(gamma[G]))+
   stdtheme
-ggsave(file=paste0(resdir,"targeted/segHierarchiesPopPsi_nwExp1_wG0_001_xgravityDecay_colgravityGamma_facetsynthRankSize-nwPhysQuantile.png"),width=20,height=18,units='cm')
+ggsave(file=paste0(resdir,"targeted/physical_segHierarchiesPopPsi_nwExp1_wG0_001_xgravityDecay_colgravityGamma_facetsynthRankSize-nwThresholdQuantile.png"),width=20,height=18,units='cm')
 
 # Psi closeness
 g = ggplot(sdata,aes(x=gravityDecay,y=segHierarchiesClosenessPsi,color=gravityGamma,group=gravityGamma))
 g+geom_point()+geom_line()+ 
-  facet_grid(synthRankSize~nwPhysQuantile,scales='free')+
+  facet_grid(synthRankSize~nwThresholdQuantile,scales='free')+
   xlab(expression(d[G]))+ylab(expression(Psi[Delta]*"[C]"))+scale_color_continuous(name=expression(gamma[G]))+
   stdtheme
-ggsave(file=paste0(resdir,"targeted/segHierarchiesClosenessPsi_nwExp1_wG0_001_xgravityDecay_colgravityGamma_facetsynthRankSize-nwPhysQuantile.png"),width=20,height=18,units='cm')
+ggsave(file=paste0(resdir,"targeted/physical_segHierarchiesClosenessPsi_nwExp1_wG0_001_xgravityDecay_colgravityGamma_facetsynthRankSize-nwThresholdQuantile.png"),width=20,height=18,units='cm')
 
 
+# distrib closeness
+g=ggplot(timedata[as.numeric(as.character(timedata$time))%%5==0,],aes(x=hierarchiesClosenessAlpha,color=time,group=time))
+g+geom_density()+scale_color_discrete(name='Time')+xlab(expression(alpha[C]))+ylab('Density')+stdtheme
+ggsave(file=paste0(resdir,"targeted/alphaClosenessDistributions.png"),width=20,height=18,units='cm')
 
 
 

@@ -1,0 +1,74 @@
+import java.text.SimpleDateFormat
+import java.util.Date
+
+// variables
+val synthRankSize = Val[Double]
+val nwGmax = Val[Double]
+val nwExponent = Val[Double]
+val nwThresholdQuantile = Val[Double]
+val finalTime = Val[Int]
+val gravityWeight = Val[Double]
+val gravityGamma = Val[Double]
+val gravityDecay = Val[Double]
+val feedbackWeight = Val[Double]
+val feedbackGamma = Val[Double]
+val feedbackDecay = Val[Double]
+val nwType = Val[String]
+val id = Val[Int]
+val replication = Val[Int]
+
+// PSE indicators
+val hierarchyPopFinal = Val[Double]
+val hierarchyClosenessFinal = Val[Double]
+val rankCorrsPopClosenessFinal = Val[Double]
+
+
+// setup-experiment-synthetic [synth-ranksize nw-type nw-threshold nw-gmax nw-exponent physical-nw-rein-quantile nw-slimemould-fun grav-weight grav-gamma grav-decay feed-weight feed-gamma feed-decay final-time seed
+val cmds = Seq("setup-experiment-synthetic ${synthRankSize} \"${nwType}\" ${nwThresholdQuantile} ${nwGmax} ${nwExponent} ${gravityWeight} ${gravityGamma} ${gravityDecay} ${feedbackWeight} ${feedbackGamma} ${feedbackDecay} ${finalTime} ${replication}","run-experiment")
+
+val model = NetLogo6Task(workDirectory / "HEADLESS_MacroCoEvol.nlogo",cmds,embedWorkspace=true,reuseWorkspace=true) set(
+    (inputs, outputs) += (synthRankSize,nwGmax,nwExponent,nwThresholdQuantile,finalTime,gravityWeight,gravityGamma,gravityDecay,feedbackWeight,feedbackGamma,feedbackDecay,nwType,replication),
+    outputs += hierarchyPopFinal mapped "pse-delta-pop-hierarchy",
+    outputs += hierarchyClosenessFinal mapped "pse-delta-closeness-hierarchy",
+    outputs += rankCorrsPopClosenessFinal mapped "pse-rankcorr",
+    finalTime :=30, feedbackWeight:= 0.0, feedbackDecay := 1.0, feedbackGamma := 1.0,
+    nwType := "virtual"
+)
+
+val purpose = "PSE_SYNTHETICVIRTUAL_GRID"
+
+val datestr = (new SimpleDateFormat("yyyyMMdd")).format(new Date())
+val resdir = datestr+"_"+purpose
+
+
+val pseisland =
+    PSEEvolution (
+      genome =
+        Seq(
+          synthRankSize in (0.1,2.0)
+          ,nwThresholdQuantile in (0.0,0.99) // TODO quantile function fails at 1
+          ,nwGmax in (0.0,0.05)
+          ,nwExponent in (0.0,5.0)
+          ,gravityWeight in (0.0,0.01)
+          ,gravityGamma in (0.0,5.0)
+          ,gravityDecay in (1.0,500.0)
+        ),
+      objectives =
+        Seq(
+          hierarchyPopFinal in (-0.2 to 0.2 by 0.02),
+          hierarchyClosenessFinal in (-1.0 to 1.0 by 0.1),
+          rankCorrsPopClosenessFinal in (-1.0 to 1.0 by 0.1)
+          ),
+      stochastic = Stochastic(seed = replication),
+      evaluation = model,
+      termination = 20000,
+      parallelism = 500,
+      distribution = Island(10 minutes)
+    )
+
+val savePopulation = SavePopulationHook(pseisland, workDirectory / "pse" / resdir, frequency = 1000)
+
+val grid = EGIEnvironment("vo.complex-systems.eu",openMOLEMemory = 4000 megabytes)
+
+(pseisland on grid hook savePopulation)
+

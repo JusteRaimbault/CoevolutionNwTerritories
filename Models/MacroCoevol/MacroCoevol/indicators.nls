@@ -266,6 +266,14 @@ to-report rank-correlations-vars-current [var1 var2]
   report rank-correlation-vars var1 var2 ticks
 end
 
+to-report pse-rankcorr
+  let res 0
+  carefully [
+    set res rank-correlations-vars-current "city-population" "city-closeness-centrality"
+  ][]
+  report res
+end
+  
 ;;
 ; all rank correlations between two variables
 to-report rank-correlations-vars [var1 var2]
@@ -402,6 +410,16 @@ to-report population-hierarchy-current
   report population-hierarchy ticks
 end
 
+;;
+; wrapper for pse
+to-report pse-delta-pop-hierarchy
+  let res 0
+  carefully [
+    set res ((item 0 (population-hierarchy ticks)) - (item 0 (population-hierarchy 0)))
+  ][]
+  report res
+end
+
 to-report population-seg-hierarchy [t]
   let pops matrix:get-column global:populations t
   report breakpoint-regression pops
@@ -489,6 +507,18 @@ end
 to-report closeness-hierarchy-current
   report closeness-hierarchy ticks
 end
+
+;;
+; wrapper for pse
+to-report pse-delta-closeness-hierarchy
+  let res 0
+  carefully [
+    set res ((item 0 (closeness-hierarchy ticks)) - (item 0 (closeness-hierarchy 0)))
+  ][]
+  report res
+end
+
+
 
 ;;
 ; entropy of closeness at time t

@@ -122,13 +122,13 @@ end
 
 
 to run-experiment
-  ;; depending on indicators, getting them after will fail anyway - better remove the secure run
-  ;carefully[
+  ;; depending on indicators, getting them after will fail anyway - better remove the secure run? - ok for pse - indicators should be all wrapped?
+  carefully[
     go-full-period
-  ;][
-  ;  show error-message
-  ;  set global:failed? true
-  ;]
+  ][
+    show error-message
+    set global:failed? true
+  ]
 end
 
 
@@ -160,11 +160,11 @@ to test-experiment-pse
   ; feedbackDecay=1.0, feedbackGamma=1.0, feedbackWeight=0.0, finalTime=30, gravityDecay=235.32452323467268, gravityGamma=5.0,
   ;gravityWeight=0.01, id=0, nwExponent=0.0, nwGmax=0.019517621425440414, nwPhysQuantile=0.0, nwSlimeMouldFun=thresholded, nwThreshold=0.0,
   ;nwType=virtual, openmole$seed=242991035577441843, replication=1756061224, synthRankSize=1.7071702917293508
-  setup-experiment-synthetic 1.7 "virtual" 0.1 0.0195 1.0 0.01 5.0 235 0.0 1.0 1.0 30 1756061224
+  setup-experiment-synthetic 1.7 "virtual" 0.99 0.0195 1.0 0.01 5.0 235 0.0 1.0 1.0 30 (random 100000);1756061224
   run-experiment
-  show item 0 population-hierarchy-current
-  show item 0 closeness-hierarchy-current
-  show rank-correlations-vars-current "city-population" "city-closeness-centrality"
+  show pse-delta-pop-hierarchy
+  show pse-delta-closeness-hierarchy
+  show pse-rankcorr
 end
 
 
