@@ -1,0 +1,104 @@
+
+
+Allen, B., Stacey, B. C., & Bar-Yam, Y. (2017). Multiscale information theory and the marginal utility of information. Entropy, 19(6), 273.
+
+Batty, M. (2006). Hierarchy in cities and city systems. In Hierarchy in natural and social sciences (pp. 143-168). Springer, Dordrecht.
+
+Bigotte, J. F., Krass, D., Antunes, A. P., & Berman, O. (2010). Integrated modeling of urban hierarchy and transportation network planning. Transportation Research Part A: Policy and Practice, 44(7), 506-522.
+
+Bretagnolle, A. (2003). Vitesse et processus de sélection hiérarchique dans le système des villes françaises. Données urbaines, 4, 309-323.
+
+Chérel, G., Cottineau, C., & Reuillon, R. (2015). Beyond corroboration: Strengthening model validation by looking for unexpected patterns. PloS one, 10(9), e0138212.
+
+Cottineau, C., Hatna, E., Arcaute, E., & Batty, M. (2017). Diverse cities or the systematic paradox of urban scaling laws. Computers, environment and urban systems, 63, 80-94.
+
+Crumley, C. L. (1987). A dialectical critique of hierarchy. Power relations and state formation, 155-169.
+
+Dang, Y., & Peng, L. (2012). Hierarchy of air freight transportation network based on centrality measure of complex networks. Journal of Transportation Systems Engineering and Information Technology, 12(3), 109-114.
+
+Fanelli, D., & Glänzel, W. (2013). Bibliometric evidence for a hierarchy of the sciences. PLoS one, 8(6), e66938.
+
+Godfrey, B. J., & Zhou, Y. (1999). Ranking world cities: multinational corporations and the global urban hierarchy. Urban Geography, 20(3), 268-281.
+
+Holland, J. H. (2012). Signals and boundaries: Building blocks for complex adaptive systems. Mit Press.
+
+Jiang, B. (2009). Street hierarchies: a minority of streets account for a majority of traffic flow. International Journal of Geographical Information Science, 23(8), 1033-1048.
+
+Lane, D. (2006). Hierarchy, complexity, society. In Hierarchy in natural and social sciences (pp. 81-119). Springer, Dordrecht.
+
+Lehman, J., & Stanley, K. O. (2008, August). Exploiting open-endedness to solve problems through the search for novelty. In ALIFE (pp. 329-336).
+
+Levinson, D. M., Xie, F., & Zhu, S. (2007). The co-evolution of land use and road networks. Transportation and traffic theory, 839-859.
+
+Li, H., Wei, Y. D., Liao, F. H., & Huang, Z. (2015). Administrative hierarchy and urban land expansion in transitional China. Applied Geography, 56, 177-186.
+
+Liao, L., & Gaudin, J. P. (2017). The opening to the market in China (1980-2000) and the local economic development: a form of multilevel governance?. CYBERGEO-EUROPEAN JOURNAL OF GEOGRAPHY.
+
+Liu, X., Derudder, B., & García, C. G. (2013). Exploring the co-evolution of the geographies of air transport aviation and corporate networks. Journal of Transport Geography, 30, 26-36.
+
+Mones, E., Vicsek, L., & Vicsek, T. (2012). Hierarchy measure for complex networks. PloS one, 7(3), e33799.
+
+Morin, E. (1980). La méthode: la vie de la vie. Seuil, Paris.
+
+Muggeo, V. M. (2003). Estimating regression models with unknown break‐points. Statistics in medicine, 22(19), 3055-3071.
+
+Offner, J. M., Beaucire, F., Delaplace, M., Frémont, A., Ninot, O., Bretagnolle, A., & Pumain, D. (2014). Les effets structurants des infrastructures de transport. Espace géographique, 43(1), p-51.
+
+Offner, J. M. (1993). Les «effets structurants» du transport: mythe politique, mystification scientifique. L'espace géographique, 233-242.
+
+Pires, M. M., Prado, P. I., & Guimarães Jr, P. R. (2011). Do food web models reproduce the structure of mutualistic networks?. PLoS One, 6(11), e27280.
+
+Pumain, D., Paulus, F., Vacchiani-Marcuzzo, C., & Lobo, J. (2006). An evolutionary theory for interpreting urban scaling laws. Cybergeo: European Journal of Geography.
+
+Pumain, D. (2003). Une approche de la complexité en géographie. Géocarrefour, 78(1), 25-31.
+
+Pumain, D. (2004). Scaling laws and urban systems.
+
+Pumain, D. (2006, a). Hierarchy in natural and social sciences (ed.). Springer, Dordrecht.
+
+Pumain, D. (2006, b). Alternative explanations of hierarchical differentiation in urban systems. In Hierarchy in natural and social sciences (pp. 169-222). Springer, Dordrecht.
+
+Pumain, D. (2006, c). Introduction. In Hierarchy in natural and social sciences (pp. 1-12). Springer, Dordrecht.
+
+Pumain, D. (2019). Les voies de l'interaction et les hiérarchies urbaines. In actes du colloque Voies, réseaux, paysages en Gaule en hommage à Jean-Luc Fiches, Revue d’Archéologie Narbonnaise.
+
+Raimbault, J. (2017). Identification de causalités dans des données spatio-temporelles. In Spatial Analysis and GEOmatics 2017.
+
+Raimbault, J. (2018). Caractérisation et modélisation de la co-évolution des réseaux de transport et des territoires (Doctoral dissertation, Université Paris 7 Denis Diderot).
+
+Raimbault, J., Cottineau, C., Le Texier, M., Le Nechet, F., & Reuillon, R. (2019). Space Matters: Extending Sensitivity Analysis to Initial Spatial Conditions in Geosimulation Models. Journal of Artificial Societies and Social Simulation, 22(4).
+
+Raimbault, J. (2019, a). De l'endogénéité des hiérarchies dans les systèmes territoriaux complexes. In Journée Des jeunes chercheurs de l'Institut de Géographie: Compter, classer, catégoriser.
+
+Raimbault, J. (2019, b). Space and complexities of territorial systems. arXiv preprint arXiv:1901.09869.
+
+Raimbault, J. (2019, c). Modeling interactions between transportation networks and territories: a co-evolution approach. arXiv preprint arXiv:1902.04802.
+
+Raimbault, J. (2019, d). An urban morphogenesis model capturing interactions between networks and territories. In The mathematics of urban morphology (pp. 383-409). Birkhäuser, Cham.
+
+Raimbault, J., Denis, E., & Pumain, D. (2020). Empowering Urban Governance through Urban Science: Multi-Scale Dynamics of Urban Systems Worldwide. Sustainability, 12(15), 5954.
+
+Raimbault, J. (2020, a). Relating complexities for the reflexive study of complex systems. In Theories and models of urbanization (pp. 27-41). Springer, Cham.
+
+Raimbault, J. (2020, b). Unveiling co-evolutionary patterns in systems of cities: a systematic exploration of the simpopnet model. In Theories and Models of Urbanization (pp. 261-278). Springer, Cham.
+
+Raimbault, J. (2020, c). Indirect evidence of network effects in a system of cities. Environment and Planning B: Urban Analytics and City Science, 47(1), 138-155.
+
+Raimbault, J. (2021). Modeling the co-evolution of cities and networks. In Handbook of Cities and Networks. Edward Elgar Publishing.
+
+Reuillon, R., Leclaire, M., & Rey-Coyrehourcq, S. (2013). OpenMOLE, a workflow engine specifically tailored for the distributed exploration of simulation models. Future Generation Computer Systems, 29(8), 1981-1990.
+
+Rozenblat, C., & Pumain, D. (2018). Conclusion: Toward a methodology for multi-scalar urban system policies. International and Transnational Perspectives on Urban Systems, 385.
+
+Schmitt, C. (2014). Modélisation de la dynamique des systèmes de peuplement: de SimpopLocal à SimpopNet (Doctoral dissertation, Université Panthéon-Sorbonne-Paris I).
+
+Tisue, S., & Wilensky, U. (2004, May). Netlogo: A simple environment for modeling complexity. In International conference on complex systems (Vol. 21, pp. 16-21).
+
+Volberda, H. W., & Lewin, A. Y. (2003). Co‐evolutionary dynamics within and between firms: From evolution to co‐evolution. Journal of management studies, 40(8), 2111-2136.
+
+West, G.B. (2017). Scale: the universal laws of growth, innovation, sustainability, and the pace of life in organisms, cities, economies, and companies. Penguin, New York.
+
+Xie, F., & Levinson, D. (2009). Topological evolution of surface transportation networks. Computers, Environment and Urban Systems, 33(3), 211-223.
+
+Yerra, B. M., & Levinson, D. M. (2005). The emergence of hierarchy in transportation networks. The Annals of Regional Science, 39(3), 541-553.
+
