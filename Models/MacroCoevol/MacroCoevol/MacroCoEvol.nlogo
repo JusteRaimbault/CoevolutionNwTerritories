@@ -579,7 +579,7 @@ CHOOSER
 global:setup-type
 global:setup-type
 "synthetic" "gis"
-0
+1
 
 SLIDER
 1
@@ -678,7 +678,7 @@ global:network-reinforcment-threshold
 global:network-reinforcment-threshold
 0
 5
-2.18761607196435
+0.8849341060219217
 0.1
 1
 NIL
@@ -841,7 +841,7 @@ SWITCH
 333
 global:geo-paths?
 global:geo-paths?
-1
+0
 1
 -1000
 
