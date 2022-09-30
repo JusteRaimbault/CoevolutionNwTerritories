@@ -1,3 +1,6 @@
 [submodule "Docs/Papers/CoevolutionModels-chapter"]
 	path = Docs/Papers/CoevolutionModels-chapter
 	url = git@github.com:JusteRaimbault/CoevolutionModels-chapter.git
+[submodule "Docs/Papers/LUTModels-chapter"]
+	path = Docs/Papers/LUTModels-chapter
+	url = git@github.com:JusteRaimbault/LUTModels-chapter.git
