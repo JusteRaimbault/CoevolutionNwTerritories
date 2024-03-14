@@ -131,7 +131,7 @@ ggsave(file=paste0(resdir,"summarizedindics/",indic,'_nwExp',nwExp,'_wG',wg,'_xg
 #resprefix = '20200120_175200_HIERARCHIES_SYNTHETICVIRTUAL_TARGETED_GRID' # rerun with quantile param
 resprefix = '20200123_183857_HIERARCHIES_SYNTHETICVIRTUAL_TARGETED_GRID'
 res <- as.tbl(read.csv(paste0('exploration/',resprefix,'.csv'),stringsAsFactors = FALSE))
-resdir=paste0(Sys.getenv('CS_HOME'),'/CoevolutionNwTerritories/Results/MacroCoevol/',resprefix,'/');dir.create(resdir);dir.create(paste0(resdir,'targeted'))
+resdir=paste0(Sys.getenv('CS_HOME'),'/NetworksTerritories/CoevolutionNwTerritories/Results/MacroCoevol/',resprefix,'/');dir.create(resdir);dir.create(paste0(resdir,'targeted'))
 params = c("synthRankSize","nwExponent","nwThresholdQuantile","gravityWeight","gravityGamma","gravityDecay")
 d = sumdata()
 timedata = d$timedata;sdata = d$sdata
@@ -145,6 +145,9 @@ g+geom_point()+geom_line()+
   xlab(expression(d[G]))+ylab(expression(rho[r*","*Delta]*"[P,C]"))+scale_color_continuous(name=expression(gamma[G]))+
   stdtheme
 ggsave(file=paste0(resdir,"targeted/rankCorrsPopCloseness_nwExp1_wG0_001_xgravityDecay_colgravityGamma_facetsynthRankSize-nwThresholdQuantile.png"),width=20,height=18,units='cm')
+# pdf for paper
+ggsave(file=paste0(Sys.getenv('CS_HOME'),"/NetworksTerritories/CoevolutionNwTerritories/Docs/Papers/HierarchyCoevolution/chapter/figuresraw/rankCorrsPopCloseness_nwExp1_wG0_001_xgravityDecay_colgravityGamma_facetsynthRankSize-nwThresholdQuantile.pdf"),width=20,height=18,units='cm')
+
 
 # hierarchy closenesses
 g = ggplot(sdata,aes(x=gravityDecay,y=hierarchiesClosenessAlpha,color=gravityGamma,group=gravityGamma))
@@ -153,6 +156,9 @@ g+geom_point()+geom_line()+
   xlab(expression(d[G]))+ylab(expression(alpha[Delta]*"[C]"))+scale_color_continuous(name=expression(gamma[G]))+
   stdtheme
 ggsave(file=paste0(resdir,"targeted/hierarchiesClosenessAlpha_nwExp1_wG0_001_xgravityDecay_colgravityGamma_facetsynthRankSize-nwThresholdQuantile.png"),width=20,height=18,units='cm')
+# pdf for paper
+ggsave(file=paste0(Sys.getenv('CS_HOME'),"/NetworksTerritories/CoevolutionNwTerritories/Docs/Papers/HierarchyCoevolution/chapter/figuresraw/hierarchiesClosenessAlpha_nwExp1_wG0_001_xgravityDecay_colgravityGamma_facetsynthRankSize-nwThresholdQuantile.pdf"),width=20,height=18,units='cm')
+
 
 # hierarchy pops
 g = ggplot(sdata,aes(x=gravityDecay,y=hierarchiesPopAlpha,color=gravityGamma,group=gravityGamma))
@@ -161,6 +167,9 @@ g+geom_point()+geom_line()+
   xlab(expression(d[G]))+ylab(expression(alpha[Delta]*"[P]"))+scale_color_continuous(name=expression(gamma[G]))+
   stdtheme
 ggsave(file=paste0(resdir,"targeted/hierarchiesPopAlpha_nwExp1_wG0_001_xgravityDecay_colgravityGamma_facetsynthRankSize-nwThresholdQuantile.png"),width=20,height=18,units='cm')
+# pdf for paper
+ggsave(file=paste0(Sys.getenv('CS_HOME'),"/NetworksTerritories/CoevolutionNwTerritories/Docs/Papers/HierarchyCoevolution/chapter/figuresraw/hierarchiesPopAlpha_nwExp1_wG0_001_xgravityDecay_colgravityGamma_facetsynthRankSize-nwThresholdQuantile.pdf"),width=20,height=18,units='cm')
+
 
 # Psi pops
 g = ggplot(sdata,aes(x=gravityDecay,y=segHierarchiesPopPsi,color=gravityGamma,group=gravityGamma))
@@ -169,6 +178,7 @@ g+geom_point()+geom_line()+
   xlab(expression(d[G]))+ylab(expression(Psi[Delta]*"[P]"))+scale_color_continuous(name=expression(gamma[G]))+
   stdtheme
 ggsave(file=paste0(resdir,"targeted/segHierarchiesPopPsi_nwExp1_wG0_001_xgravityDecay_colgravityGamma_facetsynthRankSize-nwThresholdQuantile.png"),width=20,height=18,units='cm')
+# not in paper
 
 # Psi closeness
 g = ggplot(sdata,aes(x=gravityDecay,y=segHierarchiesClosenessPsi,color=gravityGamma,group=gravityGamma))
@@ -177,6 +187,8 @@ g+geom_point()+geom_line()+
   xlab(expression(d[G]))+ylab(expression(Psi[Delta]*"[C]"))+scale_color_continuous(name=expression(gamma[G]))+
   stdtheme
 ggsave(file=paste0(resdir,"targeted/segHierarchiesClosenessPsi_nwExp1_wG0_001_xgravityDecay_colgravityGamma_facetsynthRankSize-nwThresholdQuantile.png"),width=20,height=18,units='cm')
+# pdf for paper
+ggsave(file=paste0(Sys.getenv('CS_HOME'),"/NetworksTerritories/CoevolutionNwTerritories/Docs/Papers/HierarchyCoevolution/chapter/figuresraw/segHierarchiesClosenessPsi_nwExp1_wG0_001_xgravityDecay_colgravityGamma_facetsynthRankSize-nwThresholdQuantile.pdf"),width=20,height=18,units='cm')
 
 
 ##

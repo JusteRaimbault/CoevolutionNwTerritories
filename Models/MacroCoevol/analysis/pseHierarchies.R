@@ -1,14 +1,14 @@
-setwd(paste0(Sys.getenv('CS_HOME'),'/CoevolutionNwTerritories/Models/MacroCoevol/MacroCoevol'))
+setwd(paste0(Sys.getenv('CS_HOME'),'/NetworksTerritories/CoevolutionNwTerritories/Models/MacroCoevol/MacroCoevol'))
 
 library(dplyr)
 library(ggplot2)
 library(GGally)
 
-source(paste0(Sys.getenv('CN_HOME'),'/Models/Utils/R/plots.R'))
+source(paste0(Sys.getenv('CS_HOME'),'/Organisation/Models/Utils/R/plots.R'))
 
 resprefix = '20200124_PSE_SYNTHETICPHYSICAL_GRID'
 
-resdir = paste0(Sys.getenv('CS_HOME'),'/CoevolutionNwTerritories/Results/MacroCoevol/PSE/',resprefix,'/');dir.create(resdir)
+resdir = paste0(Sys.getenv('CS_HOME'),'/NetworksTerritories/CoevolutionNwTerritories/Results/MacroCoevol/PSE/',resprefix,'/');dir.create(resdir,showWarnings = F)
 
 ###
 # check convergence (number of patterns)
@@ -76,6 +76,18 @@ for(samples in c(1,5,10)){
     filename = paste0(resdir,'scatterdeltaobjs_colorgravityGamma_samples',samples,'.png'),width=30,height=30,units='cm')
 }
 
+
+# pdf figure for paper
+samples=10
+ggsave(
+  plot=ggpairs(data=res[res$evolution.samples>=samples,],columns = c("DeltaHierarchyPop","DeltaHierarchyCloseness","rankCorrsPopClosenessFinal"),
+               aes(colour=gravityDecayF,alpha=0.4)
+  )+stdtheme,
+  filename =paste0(Sys.getenv('CS_HOME'),"/NetworksTerritories/CoevolutionNwTerritories/Docs/Papers/HierarchyCoevolution/chapter/figuresraw/scatterdeltaobjs_colorgravityDecay_samples",samples,".pdf"),width=30,height=30,units='cm')
+
+
+
+# values
 
 summary(res[res$DeltaHierarchyPop>=-0.2&res$evolution.samples>=10,])
 

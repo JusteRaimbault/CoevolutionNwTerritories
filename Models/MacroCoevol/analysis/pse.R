@@ -4,7 +4,7 @@ library(ggplot2)
 library(GGally)
 library(DiceDesign)
 library(reshape2)
-source(paste0(Sys.getenv('CN_HOME'),'/Models/Utils/R/plots.R'))
+source(paste0(Sys.getenv('CS_HOME'),'/Organisation/Models/Utils/R/plots.R'))
 
 setwd(paste0(Sys.getenv('CN_HOME'),'/Models/MacroCoEvol/MacroCoEvol/calibres'))
 
