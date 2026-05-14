@@ -1,0 +1,13 @@
+<component name="libraryTable">
+  <library name="sbt: org.piwik.java.tracking:matomo-java-tracker:3.4.0:jar">
+    <CLASSES>
+      <root url="jar://$USER_HOME$/.cache/coursier/v1/https/repo1.maven.org/maven2/org/piwik/java/tracking/matomo-java-tracker/3.4.0/matomo-java-tracker-3.4.0.jar!/" />
+    </CLASSES>
+    <JAVADOC>
+      <root url="jar://$USER_HOME$/.cache/coursier/v1/https/repo1.maven.org/maven2/org/piwik/java/tracking/matomo-java-tracker/3.4.0/matomo-java-tracker-3.4.0-javadoc.jar!/" />
+    </JAVADOC>
+    <SOURCES>
+      <root url="jar://$USER_HOME$/.cache/coursier/v1/https/repo1.maven.org/maven2/org/piwik/java/tracking/matomo-java-tracker/3.4.0/matomo-java-tracker-3.4.0-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

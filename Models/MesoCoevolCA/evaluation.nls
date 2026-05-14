@@ -5,6 +5,40 @@
   
 
 
+to export-data
+  let current-time ticks
+  if export-data? [
+
+    let current-data []
+    foreach data-export-patches [ ? ->
+      ask ? [
+      ;set current-data lput (list "density" pdensity pxcor pycor ticks) current-data
+      ;set current-data lput (list "cdistance" pdistance-to-centre pxcor pycor ticks) current-data
+      ;set current-data lput (list "rdistance" pdistance-to-roads pxcor pycor ticks) current-data
+      ;set current-data lput (list "ceucldistance" distance one-of centres with-min [distance myself] pxcor pycor ticks) current-data
+      set current-data lput (list pxcor pycor current-time pdensity pdistance-to-centre pdistance-to-roads (distance one-of centres with-min [distance myself])) current-data
+      ]
+    ]
+    set data-to-export concatenate (list current-data data-to-export)
+  ]
+
+  if values-table? [
+     ; table : time, indic, patchx, patchy -> value
+     foreach data-export-patches [ ? ->
+       ask ? [
+         table:put values-table (list current-time "density" pxcor pycor) pdensity
+         table:put values-table (list current-time "centre-distance" pxcor pycor) pdistance-to-centre
+         table:put values-table (list current-time "road-distance" pxcor pycor) pdistance-to-roads
+         table:put values-table (list current-time "centre-eucl-distance" pxcor pycor) (distance one-of centres with-min [distance myself])
+       ]
+     ]
+  ]
+
+  ;if export-movie? [movie-grab-view]
+end
+
+
+
 ;;output value of reporters.
 ;;not done in monitors to avoid calculation at each step.
 to calculate-reporters
@@ -16,6 +50,25 @@ to calculate-reporters
   ]
   if output-file? [print-in-file output-file-name line]
 end
+
+
+
+to-report average-transfer-entropy [var1 var2 k tau]
+  let current-time ticks
+  let te []
+  foreach data-export-patches [? -> ask ? [
+    let t 1
+    let x [] let y []
+    repeat (current-time - 1) [
+      set x lput ((table:get values-table (list t var1 [pxcor] of ? [pycor] of ?)) - (table:get values-table (list (t - 1) var1 [pxcor] of ? [pycor] of ?))) x
+      set y lput ((table:get values-table (list t var2 [pxcor] of ? [pycor] of ?)) - (table:get values-table (list (t - 1) var2 [pxcor] of ? [pycor] of ?))) y
+      set t t + 1
+    ]
+    set te lput (transferentropy:transfer-entropy x y k tau) te
+  ]]
+  report mean te
+end
+
 
 
 

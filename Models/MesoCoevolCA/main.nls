@@ -20,6 +20,8 @@ to go
   ;;display
   display-CA
   
+  export-data
+  
   ;;tick
   tick
 end
