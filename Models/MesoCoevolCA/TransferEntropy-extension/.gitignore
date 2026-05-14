@@ -1,3 +1,7 @@
+.idea
+.bsp
+.github
+
 .bundledFiles
 target/
 /*.jar
