@@ -8,7 +8,7 @@
 ; boolean reporter
 to-report lexcomp [var1 var2 reporterTasksList]
   let res true let fixed? false
-  foreach reporterTasksList [
+  foreach reporterTasksList [? ->
      if not fixed? [
        ifelse [runresult ?] of var1 < [runresult ?] of var2 [
          set res true set fixed? true
@@ -25,6 +25,6 @@ to-report lexcomp [var1 var2 reporterTasksList]
   report res
 end
 
-to test-lexcomp
-  foreach sort-by [lexcomp ?1 ?2 (list task [pxcor] task [pcolor])] patches [ask ? [show word word pxcor " - " pcolor]]
-end
+;to test-lexcomp
+;  foreach sort-by [lexcomp ?1 ?2 (list task [pxcor] task [pcolor])] patches [ask ? [show word word pxcor " - " pcolor]]
+;end

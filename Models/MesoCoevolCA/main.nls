@@ -20,9 +20,6 @@ to go
   ;;display
   display-CA
   
-  ;; export data if needed
-  export-data
-  
   ;;tick
   tick
 end
@@ -64,7 +61,7 @@ to sprawl
             new-path
             ;;destroy old houses and set not constructible!
             ;;only line where we kill houses !
-            foreach footprint [ask ? [set constructible? false set constructed? false ask houses-here[die]]]
+            foreach footprint [? -> ask ? [set constructible? false set constructed? false ask houses-here[die]]]
           ]
         ]
       ]

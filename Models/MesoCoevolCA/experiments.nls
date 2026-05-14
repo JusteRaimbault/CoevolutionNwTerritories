@@ -85,3 +85,9 @@ to run-experiment
   
   
 end
+
+
+to test-experiment
+  setup-headless 0.5 0.5 0.5 1 30 (random 10000)
+  run-experiment
+end

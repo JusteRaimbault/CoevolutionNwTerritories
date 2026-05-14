@@ -15,22 +15,22 @@ end
 
 
 
-to-report my-singular-link-breed
-  foreach context:link-breed-singular-names [
-     if runresult (word "is-" ? "? self") [report ?]
-  ]
-  report "LINK"
-end
+;to-report my-singular-link-breed
+;  foreach context:link-breed-singular-names [
+;     if runresult (word "is-" ? "? self") [report ?]
+;  ]
+;  report "LINK"
+;end
 
 
 
 
-to-report my-link-breed
-  foreach context:link-breed-names [
-     if runresult (word "is-" ? "? self") [report ?]
-  ]
-  report "LINKS"
-end
+;to-report my-link-breed
+;  foreach context:link-breed-names [
+;     if runresult (word "is-" ? "? self") [report ?]
+;  ]
+;  report "LINKS"
+;end
 
 
 
@@ -90,14 +90,14 @@ to-report intersection-with-link [t1 t2]
   ;; treat parallel/collinear lines as non-intersecting
   if m1 = m2 [ report [] ]
   ;; is t1 vertical? if so, swap the two turtles
-  if abs m1 = tan 90
+  if [link-heading] of t1 = 0 or [link-heading] of t1 = 180 ;abs m1 = tan 90
   [
-    ifelse abs m2 = tan 90
+    ifelse [link-heading] of t2 = 0 or [link-heading] of t2 = 180
       [ report [] ]
       [ report intersection-with-link t2 t1 ]
   ]
   ;; is t2 vertical? if so, handle specially
-  if abs m2 = tan 90 [
+  if [link-heading] of t2 = 0 or [link-heading] of t2 = 180 [
      ;; represent t1 line in slope-intercept form (y=mx+c)
       let c1 [link-ycor - link-xcor * m1] of t1
       ;; t2 is vertical so we know x already

@@ -49,25 +49,3 @@ to display-ABM
   
 end
 
-
-
-;;;;;;;;;;;;
-;; display plot in the case of an exploration
-;;;;;;;
-
-to plot-pareto-exploration
-  ;;only called from application, so config-comparison always true, no need to check!
-  ;;however, better in the mood of a flexible and multiple coders context !
-  
-  if config-comparison?[ 
-    set-current-plot "pareto"
-    clear-plot
-    set-current-plot-pen "pen"
-    set-plot-pen-mode 2
-    
-    foreach pareto-points [
-      plotxy first ? last ? 
-    ]
-  ]
-  
-end

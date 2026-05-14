@@ -2,69 +2,6 @@
 ;; Evaluation functions
 ;;;;;;;;;;;;;;;;
 
-
-
-to export-view-config
-  let filename (word export-view-prefix "/config_tf" ticks "_wd" (floor density-coefficient) "_wr" (floor distance-to-roads-coefficient) "_wc" (floor distance-to-center-coefficient) "_seed" seed ".png")
-  export-view filename
-  let interfacename (word export-view-prefix "/config_tf" ticks "_wd" (floor density-coefficient) "_wr" (floor distance-to-roads-coefficient) "_wc" (floor distance-to-center-coefficient) "_seed" seed "_INTERFACE.png")
-  export-interface interfacename
-end
-
-
-
-to export-data
-  let current-time ticks
-  if export-data? [
-    
-    let current-data []
-    foreach data-export-patches [
-      ask ? [
-      ;set current-data lput (list "density" pdensity pxcor pycor ticks) current-data
-      ;set current-data lput (list "cdistance" pdistance-to-centre pxcor pycor ticks) current-data
-      ;set current-data lput (list "rdistance" pdistance-to-roads pxcor pycor ticks) current-data
-      ;set current-data lput (list "ceucldistance" distance one-of centres with-min [distance myself] pxcor pycor ticks) current-data
-      set current-data lput (list pxcor pycor current-time pdensity pdistance-to-centre pdistance-to-roads (distance one-of centres with-min [distance myself])) current-data
-      ]
-    ]
-    set data-to-export concatenate (list current-data data-to-export)
-  ]
-  
-  if values-table? [
-     ; table : time, indic, patchx, patchy -> value
-     foreach data-export-patches [
-       ask ? [
-         table:put values-table (list current-time "density" pxcor pycor) pdensity
-         table:put values-table (list current-time "centre-distance" pxcor pycor) pdistance-to-centre
-         table:put values-table (list current-time "road-distance" pxcor pycor) pdistance-to-roads
-         table:put values-table (list current-time "centre-eucl-distance" pxcor pycor) (distance one-of centres with-min [distance myself])
-       ]
-     ]
-  ]
-  
-  if export-movie? [movie-grab-view]
-end
-
-
-to export-data-to-file
-  let fileprefix (word "/Users/Juste/Documents/ComplexSystems/CityNetwork/Models/Statistics/Synthetic/rdb/" (replace (replace date-and-time " " "_") ":" "_"))
-  lists-csv-export data-to-export (list "x" "y" "t" "density" "cdistance" "rdistance" "ceucldistance") ";" (word fileprefix ".csv")
-  ; export param values
-  let params []
-  set params lput (list "distance-to-activities-coefficient" distance-to-activities-coefficient) params
-  set params lput (list "density-coefficient" density-coefficient) params
-  set params lput (list "distance-to-roads-coefficient" distance-to-roads-coefficient) params
-  set params lput (list "distance-to-center-coefficient" distance-to-center-coefficient) params 
-  set params lput (list "distance-road-needed" distance-road-needed) params 
-  set params lput (list "built-cells-per-tick" built-cells-per-tick) params 
-  set params lput (list "activities-norma" activities-norma) params 
-  set params lput (list "centers-number" centers-number) params
-  set params lput (list "activities-number" activities-number) params
-  set params lput (list "final-ticks" ticks) params 
-  lists-csv-export params (list "param" "value") ";" (word fileprefix "_params.csv")
-end
-
-  
   
 
 
@@ -72,7 +9,7 @@ end
 ;;not done in monitors to avoid calculation at each step.
 to calculate-reporters
   let line ""
-  foreach output-reporter-names [
+  foreach output-reporter-names [ ? ->
     let val (runresult ?)
     output-print word word ? " = " val
     set line word line val if ? != last output-reporter-names [set line word line ";"]
@@ -91,13 +28,13 @@ to-report lagged-correlation [var1 var2 tau t0]
   if tau > 0 [set firstvar var2 set secvar var1]
   let t (tau + 1 + t0)
   repeat (current-time - tau - 1 - t0) [
-    foreach data-export-patches [ask ? [
+    foreach data-export-patches [? -> ask ? [
        set x lput ((table:get values-table (list t firstvar [pxcor] of ? [pycor] of ?)) - (table:get values-table (list (t - 1) firstvar [pxcor] of ? [pycor] of ?))) x
        set y lput ((table:get values-table (list (t - tau) secvar [pxcor] of ? [pycor] of ?)) - (table:get values-table (list (t - tau - 1) secvar [pxcor] of ? [pycor] of ?))) y
     ]]
     set t t + 1
   ]
-  let mx mean x set x map [? - mx] x let my mean y set y map [? - my] y
+  let mx mean x set x map [? -> ? - mx] x let my mean y set y map [? -> ? - my] y
   report mean (list-times-element-wise x y) / (standard-deviation x * standard-deviation y)
 end
 
@@ -176,7 +113,7 @@ to-report spatial-autocorrelation-index
   ;;dirty but try to be efficient : sort agents lexically on coordinates
   ;;would be more efficient with single pass on patches for all species, but function would be totally unreadable
   clear-table-moran
-  let ag sort-by [lexcomp ?1 ?2 (list task [floor (xcor / moran-grid-size)] task [floor (ycor / moran-grid-size)])] houses
+  let ag sort-by [[?1 ?2] -> lexcomp ?1 ?2 (list [? -> floor (xcor / moran-grid-size)] [? -> floor (ycor / moran-grid-size)])] houses
   let min-ag first ag
   let pop-count length ag
   ;;let cut the space in subregions, 50*50 should be enough precise
@@ -200,9 +137,9 @@ to-report spatial-autocorrelation-index
   let N length table:keys moran-populations
   let d-mean pop-count / N
   let W 0 let S 0 let norm-factor 0
-  foreach table:keys moran-populations [
-    let site-i ? foreach table:keys moran-populations [
-      let site-j ?
+  foreach table:keys moran-populations [?1 -> 
+    let site-i ?1 foreach table:keys moran-populations [?2 ->
+      let site-j ?2
       if site-j != site-i [
         let weight  1 / (sqrt ((first site-i - first site-j) ^ 2 + (last site-i - last site-j) ^ 2 ))
         set W W + weight
@@ -233,24 +170,6 @@ to clear-table-moran
   
 end
 
-
-
-;;;;;;;;;;;
-;; economic eval
-;;;;;;;;;;;
-
-;;launches economic ABM and reports segregation index
-;;would need several repetitions to be more exact !
-to-report eval-economic
-  output-print "Launching economic ABM for segregation index calculation"
-  output-print word n-repets-eco " repetitions"
-  let res 0
-  repeat n-repets-eco [
-    setup-ABM
-    repeat max-ticks-economic [go-one-step-ABM]
-  ]
-  report economic-segregation
-end
 
 
 ;;;;;;;;;;;

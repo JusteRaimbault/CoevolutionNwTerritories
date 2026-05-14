@@ -54,7 +54,7 @@ to setup-patches
     ;;deal with already existing nw and centers
     ask patches with [count centres-here > 0] [set constructible? false]
     ;;could count some twice, however, isolated centers ? NO ! previous line ~
-    ask paths [foreach footprint [ask ? [set constructible? false]]]
+    ask paths [foreach footprint [? -> ask ? [set constructible? false]]]
     
     update-patches-values
     
@@ -89,7 +89,7 @@ to setup-centres
     gis:set-world-envelope (list (item 0 env - 0.02) (item 1 env + 0.02)(item 2 env - 0.02) (item 3 env + 0.02)) 
    
     let num 1 ;;var for number of centers with a != 0
-    foreach gis:feature-list-of centers-gis-layer [
+    foreach gis:feature-list-of centers-gis-layer [ ? ->
        ;;read attribute
        let act gis:property-value ? "activity"
        foreach gis:vertex-lists-of ? [
@@ -110,11 +110,11 @@ to setup-centres
     ;;implying an equality threshold, could because a problem in "fine" configurations
     ;;must care to have very small threshold,
     ;;avoiding however non-connexity that is a real issue (NOT authorised)
-    foreach gis:feature-list-of paths-gis-layer [
-      foreach gis:vertex-lists-of ? [
-         let current-vertex gis:location-of first ?
-         foreach but-first ? [
-            let next-vertex gis:location-of ?
+    foreach gis:feature-list-of paths-gis-layer [ ?1 ->
+      foreach gis:vertex-lists-of ?1 [ ?2 ->
+         let current-vertex gis:location-of first ?2
+         foreach but-first ?2 [ ?3 ->
+            let next-vertex gis:location-of ?3
             let next-extr extremity-intersection-of-gis-feature next-vertex
             ask extremity-intersection-of-gis-feature current-vertex [
               create-path-with next-extr [
@@ -167,20 +167,20 @@ to setup-network
       nw:set-context turtles links
       set clusters nw:weak-component-clusters
       ;take one cluster, connects with the closest
-      let c1 first sort-by [([pxcor] of first ?1 < [pxcor] of first ?2) or (([pxcor] of first ?1 = [pxcor] of first ?2) and ([pycor] of first ?1 < [pycor] of first ?2))] (map [sort-by [([pxcor] of ?1 < [pxcor] of ?2) or (([pxcor] of ?1 = [pxcor] of ?2) and ([pycor] of ?1 < [pycor] of ?2))] ?] clusters)
+      let c1 first sort-by [[?1 ?2] -> ([pxcor] of first ?1 < [pxcor] of first ?2) or (([pxcor] of first ?1 = [pxcor] of first ?2) and ([pycor] of first ?1 < [pycor] of first ?2))] (map [? -> sort-by [[?1 ?2] -> ([pxcor] of ?1 < [pxcor] of ?2) or (([pxcor] of ?1 = [pxcor] of ?2) and ([pycor] of ?1 < [pycor] of ?2))] ?] clusters)
       let dmin dmax let tmin1 one-of turtles let tmin2 one-of turtles
       
       ;; iterate over clusters
       ;;  Beware : new nw extension version --> agentsets and not lists, need to convert
-      foreach clusters[
+      foreach clusters[ ?1 ->
         let aux remove 0 c1
-        foreach to-list ? [set aux remove ? aux]
+        foreach to-list ?1 [?2 -> set aux remove ?2 aux]
         if  not empty? aux [
-          let d dmax let t1 one-of c1 let t2 one-of ?
-          foreach to-list ? [
-            let t ?
-            foreach c1 [
-              ask ? [if distance t < d [set d distance t set t1 self set t2 t]] 
+          let d dmax let t1 one-of c1 let t2 one-of ?1
+          foreach to-list ?1 [ ?2 ->
+            let t ?2
+            foreach c1 [ ?3 ->
+              ask ?3 [if distance t < d [set d distance t set t1 self set t2 t]] 
             ]
           ]
           show d
@@ -209,7 +209,7 @@ to setup-center-activities
     let n floor (count centres) / activities-number
     let a 0
     repeat activities-number [
-      foreach n-of n c [
+      foreach n-of n c [ ? ->
         ask ? [
           set activity a
           set c remove self c
@@ -231,7 +231,7 @@ end
 to force-activity-distrib [id]
   carefully [
     let conf-list as-char-list int-to-string id
-    foreach sort-on [number] (centres with [number > 0])[
+    foreach sort-on [number] (centres with [number > 0])[ ? ->
       ask ? [set activity string-to-int first conf-list set conf-list but-first conf-list]
     ]
     color-centres
@@ -256,7 +256,7 @@ to setup-reporters
   if output-file?[
     set output-file-name word word "../Logs/" date-and-time ".log"
     let first-line ""
-    foreach output-reporter-names [set first-line word first-line ? if ? != last output-reporter-names [set first-line word first-line ";"]]
+    foreach output-reporter-names [? -> set first-line word first-line ? if ? != last output-reporter-names [set first-line word first-line ";"]]
     print-in-file output-file-name first-line
   ]
   
@@ -265,13 +265,6 @@ to setup-reporters
   let origin-center one-of centres
   set data-export-patches to-list patches ; with [(pxcor - [pxcor] of origin-center) mod 5 = 0 and (pycor - [pycor] of origin-center) mod 5 = 0]
   
-  ;; movie
-  if export-movie? [
-    movie-cancel
-    movie-start (word "mov/" config-name ".mov")
-    movie-set-frame-rate 2
-    movie-grab-view
-  ]
   
   set values-table table:make
   
@@ -285,7 +278,7 @@ to clear
   ask intersections [die] ask links [die]
   ask one-of centres [create-path-with one-of other centres [new-path]]
   ask patches [set constructed? false set constructible? true]
-  ask links [foreach footprint [ask ? [set constructible? false]]] 
+  ask links [foreach footprint [? -> ask ? [set constructible? false]]] 
   setup-network
 end
 

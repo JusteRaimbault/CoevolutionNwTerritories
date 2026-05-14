@@ -14,7 +14,7 @@
 to-report read-csv [filename delimiter]
   let rows read-file filename
   let row-list []
-  foreach rows [
+  foreach rows [? ->
     set row-list lput (explode delimiter ?) row-list
   ]
   report row-list
@@ -40,7 +40,7 @@ end
 to-report read-csv-as-matrix [file delimiter]
   let rows read-file file
   let row-list []
-  foreach rows [
+  foreach rows [? -> 
     set row-list lput (explode delimiter ?) row-list
   ]
   report matrix:from-row-list row-list
@@ -52,7 +52,7 @@ end
 to-report read-numeric-csv-as-matrix [file delimiter]
   let rows read-file file
   let row-list []
-  foreach rows [
+  foreach rows [? ->
     set row-list lput (map read-from-string (explode delimiter ?)) row-list
   ]
   report matrix:from-row-list row-list
@@ -62,7 +62,7 @@ end
 to-report read-numeric-csv-as-row-list [file delimiter]
   let rows read-file file
   let row-list []
-  foreach rows [
+  foreach rows [? ->
     set row-list lput (map read-from-string (explode delimiter ?)) row-list
   ]
   report row-list
@@ -82,7 +82,7 @@ end
 to-report read-table [file delimiter]
   let rows read-file file
   let res table:make
-  foreach rows [
+  foreach rows [? ->
     let t explode delimiter ?
     ; if not two elements, row is not well formatted ( !! NO DELIM in values ¡¡ )
     if length t = 2 [
@@ -158,10 +158,10 @@ to lists-csv-export [lists header separator filename]
   ;;first get name of vars to write first line
   ;;rq: we suppose that export is done in same order !!!
   let first-line ""
-  foreach header [set first-line word first-line ? if ? != last header [set first-line word first-line separator]]
+  foreach header [? -> set first-line word first-line ? if ? != last header [set first-line word first-line separator]]
   let row-length length header
   print-in-file filename first-line
-  foreach lists [
+  foreach lists [? ->
     let line ""
     let lst last ?
     let j 1
