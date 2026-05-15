@@ -79,52 +79,52 @@ to setup-centres
   ]
   ]
   [
-    ;;read configuration from GIS files
-    ;;we set also roads here, because need to set
-    ;;the envelope here
-    output-print "Reading from GIS files"
-    set centers-gis-layer gis:load-dataset centers-gis-layer-path
-    set paths-gis-layer gis:load-dataset paths-gis-layer-path
-    let env gis:envelope-union-of gis:envelope-of centers-gis-layer gis:envelope-of paths-gis-layer
-    gis:set-world-envelope (list (item 0 env - 0.02) (item 1 env + 0.02)(item 2 env - 0.02) (item 3 env + 0.02)) 
-   
-    let num 1 ;;var for number of centers with a != 0
-    foreach gis:feature-list-of centers-gis-layer [ ? ->
-       ;;read attribute
-       let act gis:property-value ? "activity"
-       foreach gis:vertex-lists-of ? [
-          let loc gis:location-of first ?
-          create-centres 1 [
-              set shape "circle" set size 1 set activity act setxy first loc last loc
-              ;color set later because don't know yet number of activities
-              ifelse act != 0 [set number num set num num + 1][set number 0]
-          ]
-       ]
-    ]
-    
-    set activities-number max [activity] of centres + 1
-    ask centres [set color center-color]
-    
-    ;;setup network.
-    ;;not so evident, have to grip extremity from location of extremities of a line
-    ;;implying an equality threshold, could because a problem in "fine" configurations
-    ;;must care to have very small threshold,
-    ;;avoiding however non-connexity that is a real issue (NOT authorised)
-    foreach gis:feature-list-of paths-gis-layer [ ?1 ->
-      foreach gis:vertex-lists-of ?1 [ ?2 ->
-         let current-vertex gis:location-of first ?2
-         foreach but-first ?2 [ ?3 ->
-            let next-vertex gis:location-of ?3
-            let next-extr extremity-intersection-of-gis-feature next-vertex
-            ask extremity-intersection-of-gis-feature current-vertex [
-              create-path-with next-extr [
-                 new-path
-              ]
-            ]
-            set current-vertex next-vertex
-         ]
-      ]
-    ]
+   ; ;;read configuration from GIS files
+   ; ;;we set also roads here, because need to set
+   ; ;;the envelope here
+   ; output-print "Reading from GIS files"
+   ; set centers-gis-layer gis:load-dataset centers-gis-layer-path
+   ; set paths-gis-layer gis:load-dataset paths-gis-layer-path
+   ; let env gis:envelope-union-of gis:envelope-of centers-gis-layer gis:envelope-of paths-gis-layer
+   ; gis:set-world-envelope (list (item 0 env - 0.02) (item 1 env + 0.02)(item 2 env - 0.02) (item 3 env + 0.02)) 
+   ;
+   ; let num 1 ;;var for number of centers with a != 0
+   ; foreach gis:feature-list-of centers-gis-layer [ ? ->
+   ;    ;;read attribute
+   ;    let act gis:property-value ? "activity"
+   ;    foreach gis:vertex-lists-of ? [
+   ;       let loc gis:location-of first ?
+   ;       create-centres 1 [
+   ;           set shape "circle" set size 1 set activity act setxy first loc last loc
+   ;           ;color set later because don't know yet number of activities
+   ;           ifelse act != 0 [set number num set num num + 1][set number 0]
+   ;       ]
+   ;    ]
+   ; ]
+   ; 
+   ; set activities-number max [activity] of centres + 1
+   ; ask centres [set color center-color]
+   ; 
+   ; ;;setup network.
+   ; ;;not so evident, have to grip extremity from location of extremities of a line
+   ; ;;implying an equality threshold, could because a problem in "fine" configurations
+   ; ;;must care to have very small threshold,
+   ; ;;avoiding however non-connexity that is a real issue (NOT authorised)
+   ; foreach gis:feature-list-of paths-gis-layer [ ?1 ->
+   ;   foreach gis:vertex-lists-of ?1 [ ?2 ->
+   ;      let current-vertex gis:location-of first ?2
+   ;      foreach but-first ?2 [ ?3 ->
+   ;         let next-vertex gis:location-of ?3
+   ;         let next-extr extremity-intersection-of-gis-feature next-vertex
+   ;         ask extremity-intersection-of-gis-feature current-vertex [
+   ;           create-path-with next-extr [
+   ;              new-path
+   ;           ]
+   ;         ]
+   ;         set current-vertex next-vertex
+   ;      ]
+   ;   ]
+   ; ]
     
 ]
   

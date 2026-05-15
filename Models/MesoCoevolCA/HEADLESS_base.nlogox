@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <model version="NetLogo 7.0.3" snapToGrid="false">
-  <code><![CDATA[extensions[nw table gis matrix transferentropy] ; context convol
+  <code><![CDATA[extensions[nw table matrix transferentropy] ; context convol gis
 
 
 __includes[

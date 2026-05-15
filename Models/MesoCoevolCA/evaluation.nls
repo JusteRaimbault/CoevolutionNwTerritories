@@ -64,12 +64,32 @@ to-report average-transfer-entropy [var1 var2 k tau]
       set y lput ((table:get values-table (list t var2 [pxcor] of ? [pycor] of ?)) - (table:get values-table (list (t - 1) var2 [pxcor] of ? [pycor] of ?))) y
       set t t + 1
     ]
-    set te lput (transferentropy:transfer-entropy x y k tau) te
+    ; filter constant time-series
+    if sum map abs x > 0 and sum map abs y > 0 [
+      set te lput (transferentropy:transfer-entropy x y k tau) te
+    ]
   ]]
   report mean te
 end
 
-
+to-report transfer-entropy-ensemble [var1 var2 k tau B]
+  let current-time ticks
+  let allX [] let allY []
+  foreach data-export-patches [? -> ask ? [
+    let t 1
+    let x [] let y []
+    repeat (current-time - 1) [
+      set x lput ((table:get values-table (list t var1 [pxcor] of ? [pycor] of ?)) - (table:get values-table (list (t - 1) var1 [pxcor] of ? [pycor] of ?))) x
+      set y lput ((table:get values-table (list t var2 [pxcor] of ? [pycor] of ?)) - (table:get values-table (list (t - 1) var2 [pxcor] of ? [pycor] of ?))) y
+      set t t + 1
+    ]
+    ; filter constant time-series
+    if sum map abs x > 0 and sum map abs y > 0 [
+      set allX lput x allX set allY lput y allY
+    ]
+  ]]
+  report transferentropy:transfer-entropy-ensemble allX allY k tau B
+end
 
 
 ;;
