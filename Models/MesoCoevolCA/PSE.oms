@@ -1,0 +1,105 @@
+// variables
+val weightDensity = Val[Double]
+val weightCenter = Val[Double]
+val weightRoad = Val[Double]
+val centerNumber = Val[Int]
+
+// indicators
+val networkSpeed = Val[Double]
+val localDensity = Val[Double]
+val globalDensity = Val[Double]
+//val moran = Val[Double]
+
+// transfer entropy
+val fullTEDensCentre = Val[Array[Double]]
+val fullTECentreDens = Val[Array[Double]]
+val fullTEDensRoad = Val[Array[Double]]
+val fullTERoadDens = Val[Array[Double]]
+val fullTECentrRoad = Val[Array[Double]]
+val fullTERoadCentr = Val[Array[Double]]
+
+val TEDensCentre = Val[Double]
+val TECentreDens = Val[Double]
+val TEDensRoad = Val[Double]
+val TERoadDens = Val[Double]
+val TECentrRoad = Val[Double]
+val TERoadCentr = Val[Double]
+
+val rawTEDensCentre = Val[Double]
+val rawTECentreDens = Val[Double]
+val rawTEDensRoad = Val[Double]
+val rawTERoadDens = Val[Double]
+val rawTECentrRoad = Val[Double]
+val rawTERoadCentr = Val[Double]
+
+val tTEDensCentre = Val[Double]
+val tTECentreDens = Val[Double]
+val tTEDensRoad = Val[Double]
+val tTERoadDens = Val[Double]
+val tTECentrRoad = Val[Double]
+val tTERoadCentr = Val[Double]
+
+val seed = Val[Int]
+
+val cmds = Seq("setup-headless ${weightDensity} ${weightCenter} ${weightRoad} ${centerNumber} 30 ${seed}","run-experiment")
+
+val model = NetLogo7Task(workDirectory / "HEADLESS_base.nlogox",cmds,embedWorkspace=true) set(
+    (inputs, outputs) += (weightDensity,weightCenter,weightRoad,centerNumber,seed),
+    netLogoOutputs += ("eval-speed", networkSpeed),
+    netLogoOutputs += ("eval-density", localDensity),
+    netLogoOutputs += ("global-density", globalDensity),
+    //netLogoOutputs += ("spatial-autocorrelation-index", moran),
+    netLogoOutputs += ("transfer-entropy-ensemble \"density\" \"centre-distance\" 4 1 50",fullTEDensCentre),
+    netLogoOutputs += ("transfer-entropy-ensemble \"centre-distance\" \"density\" 4 1 50",fullTECentreDens),
+    netLogoOutputs += ("transfer-entropy-ensemble \"density\" \"road-distance\" 4 1 50",fullTEDensRoad),
+    netLogoOutputs += ("transfer-entropy-ensemble \"road-distance\" \"density\" 4 1 50",fullTERoadDens),
+    netLogoOutputs += ("transfer-entropy-ensemble \"centre-distance\" \"road-distance\"  4 1 50",fullTECentrRoad),
+    netLogoOutputs += ("transfer-entropy-ensemble \"road-distance\" \"centre-distance\" 4 1 50",fullTERoadCentr),
+    centerNumber := 1
+)
+
+val getValues = ScalaTask("""
+    |val TEDensCentre = fullTEDensCentre(0); val rawTEDensCentre = fullTEDensCentre(1); val tTEDensCentre = fullTEDensCentre(2)
+    |val TECentreDens = fullTECentreDens(0); val rawTECentreDens = fullTECentreDens(1); val tTECentreDens = fullTECentreDens(2)
+    |val TEDensRoad = fullTEDensRoad(0); val rawTEDensRoad = fullTEDensRoad(1); val tTEDensRoad = fullTEDensRoad(2);
+    |val TERoadDens = fullTERoadDens(0); val rawTERoadDens = fullTERoadDens(1); val tTERoadDens = fullTERoadDens(2);
+    |val TECentrRoad = fullTECentrRoad(0); val rawTECentrRoad = fullTECentrRoad(1); val tTECentrRoad = fullTECentrRoad(2);
+    |val TERoadCentr = fullTERoadCentr(0); val rawTERoadCentr = fullTERoadCentr(1); val tTERoadCentr = fullTERoadCentr(2);
+""".stripMargin) set (
+      (inputs, outputs) += (weightDensity,weightCenter,weightRoad,centerNumber,seed,networkSpeed,localDensity,globalDensity), // moran
+      inputs += (fullTEDensCentre, fullTECentreDens, fullTEDensRoad, fullTERoadDens, fullTECentrRoad, fullTERoadCentr),
+      outputs += (TEDensCentre, rawTEDensCentre, tTEDensCentre, TECentreDens, rawTECentreDens, tTECentreDens, 
+      TEDensRoad, rawTEDensRoad, tTEDensRoad, TERoadDens, rawTERoadDens, tTERoadDens, TECentrRoad, rawTECentrRoad, tTECentrRoad,
+      TERoadCentr, rawTERoadCentr, tTERoadCentr)
+    )
+
+val purpose = "TEST"
+//val purpose = "PSE"
+
+val timestamp = ((new java.text.SimpleDateFormat("yyyyMMdd_HHmmss")).format(new java.util.Date()))
+val resdir = (timestamp+"_"+purpose)
+
+val env = LocalEnvironment(6)
+//val env = EGIEnvironment("vo.complex-systems.eu")
+
+
+PSEEvolution(
+  evaluation = (model--getValues),
+  parallelism = 5,
+  termination = 10,
+  genome = Seq(
+    weightDensity in (0.01,1.0),
+    weightCenter in (0.01,1.0),
+    weightRoad in (0.01,1.0)
+  ),
+  objective = Seq(
+    TEDensCentre in (0.0 to 0.5 by 0.005),
+    TECentreDens  in (0.0 to 0.5 by 0.005),
+    TEDensRoad  in (0.0 to 0.5 by 0.005),
+    TERoadDens  in (0.0 to 0.5 by 0.005),
+    TECentrRoad  in (0.0 to 0.5 by 0.005),
+    TERoadCentr  in (0.0 to 0.5 by 0.005),
+  ),
+  stochastic = Stochastic(seed = seed)//,
+  //distribution = Island(60 minutes)
+) on env hook (workDirectory / "pse" / resdir)//,frequency = 100)
