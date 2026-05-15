@@ -1,0 +1,43 @@
+
+Title
+Quantifying Co-evolution in Urban Systems with Transfer Entropy
+
+Abstract
+Understanding urban systems, either from a theoretical viewpoint or for practical sustainable
+planning applications, often implies intricate dynamics, that can be in some cases with circular
+causalities between populations of agents or objects, be coined as co-evolution [1]. In particular,
+the co-evolution between transportation networks and land-use remains quite unknown, despite
+direct usefulness regarding several Sustainable Development Goals (better accessibility,
+decarbonised transport, limited urban sprawl). A method to characterise co-evolution, and more
+generally the structure of the causal graph between the considered urban system variables, and to
+establish causality regimes either in empirical data or across the parameter space of a simulation
+model, has been proposed [2], based on Granger causalities. This contribution investigates how the
+method can be extended and refined with Transfer Entropy (TE), which provides a more robust and
+non-linear measure of causality. Given two or more time-series of urban dynamics, observed on a
+population of objects, Effective Transfer Entropy between all directional couples of variables are
+estimated on the ensemble (Kraskov estimator implemented in the jidt Java library). We test the
+method on a stylised yet rich model of urban morphogenesis [3], which simulates settlement and
+network growth simultaneously, with weight parameters balancing between the explaining factors
+of future urbanisation (among local density, distance to centre, distance to road network) and with a
+network growth following a simple connection rule. We compute causalities on the population of
+raster cells, and density, distance to centre and distance to roads variables. A first experiment, a grid
+exploration of the model parameter space, provide a broad set of causality regimes, with some
+illustrated in Fig. 1. The TE method appears more systematic and robust than the previous method,
+with some regimes not found significant by lagged correlations before. This confirms that TE is an
+appropriate tool to quantify co-evolution in urban systems, to be further tested on more cases.
+
+Keywords
+Urban Systems
+Co-evolution
+Transfer Entropy
+
+Systems theory, information theory, and systems science
+Self-organization, pattern formation, and collective behavior
+
+Oral
+Lightning Talk
+Poster
+
+Online
+
+
