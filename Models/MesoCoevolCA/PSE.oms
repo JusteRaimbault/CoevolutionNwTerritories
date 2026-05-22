@@ -73,20 +73,20 @@ val getValues = ScalaTask("""
       TERoadCentr, rawTERoadCentr, tTERoadCentr)
     )
 
-val purpose = "TEST"
-//val purpose = "PSE"
+//val purpose = "TEST"
+val purpose = "PSE"
 
 val timestamp = ((new java.text.SimpleDateFormat("yyyyMMdd_HHmmss")).format(new java.util.Date()))
 val resdir = (timestamp+"_"+purpose)
 
-val env = LocalEnvironment(6)
+val env = LocalEnvironment(8)
 //val env = EGIEnvironment("vo.complex-systems.eu")
 
 
 PSEEvolution(
   evaluation = (model--getValues),
-  parallelism = 5,
-  termination = 10,
+  parallelism = 8,
+  termination = 1000,
   genome = Seq(
     weightDensity in (0.01,1.0),
     weightCenter in (0.01,1.0),
@@ -102,4 +102,4 @@ PSEEvolution(
   ),
   stochastic = Stochastic(seed = seed)//,
   //distribution = Island(60 minutes)
-) on env hook (workDirectory / "pse" / resdir)//,frequency = 100)
+) on env hook (workDirectory / "pse" / resdir,frequency = 10)
