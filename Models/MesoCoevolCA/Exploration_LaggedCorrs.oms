@@ -1,0 +1,64 @@
+// variables
+val weightDensity = Val[Double]
+val weightCenter = Val[Double]
+val weightRoad = Val[Double]
+val centerNumber = Val[Int]
+
+// indicators
+val networkSpeed = Val[Double]
+val localDensity = Val[Double]
+val globalDensity = Val[Double]
+//val moran = Val[Double]
+
+// lagged correlation
+val rhoDensCentre = Val[Double]
+val rhoCentreDens = Val[Double]
+val rhoDensRoad = Val[Double]
+val rhoRoadDens = Val[Double]
+val rhoCentrRoad = Val[Double]
+val rhoRoadCentr = Val[Double]
+
+
+val seed = Val[Int]
+
+val cmds = Seq("setup-headless ${weightDensity} ${weightCenter} ${weightRoad} ${centerNumber} 30 ${seed}","run-experiment")
+
+val model = NetLogo7Task(workDirectory / "HEADLESS_base.nlogox",cmds,embedWorkspace=true) set(
+    (inputs, outputs) += (weightDensity,weightCenter,weightRoad,centerNumber,seed),
+    netLogoOutputs += ("eval-speed", networkSpeed),
+    netLogoOutputs += ("eval-density", localDensity),
+    netLogoOutputs += ("global-density", globalDensity),
+    //netLogoOutputs += ("spatial-autocorrelation-index", moran),
+    netLogoOutputs += ("max-lagged-correlation \"density\" \"centre-distance\" 5 0",rhoDensCentre),
+    netLogoOutputs += ("max-lagged-correlation \"centre-distance\" \"density\" 5 0",rhoCentreDens),
+    netLogoOutputs += ("max-lagged-correlation \"density\" \"road-distance\" 5 0",rhoDensRoad),
+    netLogoOutputs += ("max-lagged-correlation \"road-distance\" \"density\" 5 0",rhoRoadDens),
+    netLogoOutputs += ("max-lagged-correlation \"centre-distance\" \"road-distance\"  5 0",rhoCentrRoad),
+    netLogoOutputs += ("max-lagged-correlation \"road-distance\" \"centre-distance\" 5 0",rhoRoadCentr),
+    centerNumber := 1
+)
+
+
+//val purpose = "TEST"
+val purpose = "EXPLORATION_LAGGEDCORRS"
+
+val timestamp = ((new java.text.SimpleDateFormat("yyyyMMdd_HHmmss")).format(new java.util.Date()))
+val resdir = (timestamp+"_"+purpose)
+
+//val env = LocalEnvironment(6)
+val env = MiniClustEnvironment("jraimbault","https://babar.openmole.org", time = 3 hours)
+
+
+DirectSampling(
+  evaluation = model,
+  sampling = (
+     // (weightDensity is 0.5) x (weightCenter is 0.5) x (weightRoad is 0.5) x (seed is 42)
+    (weightDensity in (0.0 to 1.0 by 0.5)) x
+    (weightCenter in (0.0 to 1.0 by 0.5)) x
+    (weightRoad in (0.0 to 1.0 by 0.5)) x 
+    (seed in RandomSequence[Int](max = 100000, size = 10))
+  ) filter ("weightDensity + weightCenter + weightRoad > 0.0")
+) on env hook (workDirectory / "exploration" / resdir)
+
+
+

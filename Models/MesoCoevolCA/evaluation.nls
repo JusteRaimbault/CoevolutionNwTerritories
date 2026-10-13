@@ -72,6 +72,8 @@ to-report average-transfer-entropy [var1 var2 k tau]
   report mean te
 end
 
+;;
+; Ensemble transfer entropy between var1 and var2, with param k (for TransferEntropyCalculatorKraskov ), delay tau, "bootstrap" B (surrogate null distribution)
 to-report transfer-entropy-ensemble [var1 var2 k tau B]
   let current-time ticks
   let allX [] let allY []
@@ -89,6 +91,23 @@ to-report transfer-entropy-ensemble [var1 var2 k tau B]
     ]
   ]]
   report transferentropy:transfer-entropy-ensemble allX allY k tau B
+end
+
+;;
+; use only with tau > 1, otherwise for tau = 1 use transfer-entropy-ensemble
+to-report max-transfer-entropy-ensemble [var1 var2 k taumax B]
+  let temax 0
+  let tau 1
+  let res []
+  repeat taumax [
+    let current-te transfer-entropy-ensemble var1 var2 k tau B
+    if item 0 current-te > temax [
+      set res current-te
+      set temax item 0 current-te
+    ]
+    set tau tau + 1
+  ]
+  report res
 end
 
 
@@ -109,6 +128,18 @@ to-report lagged-correlation [var1 var2 tau t0]
   ]
   let mx mean x set x map [? -> ? - mx] x let my mean y set y map [? -> ? - my] y
   report mean (list-times-element-wise x y) / (standard-deviation x * standard-deviation y)
+end
+
+to-report max-lagged-correlation [var1 var2 taumax t0]
+  let res []
+  let tau 1
+  repeat taumax [
+    set res lput (lagged-correlation var1 var2 tau t0) res
+    set tau tau + 1
+  ]
+  let mi min res
+  let ma max res
+  ifelse abs mi > abs ma [report mi][report ma]
 end
 
 
